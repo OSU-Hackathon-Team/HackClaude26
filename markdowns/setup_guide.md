@@ -1,49 +1,65 @@
-# Developer Setup Guide: OncoPath Sandbox
+# Developer Setup Guide: OncoPath
 
-This guide provides the technical foundation for executing the 12-week OncoPath roadmap.
+## 1. Local prerequisites
 
-## 1. Data Acquisition (CRITICAL)
-Your work involves two distinct data layers:
+- Python 3.9+
+- Node.js 18+
 
-### Clinical Layer (Phase 1 Ready)
-- **File:** `data.tsv` (already in root)
-- **Content:** Patient age, sex, primary site, and metastatic target labels.
+## 2. Python environment
 
-### Genomic Layer (Required for Phase 2)
-- **Action:** Download the Full Study Archive.
-- **Source Link:** [msk_met_2021.tar.gz (cBioPortal)](https://datahub.assets.cbioportal.org/msk_met_2021.tar.gz)
-- **File to Extract:** `data_mutations_extended.txt`.
-
-## 2. Environment Configuration
-```powershell
-# Create & Activate Virtual Env
-python -m venv venv
-.\venv\Scripts\Activate
-
-# Install Production Dependencies
-pip install pandas numpy scikit-learn xgboost shap fastapi uvicorn pydantic
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install pandas numpy scikit-learn xgboost fastapi uvicorn pydantic joblib streamlit plotly requests
 ```
 
-## 3. File Architecture
+## 3. Frontend environment
+
+```bash
+cd oncopath-next
+npm ci
+```
+
+## 4. Runtime configuration
+
+Backend:
+
+- `ONCOPATH_MODEL_DIR` (optional, default: `<repo>/models`)
+- `ONCOPATH_CORS_ORIGINS` (optional, comma-separated)
+
+Frontend:
+
+- `NEXT_PUBLIC_API_BASE_URL` (optional, default: `http://127.0.0.1:8000`)
+
+## 5. Run services
+
+Backend:
+
+```bash
+python scripts/api_service.py
+```
+
+Frontend:
+
+```bash
+cd oncopath-next
+npm run dev
+```
+
+Streamlit client (optional):
+
+```bash
+python scripts/app_frontend.py
+```
+
+## 6. Core repository layout
+
 ```text
 CancerPrediction/
-├── baseline_analytics.py # Establishing the Phase 1 benchmark
-├── data_dictionary.md   # Feature/Header mapping
-├── master_doc.md        # Vision and scientific grounding
-├── roadmap.md           # 12-week sprint plan
-├── setup_guide.md       # This document
-└── data.tsv             # Primary data source
+├── scripts/inference_api/   # canonical FastAPI inference modules
+├── scripts/api_service.py   # backend entrypoint
+├── oncopath-next/           # Next.js frontend
+├── models/                  # trained model artifacts
+├── data/                    # dataset and anatomy assets
+└── markdowns/               # docs
 ```
-
-## 4. Verification Milestone
-Before starting Phase 1, ensure you can run:
-```python
-import pandas as pd
-df = pd.read_csv('data.tsv', sep='\t')
-print(df['Primary Tumor Site'].value_counts().head())
-```
-*If this prints the top cancer types (Lung, Colorectal, etc.), your clinical layer is healthy.*
-
----
-> [!TIP]
-> Always treat the `Sample ID` as the unique key when merging the genomic layer in Phase 2.

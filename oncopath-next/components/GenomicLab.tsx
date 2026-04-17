@@ -6,10 +6,8 @@ import {
     Label, Input, Select, SelectItem,
     Slider, ScrollArea, Badge, ToggleSwitch
 } from '@/components/ui';
+import { DRIVER_GENES, OTHER_MUTATION_GENES } from '@/lib/simulation-config';
 import { Activity, Dna, User } from 'lucide-react';
-
-const SUPERSTAR_GENES = ["TP53", "KRAS", "APC", "PIK3CA", "ARID1A", "FGA"];
-const OTHER_GENES = ["PTEN", "EGFR", "KMT2D", "ATM", "RB1"];
 
 interface GenomicLabProps {
     profile: PatientProfile;
@@ -17,7 +15,7 @@ interface GenomicLabProps {
 }
 
 export function GenomicLab({ profile, onChange }: GenomicLabProps) {
-    const updateField = (field: keyof PatientProfile, value: any) => {
+    const updateField = <K extends keyof PatientProfile>(field: K, value: PatientProfile[K]) => {
         onChange({ ...profile, [field]: value });
     };
 
@@ -112,7 +110,7 @@ export function GenomicLab({ profile, onChange }: GenomicLabProps) {
                             <div className="space-y-2.5">
                                 <h4 className="text-[10px] font-semibold text-blue-400/80 uppercase tracking-wider">Driver Genes</h4>
                                 <div className="space-y-1">
-                                    {SUPERSTAR_GENES.map((gene) => (
+                                    {DRIVER_GENES.map((gene) => (
                                         <div key={gene} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-800/30 transition-colors">
                                             <label htmlFor={`gene-${gene}`} className="text-xs font-medium cursor-pointer text-slate-300">{gene}</label>
                                             <ToggleSwitch
@@ -131,7 +129,7 @@ export function GenomicLab({ profile, onChange }: GenomicLabProps) {
                             <div className="space-y-2.5">
                                 <h4 className="text-[10px] font-semibold text-emerald-400/80 uppercase tracking-wider">Other Mutations</h4>
                                 <div className="space-y-1">
-                                    {OTHER_GENES.map((gene) => (
+                                    {OTHER_MUTATION_GENES.map((gene) => (
                                         <div key={gene} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-800/30 transition-colors">
                                             <label htmlFor={`gene-${gene}`} className="text-xs font-medium cursor-pointer text-slate-300">{gene}</label>
                                             <ToggleSwitch
