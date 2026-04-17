@@ -1,0 +1,23 @@
+{
+  "DMETS_DX_CNS_BRAIN": {"label": "Brain", "region": "Head", "system": "Nervous"},
+  "DMETS_DX_MEDIASTINUM": {"label": "Mediastinum", "region": "Chest", "system": "Respiratory"},
+  "DMETS_DX_PNS": {"label": "PNS", "region": "Nervous System", "system": "Nervous"},
+  "DMETS_DX_BONE": {"label": "Bone", "region": "Skeletal", "system": "Musculoskeletal"},
+  "DMETS_DX_PLEURA": {"label": "Pleura", "region": "Chest", "system": "Respiratory"},
+  "DMETS_DX_LUNG": {"label": "Lung", "region": "Chest", "system": "Respiratory"},
+  "DMETS_DX_HEAD_NECK": {"label": "Head/Neck", "region": "Head", "system": "Multiple"},
+  "DMETS_DX_KIDNEY": {"label": "Kidney", "region": "Abdomen", "system": "Urinary"},
+  "DMETS_DX_LIVER": {"label": "Liver", "region": "Abdomen", "system": "Digestive"},
+  "DMETS_DX_DIST_LN": {"label": "Distant LN", "region": "Lymphatic", "system": "Immune"},
+  "DMETS_DX_UNSPECIFIED": {"label": "Unspecified", "region": "Unknown", "system": "Unknown"},
+  "DMETS_DX_ADRENAL_GLAND": {"label": "Adrenal Gland", "region": "Abdomen", "system": "Endocrine"},
+  "DMETS_DX_SKIN": {"label": "Skin", "region": "Integumentary", "system": "Integumentary"},
+  "DMETS_DX_BILIARY_TRACT": {"label": "Biliary Tract", "region": "Abdomen", "system": "Digestive"},
+  "DMETS_DX_INTRA_ABDOMINAL": {"label": "Intra-Abdominal", "region": "Abdomen", "system": "Digestive"},
+  "DMETS_DX_MALE_GENITAL": {"label": "Male Genital", "region": "Pelvis", "system": "Reproductive"},
+  "DMETS_DX_BREAST": {"label": "Breast", "region": "Chest", "system": "Reproductive"},
+  "DMETS_DX_BLADDER_UT": {"label": "Bladder", "region": "Pelvis", "system": "Urinary"},
+  "DMETS_DX_BOWEL": {"label": "Bowel", "region": "Abdomen", "system": "Digestive"},
+  "DMETS_DX_OVARY": {"label": "Ovary", "region": "Pelvis", "system": "Reproductive"},
+  "DMETS_DX_FEMALE_GENITAL": {"label": "Female Genital", "region": "Pelvis", "system": "Reproductive"}
+}

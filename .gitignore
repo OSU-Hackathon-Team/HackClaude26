@@ -1,0 +1,33 @@
+# Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data files
+data.gz
+data_clean.tsv
+*.tsv
+*.csv
+*.gz
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-specific
+txts/
+clean_headers.txt
+clean_sample.txt
+requirements.txt
