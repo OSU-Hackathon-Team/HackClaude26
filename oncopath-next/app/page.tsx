@@ -4,8 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { GenomicLab } from '@/components/GenomicLab';
 import { MetastaticHeatmap } from '@/components/MetastaticHeatmap';
 import { PatientProfile, simulateRisk } from '@/lib/api';
-import { INITIAL_PROFILE } from '@/lib/simulation-config';
 import { AlertCircle, Terminal, HelpCircle } from 'lucide-react';
+
+const INITIAL_PROFILE: PatientProfile = {
+  age: 65,
+  sex: "Male",
+  primary_site: "Lung",
+  oncotree_code: "LUAD",
+  mutations: { "TP53": 1, "KRAS": 1 }
+};
 
 export default function Home() {
   const [profile, setProfile] = useState<PatientProfile>(INITIAL_PROFILE);
@@ -20,9 +27,8 @@ export default function Home() {
         setError(null);
         const result = await simulateRisk(profile);
         setRisks(result.simulated_risks);
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Failed to connect to backend";
-        setError(message);
+      } catch (err: any) {
+        setError(err.message || "Failed to connect to backend");
       } finally {
         setLoading(false);
       }

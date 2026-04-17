@@ -1,86 +1,67 @@
-# OncoPath
+# OncoPath: Multimodal Cancer Metastasis Risk Prediction
 
-OncoPath predicts organ-specific metastatic risk from a patient profile and mutation set. The repo now uses a single inference contract shared by the FastAPI backend and the Next.js frontend.
+OncoPath is a state-of-the-art AI-driven platform designed to predict organ-specific metastatic risks for cancer patients. By integrating longitudinal clinical data with genomic mutation profiles from the MSK-MET dataset, OncoPath provides clinicians and researchers with real-time "What-If" simulations to understand how specific genetic mutations influence cancer progression across 21 different anatomical sites.
 
-## Core architecture
+## 🚀 Key Features
 
-- `scripts/inference_api/`: canonical FastAPI inference service modules (settings, schemas, loading, simulation logic).
-- `scripts/api_service.py`: compatibility entrypoint (`python scripts/api_service.py`).
-- `oncopath-next/`: web frontend and typed API client.
-- `models/`: trained model artifacts (`clinical_*`, `genomic_features`, `model_*.joblib`).
-- `data/`: source data and anatomy metadata.
+- **Real-Time Simulation:** Interactive "What-If" engine to observe risk changes based on genomic alterations (e.g., TP53, KRAS mutations).
+- **Multimodal Integration:** Combines clinical features (Age, Sex, Primary Site) with high-dimensional genomic data.
+- **Site-Specific Intelligence:** 21 individual XGBoost models optimized for specific metastatic targets (Adrenal Gland, Liver, Lung, Bone, etc.).
+- **Model Interpretability:** Uses SHAP (SHapley Additive exPlanations) to provide transparent reasoning for risk predictions.
+- **Anatomical Visualization:** Interactive 2D/3D heatmaps for intuitive risk assessment across the entire body.
 
-## Canonical inference interface
+## 🛠️ Tech Stack
 
-- **Primary endpoint:** `POST /simulate`
-- **Compatibility alias:** `POST /predict` (deprecated alias to `/simulate`)
+- **Frontend:** [Next.js](https://nextjs.org/), React, [Tailwind CSS](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/), [Three.js](https://threejs.org/).
+- **Backend:** [FastAPI](https://fastapi.tiangolo.com/), Python, XGBoost, Scikit-learn, [SHAP](https://shap.readthedocs.io/en/latest/).
+- **Deployment:** Vercel (Frontend), FastAPI/Uvicorn (Backend).
 
-Request body:
+## 📁 Project Structure
 
-```json
-{
-  "age": 65,
-  "sex": "Male",
-  "primary_site": "Lung",
-  "oncotree_code": "LUAD",
-  "mutations": {
-    "TP53": 1,
-    "KRAS": 1
-  }
-}
-```
+- `oncopath-next/`: Modern Next.js application for the interactive dashboard.
+- `scripts/`: Python implementation for data processing, model training, and the API service.
+  - `api_service.py`: FastAPI server for real-time inference.
+  - `train_iteration_3.py`: Automated ML pipeline for multi-site model training.
+- `models/`: Serialized models and preprocessing artifacts (`joblib`).
+- `data/`: Multi-omic datasets and diagnostic reports.
 
-Response body:
+## 🚦 Getting Started
 
-```json
-{
-  "patient_age": 65,
-  "primary_site": "Lung",
-  "simulated_risks": {
-    "DMETS_DX_LIVER": 0.41,
-    "DMETS_DX_BONE": 0.52
-  }
-}
-```
+### Prerequisites
 
-Validation errors return:
+- Node.js (v18+)
+- Python (3.9+)
 
-```json
-{
-  "detail": {
-    "code": "invalid_profile",
-    "message": "Mutation value for 'TP53' must be 0 or 1."
-  }
-}
-```
-
-## Run locally
-
-### Backend (FastAPI)
+### 1. Backend Setup
 
 ```bash
-pip install pandas numpy scikit-learn xgboost fastapi uvicorn pydantic joblib
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the Risk Simulator API
 python scripts/api_service.py
 ```
 
-Optional backend environment variables:
-
-- `ONCOPATH_MODEL_DIR` (default: `<repo>/models`)
-- `ONCOPATH_CORS_ORIGINS` (comma-separated, default: `http://localhost:3000`)
-
-### Frontend (Next.js)
+### 2. Frontend Setup
 
 ```bash
 cd oncopath-next
-npm ci
+
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
 ```
 
-Optional frontend environment variable:
+The application will be available at `http://localhost:3000`.
 
-- `NEXT_PUBLIC_API_BASE_URL` (default: `http://127.0.0.1:8000`)
+## 🧬 Model Training & Evaluation
 
-## Documentation map
+Our models are audited for "Genomic Lift"—measuring the performance improvement when adding genetic data to clinical-only baselines. The pipeline utilizes:
+- **Dynamic Discovery:** Automatically identifies valid targets with sufficient sample sizes.
+- **Strict Leakage Prevention:** Ensures reliable evaluation by purging metadata not available at the time of sequencing.
+- **Cross-Validation:** 5-fold stratified CV for robust accuracy reports.
 
-- `markdowns/api_specs.md`: authoritative API contract and error model.
-- `markdowns/README.md`: doc index and historical doc pointers.
+---
+*Created by [Jason Seh](https://linkedin.com/in/jason-seh)*

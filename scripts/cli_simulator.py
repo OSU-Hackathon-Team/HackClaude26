@@ -15,11 +15,10 @@ LEARNING POINTS:
 """
 
 import requests
+import json
 import os
-from urllib.parse import urljoin
 
-API_BASE_URL = os.getenv("ONCOPATH_API_BASE_URL", "http://127.0.0.1:8000").rstrip("/") + "/"
-API_URL = urljoin(API_BASE_URL, "simulate")
+API_URL = "http://127.0.0.1:8000/simulate"
 
 def run_simulation(age, sex, site, code, mutations):
     payload = {
@@ -73,7 +72,7 @@ if __name__ == "__main__":
     mock_patient = {
         "age": 68,
         "sex": "Male",
-        "primary_site": "Lung",
+        "primary_site": "",
         "oncotree_code": "LUAD",
         "mutations": {}
     }

@@ -21,21 +21,17 @@ import pandas as pd
 import plotly.express as px
 import json
 import os
-from pathlib import Path
-from urllib.parse import urljoin
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="OncoPath | Metastatic HUD", page_icon="🌡️", layout="wide")
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-API_BASE_URL = os.getenv("ONCOPATH_API_BASE_URL", "http://127.0.0.1:8000").rstrip("/") + "/"
-API_URL = urljoin(API_BASE_URL, "simulate")
-ANATOMY_PATH = PROJECT_ROOT / "data" / "anatomy_mapping.json"
+API_URL = "http://127.0.0.1:8000/simulate"
+ANATOMY_PATH = r'c:\Users\pohfe\OneDrive - The Ohio State University\Desktop\Coding Projects\CancerPrediction\data\anatomy_mapping.json'
 
 # --- LOAD ASSETS ---
 @st.cache_data
 def load_anatomy():
-    with open(ANATOMY_PATH, "r", encoding="utf-8") as f:
+    with open(ANATOMY_PATH, 'r') as f:
         return json.load(f)
 
 anatomy_map = load_anatomy()

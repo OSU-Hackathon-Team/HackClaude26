@@ -1,80 +1,54 @@
-# OncoPath Inference API Specification
+# API Specification (Draft): OncoPath "What-If" Engine
 
-The inference service is implemented in `scripts/inference_api/` and exposed via `scripts/api_service.py`.
+The OncoPath API is built with **FastAPI** to provide real-time metastatic risk simulations based on hypothetical patient profiles.
 
-## Endpoints
+## Endpoint: `POST /predict`
 
-### `POST /simulate` (canonical)
-
-Request body:
-
+### Request Body (JSON)
 ```json
 {
-  "age": 62,
+  "age_at_sequencing": 62,
   "sex": "Female",
   "primary_site": "Lung",
   "oncotree_code": "LUAD",
-  "mutations": {
-    "TP53": 1,
-    "KRAS": 0,
-    "EGFR": 1
+  "genomic_markers": {
+    "tp53": 1,
+    "kras": 0,
+    "egfr": 1,
+    "msi_score": 1.2,
+    "tmb": 5.4,
+    "fga": 0.35
   }
 }
 ```
 
-Response body:
-
+### Response Body (JSON)
 ```json
 {
-  "patient_age": 62,
-  "primary_site": "Lung",
-  "simulated_risks": {
-    "DMETS_DX_LIVER": 0.45,
-    "DMETS_DX_LUNG": 0.12,
-    "DMETS_DX_BONE": 0.38,
-    "DMETS_DX_CNS_BRAIN": 0.05
+  "prediction_id": "uuid-1234",
+  "status": "success",
+  "risk_scores": {
+    "liver": 0.45,
+    "lung": 0.12,
+    "bone": 0.38,
+    "brain": 0.05
+  },
+  "confidence_metrics": {
+    "standard_deviation": 0.03,
+    "calibration_score": 0.92
+  },
+  "shap_values": {
+    "egfr_positive": 0.15,
+    "age_62": -0.02,
+    "luad_histology": 0.08
   }
 }
 ```
 
-### `POST /predict` (deprecated compatibility alias)
-
-Accepts the same request body and returns the same response as `/simulate`.
-
-### `GET /` and `GET /health`
-
-Response body:
-
-```json
-{
-  "status": "online",
-  "model_count": 21,
-  "models_loaded": [
-    "DMETS_DX_LIVER",
-    "DMETS_DX_LUNG"
-  ]
-}
-```
-
-## Error model
-
-For request validation errors produced by the service:
-
-```json
-{
-  "detail": {
-    "code": "invalid_profile",
-    "message": "Mutation value for 'TP53' must be 0 or 1."
-  }
-}
-```
-
-## Environment variables
-
-- `ONCOPATH_MODEL_DIR`: optional absolute or project-relative model artifact directory.
-- `ONCOPATH_CORS_ORIGINS`: optional comma-separated CORS origins.
+## Explainability Layer
+The `shap_values` object in the response body will power the frontend visualization (e.g., force plots or waterfall charts), showing the user which features contributed most to the calculated risk for the selected organ.
 
 ---
 
 > [!WARNING]
-> This API is a research sandbox tool for simulated "What-If" scenarios and is not a clinical decision system.
+> This API is a research sandbox tool. All requests must be treated as simulated "What-If" scenarios and not as clinical commands.
