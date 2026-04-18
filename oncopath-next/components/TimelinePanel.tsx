@@ -1,0 +1,361 @@
+'use client';
+
+import React, { useMemo } from 'react';
+import { AlertCircle, ActivitySquare } from 'lucide-react';
+import { Select, SelectItem, Slider } from '@/components/ui';
+import type { PredictionSnapshot } from '@/lib/api';
+import {
+  DEFAULT_TIMELINE_MONTHS,
+  getTimelinePointAtMonth,
+  TIMELINE_TREATMENT_PRESETS,
+  type TimelinePoint,
+  type TreatmentPresetId,
+} from '@/lib/timeline';
+
+interface OrganOption {
+  key: string;
+  label: string;
+}
+
+interface TimelinePanelProps {
+  organOptions: OrganOption[];
+  selectedOrgan: string;
+  selectedTreatment: TreatmentPresetId;
+  selectedMonth: number;
+  timeline: TimelinePoint[];
+  timelineSource: 'local' | 'backend';
+  baselineRisk: number | null;
+  prediction: PredictionSnapshot | null;
+  onOrganChange: (organ: string) => void;
+  onTreatmentChange: (treatment: TreatmentPresetId) => void;
+  onMonthChange: (month: number) => void;
+}
+
+const CHART_WIDTH = 640;
+const CHART_HEIGHT = 220;
+const CHART_PADDING_X = 44;
+const CHART_PADDING_Y = 24;
+const TREATMENT_IDS = new Set<string>(TIMELINE_TREATMENT_PRESETS.map((preset) => preset.id));
+
+function asPercent(risk: number): string {
+  return `${Math.round(risk * 100)}%`;
+}
+
+export function TimelinePanel({
+  organOptions,
+  selectedOrgan,
+  selectedTreatment,
+  selectedMonth,
+  timeline,
+  timelineSource,
+  baselineRisk,
+  prediction,
+  onOrganChange,
+  onTreatmentChange,
+  onMonthChange,
+}: TimelinePanelProps) {
+  const selectedOrganLabel = useMemo(
+    () => organOptions.find((option) => option.key === selectedOrgan)?.label ?? selectedOrgan,
+    [organOptions, selectedOrgan]
+  );
+
+  const maxMonth = timeline.length
+    ? timeline[timeline.length - 1].month
+    : DEFAULT_TIMELINE_MONTHS;
+  const clampedMonth = Math.min(Math.max(selectedMonth, 0), maxMonth);
+  const activePoint = getTimelinePointAtMonth(timeline, clampedMonth);
+
+  const chart = useMemo(() => {
+    if (!timeline.length) {
+      return null;
+    }
+
+    const toX = (month: number) =>
+      CHART_PADDING_X + (month / Math.max(maxMonth, 1)) * (CHART_WIDTH - CHART_PADDING_X * 2);
+    const toY = (risk: number) =>
+      CHART_HEIGHT - CHART_PADDING_Y - risk * (CHART_HEIGHT - CHART_PADDING_Y * 2);
+
+    const linePoints = timeline.map((point) => `${toX(point.month)},${toY(point.risk)}`).join(' ');
+    const firstPoint = timeline[0];
+    const lastPoint = timeline[timeline.length - 1];
+    const areaPath = [
+      `M ${toX(firstPoint.month)} ${toY(0)}`,
+      `L ${toX(firstPoint.month)} ${toY(firstPoint.risk)}`,
+      ...timeline.map((point) => `L ${toX(point.month)} ${toY(point.risk)}`),
+      `L ${toX(lastPoint.month)} ${toY(0)}`,
+      'Z',
+    ].join(' ');
+
+    const marker =
+      activePoint === null
+        ? null
+        : {
+            x: toX(activePoint.month),
+            y: toY(activePoint.risk),
+          };
+
+    return { linePoints, areaPath, marker, toX, toY };
+  }, [activePoint, maxMonth, timeline]);
+
+  const monthTicks = useMemo(() => {
+    const ticks = [0, Math.round(maxMonth * 0.25), Math.round(maxMonth * 0.5), Math.round(maxMonth * 0.75), maxMonth];
+    return Array.from(new Set(ticks)).sort((a, b) => a - b);
+  }, [maxMonth]);
+
+  const confidenceEntries = useMemo(() => {
+    return Object.entries(prediction?.confidence_metrics ?? {}).sort((a, b) => b[1] - a[1]);
+  }, [prediction?.confidence_metrics]);
+
+  const shapEntries = useMemo(() => {
+    return Object.entries(prediction?.shap_values ?? {})
+      .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+      .slice(0, 5);
+  }, [prediction?.shap_values]);
+
+  const hasOrganOptions = organOptions.length > 0;
+  const sourceLabel = timelineSource === 'backend' ? 'Backend Projection' : 'Simulated Projection';
+
+  return (
+    <section className="border-t border-slate-800/40 bg-[#060d1a]/90 backdrop-blur-sm px-6 py-4 z-20">
+      <div className="grid grid-cols-1 xl:grid-cols-[300px_1fr_330px] gap-4 items-start">
+        <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4 space-y-4">
+          <div>
+            <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Timeline Controls</h3>
+            <p className="text-[10px] text-slate-500 mt-1">Select organ, treatment, and month horizon.</p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Organ</label>
+            <Select
+              value={selectedOrgan}
+              onValueChange={(value) => {
+                onOrganChange(value);
+                onMonthChange(0);
+              }}
+            >
+              {organOptions.map((option) => (
+                <SelectItem key={option.key} value={option.key}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Treatment</label>
+            <Select
+              value={selectedTreatment}
+              onValueChange={(value) => {
+                if (TREATMENT_IDS.has(value)) {
+                  onTreatmentChange(value as TreatmentPresetId);
+                  onMonthChange(0);
+                }
+              }}
+            >
+              {TIMELINE_TREATMENT_PRESETS.map((preset) => (
+                <SelectItem key={preset.id} value={preset.id}>
+                  {preset.label}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+              <span>Month</span>
+              <span className="text-blue-400 font-mono">{clampedMonth}</span>
+            </div>
+            <Slider
+              value={[clampedMonth]}
+              min={0}
+              max={Math.max(maxMonth, 1)}
+              step={1}
+              onValueChange={([value]) => onMonthChange(value)}
+              className={!hasOrganOptions ? 'opacity-40 pointer-events-none' : ''}
+            />
+          </div>
+
+          {activePoint && baselineRisk !== null ? (
+            <div className="rounded-lg border border-slate-700/60 bg-slate-900/60 p-3 space-y-1.5">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Baseline</span>
+                <span className="font-mono text-slate-200">{asPercent(baselineRisk)}</span>
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Month {activePoint.month}</span>
+                <span className="font-mono text-blue-300">{asPercent(activePoint.risk)}</span>
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Delta</span>
+                <span className="font-mono text-emerald-300">
+                  {`${activePoint.risk >= baselineRisk ? '+' : ''}${Math.round(
+                    (activePoint.risk - baselineRisk) * 100
+                  )}%`}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-amber-500/30 bg-amber-950/30 px-3 py-2 text-[10px] text-amber-200">
+              No baseline risk available for this organ selection.
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                <ActivitySquare size={14} className="text-blue-400" />
+                {selectedOrganLabel || 'Projection Curve'}
+              </h3>
+              <p className="text-[10px] text-slate-500 mt-1">
+                Month marker drives active anatomical risk value.
+              </p>
+            </div>
+            <span
+              className={`text-[10px] uppercase tracking-wider font-semibold rounded-md px-2 py-1 border ${
+                timelineSource === 'backend'
+                  ? 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10'
+                  : 'text-blue-300 border-blue-500/30 bg-blue-500/10'
+              }`}
+            >
+              {sourceLabel}
+            </span>
+          </div>
+
+          {!hasOrganOptions ? (
+            <div className="h-[220px] rounded-lg border border-slate-700/50 bg-slate-950/50 flex items-center justify-center px-6 text-center">
+              <p className="text-xs text-slate-400">
+                No baseline risk scores are available yet. Run a prediction to unlock timeline projections.
+              </p>
+            </div>
+          ) : baselineRisk === null ? (
+            <div className="h-[220px] rounded-lg border border-amber-500/30 bg-amber-950/20 flex items-center justify-center px-6 text-center gap-2">
+              <AlertCircle size={14} className="text-amber-300" />
+              <p className="text-xs text-amber-100">
+                Selected organ has no baseline risk. Choose another organ with a valid risk score.
+              </p>
+            </div>
+          ) : !chart ? (
+            <div className="h-[220px] rounded-lg border border-slate-700/50 bg-slate-950/50 flex items-center justify-center">
+              <p className="text-xs text-slate-400">Projection curve not available.</p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-slate-700/50 bg-slate-950/40 p-2">
+              <svg
+                viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+                className="w-full h-[220px]"
+                role="img"
+                aria-label="Risk projection over time"
+              >
+                {[0, 0.25, 0.5, 0.75, 1].map((level) => (
+                  <line
+                    key={`grid-${level}`}
+                    x1={CHART_PADDING_X}
+                    y1={chart.toY(level)}
+                    x2={CHART_WIDTH - CHART_PADDING_X}
+                    y2={chart.toY(level)}
+                    stroke="rgba(100,116,139,0.22)"
+                    strokeWidth={1}
+                  />
+                ))}
+                {monthTicks.map((tick) => (
+                  <line
+                    key={`tick-${tick}`}
+                    x1={chart.toX(tick)}
+                    y1={CHART_HEIGHT - CHART_PADDING_Y}
+                    x2={chart.toX(tick)}
+                    y2={CHART_PADDING_Y}
+                    stroke="rgba(100,116,139,0.2)"
+                    strokeWidth={1}
+                  />
+                ))}
+                <path d={chart.areaPath} fill="rgba(59,130,246,0.14)" />
+                <polyline
+                  fill="none"
+                  stroke="rgb(96,165,250)"
+                  strokeWidth={3}
+                  points={chart.linePoints}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {chart.marker && (
+                  <>
+                    <line
+                      x1={chart.marker.x}
+                      y1={CHART_HEIGHT - CHART_PADDING_Y}
+                      x2={chart.marker.x}
+                      y2={CHART_PADDING_Y}
+                      stroke="rgba(147,197,253,0.7)"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 4"
+                    />
+                    <circle cx={chart.marker.x} cy={chart.marker.y} r={6} fill="rgb(191,219,254)" />
+                    <circle cx={chart.marker.x} cy={chart.marker.y} r={10} fill="rgba(59,130,246,0.25)" />
+                  </>
+                )}
+              </svg>
+              <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500 px-2">
+                <span>Month 0</span>
+                <span>Month {maxMonth}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4 space-y-3">
+          <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Explainability</h3>
+
+          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3 space-y-1">
+            <div className="flex justify-between text-[10px] text-slate-400">
+              <span>Prediction ID</span>
+              <span className="font-mono text-slate-200">{prediction?.prediction_id ?? 'Not available'}</span>
+            </div>
+            <div className="flex justify-between text-[10px] text-slate-400">
+              <span>Status</span>
+              <span className="font-mono text-slate-200">{prediction?.status ?? 'Not available'}</span>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
+              Confidence Metrics
+            </div>
+            {confidenceEntries.length ? (
+              <div className="space-y-1.5">
+                {confidenceEntries.slice(0, 4).map(([key, value]) => (
+                  <div key={key} className="flex justify-between text-[10px] text-slate-300">
+                    <span className="truncate pr-2">{key}</span>
+                    <span className="font-mono text-emerald-300">{value.toFixed(3)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
+              SHAP Values
+            </div>
+            {shapEntries.length ? (
+              <div className="space-y-1.5">
+                {shapEntries.map(([key, value]) => (
+                  <div key={key} className="flex justify-between text-[10px] text-slate-300">
+                    <span className="truncate pr-2">{key}</span>
+                    <span className={`font-mono ${value >= 0 ? 'text-rose-300' : 'text-cyan-300'}`}>
+                      {value.toFixed(4)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
