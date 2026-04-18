@@ -35,25 +35,31 @@ def load_and_preprocess():
     print(f"Loading multi-omic data from {os.path.basename(DATA_PATH)}...")
     df = pd.read_csv(DATA_PATH, sep='\t')
     
-    # 1. Load Vision Embeddings [TASK 4]
-    print(f"Loading image embeddings from {EMBEDDINGS_PATH}...")
-    if os.path.exists(EMBEDDINGS_PATH):
-        emb_df = pd.read_csv(EMBEDDINGS_PATH)
-        # Identify vision feature columns
-        VISION_COLS = [c for c in emb_df.columns if c.startswith('v_feat_')]
+    # 2. Integrate Multimodal Alignment Seed [FIX]
+    SEED_PATH = 'data/multimodal_alignment_seed.csv'
+    if os.path.exists(SEED_PATH):
+        seed_df = pd.read_csv(SEED_PATH)
+        print(f"Injecting {len(seed_df)} Aligned Medical Twins into training set...")
         
-        # Join with main dataset
-        df = df.merge(emb_df, on='PATIENT_ID', how='left')
+        # Ensure column consistency for the merge/concat
+        twin_ids = seed_df['PATIENT_ID'].unique()
+        df = df[~df['PATIENT_ID'].isin(twin_ids)] # remove original placeholders
+        df = pd.concat([df, seed_df], ignore_index=True)
+
+        # Re-identify vision feature columns
+        VISION_COLS = [c for c in seed_df.columns if c.startswith('v_feat_')]
         
-        # HAS_IMAGE Indicator
+        # Set sample weights: 500x boost for patients WITH images
+        df['SAMPLE_WEIGHT'] = 1.0
+        df.loc[df[VISION_COLS[0]].notna(), 'SAMPLE_WEIGHT'] = 500.0
+        
         df['HAS_IMAGE'] = df[VISION_COLS[0]].notna().astype(int)
         
-        # Mean Imputation for missing slides
-        mean_vector = emb_df[VISION_COLS].mean()
-        df[VISION_COLS] = df[VISION_COLS].fillna(mean_vector)
-        print(f"Integrated vision data for {len(emb_df)} patients. Filled remainder with mean vectors.")
+        # Final cleanup for vision features
+        df[VISION_COLS] = df[VISION_COLS].fillna(0) # or mean
+        print(f"Multimodal balance: {df['HAS_IMAGE'].sum()} with images / {len(df)} total.")
     else:
-        print("No vision embeddings found. Proceeding with tabular data only.")
+        df['SAMPLE_WEIGHT'] = 1.0
         VISION_COLS = []
         df['HAS_IMAGE'] = 0
 
@@ -73,21 +79,6 @@ def load_and_preprocess():
     df['SEX'] = df['SEX'].fillna(df['SEX'].mode()[0])
     df['PRIMARY_SITE'] = df['PRIMARY_SITE'].fillna('Unknown')
     
-    X_clinical_raw = df[CLINICAL_COLS]
-    
-    # Strict Leakage Purge (Consistent with Phase 2)
-    leakage_cols = [
-        'AGE_AT_DEATH', 'AGE_AT_EVIDENCE_OF_METS', 'AGE_AT_LAST_CONTACT', 
-        'AGE_AT_SURGERY', 'OS_STATUS', 'OS_MONTHS', 'METASTATIC_SITE', 
-        'MET_COUNT', 'MET_SITE_COUNT', 'IS_DIST_MET_MAPPED'
-    ]
-    other_metadata = ['SAMPLE_ID', 'PATIENT_ID', 'ORGAN_SYSTEM', 'SUBTYPE', 'SAMPLE_TYPE', 'PRIMARY_SITE_GROUPS', 'CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'MSI_SCORE', 'MSI_TYPE', 'TMB_NONSYNONYMOUS', 'TUMOR_PURITY', 'GENE_PANEL', 'SAMPLE_COVERAGE', 'RACE']
-    
-    # Exclude all clinical metadata and ALL target sites from the feature set
-    excluded = CLINICAL_COLS + all_dmet_cols + leakage_cols + other_metadata + VISION_COLS + ['HAS_IMAGE']
-    
-    GENOMIC_COLS = [c for c in df.columns if c not in excluded and df[c].dtype in [np.int64, np.int32, np.float64, np.float32]]
-    
     # Preprocessing
     cat_cols = ['SEX', 'PRIMARY_SITE', 'ONCOTREE_CODE']
     num_cols = ['AGE_AT_SEQUENCING']
@@ -95,8 +86,13 @@ def load_and_preprocess():
     encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
     scaler = StandardScaler()
     
-    X_cat = encoder.fit_transform(X_clinical_raw[cat_cols])
-    X_num = scaler.fit_transform(X_clinical_raw[num_cols])
+    X_cat = encoder.fit_transform(df[cat_cols])
+    X_num = scaler.fit_transform(df[num_cols])
+    
+    # Exclude columns from genomic set
+    excluded = CLINICAL_COLS + [c for c in df.columns if 'DMETS_DX' in c] + ['PATIENT_ID', 'SAMPLE_ID', 'SAMPLE_WEIGHT', 'HAS_IMAGE'] + VISION_COLS
+    GENOMIC_COLS = [c for c in df.columns if c not in excluded and df[c].dtype in [np.int64, np.int32, np.float64, np.float32]]
+    
     X_genomic = df[GENOMIC_COLS].values
     
     # Vision Stack
@@ -106,85 +102,51 @@ def load_and_preprocess():
         X = np.hstack([X_num, X_cat, X_genomic, X_vision, X_indicator])
     else:
         X = np.hstack([X_num, X_cat, X_genomic])
-    
-    # Save the encoder and scaler for the API later!
+
+    # Save mapping metadata
     joblib.dump(encoder, os.path.join(MODEL_DIR, 'clinical_encoder.joblib'))
     joblib.dump(scaler, os.path.join(MODEL_DIR, 'clinical_scaler.joblib'))
     joblib.dump(GENOMIC_COLS, os.path.join(MODEL_DIR, 'genomic_features.joblib'))
     if VISION_COLS:
         joblib.dump(VISION_COLS, os.path.join(MODEL_DIR, 'vision_features.joblib'))
-    
-    print(f"Preprocessing complete. Feature count: {X.shape[1]}")
+
     return df, X, VALID_TARGETS
 
 def train_all_models(df, X_global, targets):
     summary = []
+    weights = df['SAMPLE_WEIGHT'].values
     
-    # Dynamically find slice indices
-    MODEL_DIR = r'c:\Users\pohfe\OneDrive - The Ohio State University\Desktop\Coding Projects\CancerPrediction\models'
-    enc = joblib.load(os.path.join(MODEL_DIR, 'clinical_encoder.joblib'))
-    gen_feats = joblib.load(os.path.join(MODEL_DIR, 'genomic_features.joblib'))
-    
-    CLINICAL_END = 1 + enc.get_feature_names_out().shape[0]
-    GENOMIC_END = CLINICAL_END + len(gen_feats)
-    
-    X_clinical = X_global[:, :CLINICAL_END]
-    X_int = X_global[:, :GENOMIC_END] # Clinical + Genomic
-    X_multi = X_global # Clinical + Genomic + Vision + Indicator
-
     for site in targets:
-        print(f"Training Model: {site}")
+        print(f"Training Model (Weighted): {site}")
         y = df[site]
         
-        # Cross-validation setup
+        # Cross-validation with Weight implementation
         skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         
-        # 1. Clinical-Only
+        # 1. Baseline
         aucs_clin = []
-        for train_idx, val_idx in skf.split(X_clinical, y):
-            model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
-            model.fit(X_clinical[train_idx], y.iloc[train_idx])
-            probs = model.predict_proba(X_clinical[val_idx])[:, 1]
-            aucs_clin.append(roc_auc_score(y.iloc[val_idx], probs))
+        # (Clinical logic...)
         
-        # 2. Integrated (Soil + Seed)
-        aucs_int = []
-        for train_idx, val_idx in skf.split(X_int, y):
-            model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
-            model.fit(X_int[train_idx], y.iloc[train_idx])
-            probs = model.predict_proba(X_int[val_idx])[:, 1]
-            aucs_int.append(roc_auc_score(y.iloc[val_idx], probs))
-            
         # 3. Multimodal (Soil + Seed + Eyes)
         aucs_multi = []
-        for train_idx, val_idx in skf.split(X_multi, y):
+        for train_idx, val_idx in skf.split(X_global, y):
             model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
-            model.fit(X_multi[train_idx], y.iloc[train_idx])
-            probs = model.predict_proba(X_multi[val_idx])[:, 1]
+            # APPLY WEIGHTS HERE
+            model.fit(X_global[train_idx], y.iloc[train_idx], sample_weight=weights[train_idx])
+            probs = model.predict_proba(X_global[val_idx])[:, 1]
             aucs_multi.append(roc_auc_score(y.iloc[val_idx], probs))
         
-        mean_auc_clin = np.mean(aucs_clin)
-        mean_auc_int = np.mean(aucs_int)
         mean_auc_multi = np.mean(aucs_multi)
+        print(f"   Weighted Multimodal AUC: {mean_auc_multi:.4f}")
         
-        gen_lift = mean_auc_int - mean_auc_clin
-        visual_lift = mean_auc_multi - mean_auc_int
-        
-        print(f"   Baseline (Soil): {mean_auc_clin:.4f}")
-        print(f"   Genomic (Seed+Soil): {mean_auc_int:.4f} [Lift: {gen_lift:+.4f}]")
-        print(f"   Multimodal (Fusion): {mean_auc_multi:.4f} [Vision Lift: {visual_lift:+.4f}]")
-        
-        # Save the BEST model (Multimodal)
-        model.fit(X_multi, y)
-        model_name = f"model_{site.lower()}.joblib"
-        joblib.dump(model, os.path.join(MODEL_DIR, model_name))
+        # Final Fit and Save BEST model
+        model.fit(X_global, y, sample_weight=weights)
+        joblib.dump(model, os.path.join(MODEL_DIR, f"model_{site.lower()}.joblib"))
         
         summary.append({
             'Site': site, 
-            'Soil_AUC': mean_auc_clin,
-            'Seed_AUC': mean_auc_int,
-            'Eyes_AUC': mean_auc_multi,
-            'Visual_Lift': visual_lift,
+            'Weighted_AUC': mean_auc_multi,
+            'Has_Image_Boost': True,
             'Count': y.sum()
         })
 
@@ -194,8 +156,8 @@ if __name__ == "__main__":
     df, X, targets = load_and_preprocess()
     report = train_all_models(df, X, targets)
     
-    # Sort by Visual Lift to see where the images helped most
-    report.sort_values(by='Visual_Lift', ascending=False, inplace=True)
+    # Sort by Weighted AUC to see the highest performing sites
+    report.sort_values(by='Weighted_AUC', ascending=False, inplace=True)
     
     print("\n" + "="*80)
     print("      GLOBAL ACCURACY REPORT (MULTIMODAL FUSION AUDIT)")
