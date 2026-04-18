@@ -19,8 +19,8 @@ Refer to **`contracts.md` Section 1**.
 - **Agent Note**: You can build the extraction logic independently of the GraphQL/API layer by using a simple `main` test block.
 
 ### Checklist:
-- [ ] Select Pre-trained Foundation Model (Phikon/UNI)
-- [ ] Implement `extract_embeddings.py` script
+- [x] Select Pre-trained Foundation Model (Phikon/UNI)
+- [x] Implement `extract_embeddings.py` script
 - [ ] Pre-generate embeddings for a subset of CAMELYON slides
 - [ ] Modify `train_iteration_3.py` to accept embeddings
 - [ ] Retrain XGBoost models with "Visual Lift" features
