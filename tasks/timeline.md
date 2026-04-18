@@ -10,7 +10,7 @@ Build a timeline experience that explains cancer risk changes in plain language 
 | Local fallback timeline | Frontend can generate local projection immediately (before backend returns). | `oncopath-next/lib/timeline.ts` |
 | Timeline visualization UI | Full timeline chart/panel and drawer components exist. | `oncopath-next/components/TimelinePanel.tsx`, `oncopath-next/components/ui/TimelineDrawer.tsx` |
 | Dashboard wiring | 12-month projection is shown in organ popover, but full timeline drawer is not mounted in `BodyDashboard`. | `oncopath-next/components/BodyDashboard.tsx` |
-| Claude SDK integration | Not implemented yet. | N/A |
+| Copilot API integration | Not implemented yet; implementation demo exists at `/home/mitch/Documents/copilothax` (`demo_chat.py`, `mcp_server.py`). | N/A |
 | MCP animation control | Not implemented yet. | N/A |
 | End-to-end test capability | Agent has Playwright MCP server access and should actively test every shipped timeline feature in-browser. | Playwright MCP tooling |
 | Contract docs | Outdated (`/simulate/temporal` listed; actual endpoint is `/predict/timeline`). | `contracts.md` |
@@ -72,10 +72,10 @@ Build a timeline experience that explains cancer risk changes in plain language 
 ### Phase 4 - UX and Reliability Improvements
 1. Add playhead autoplay for timeline (`Play`, `Pause`, `Replay`).
 2. Add "compare two treatments" split chart mode.
-3. Add optimistic loading text while backend/Claude responses are pending.
+3. Add optimistic loading text while backend/Copilot API responses are pending.
 4. Add guardrails:
    - if backend fails, keep local projection and show clear message
-   - if Claude fails, keep deterministic fallback explanation template
+   - if Copilot API assistant fails, keep deterministic fallback explanation template
 5. Track product metrics:
    - time to first explanation
    - percentage of sessions using timeline controls
@@ -91,21 +91,22 @@ Build a timeline experience that explains cancer risk changes in plain language 
 4. Record failures with exact repro steps and block release until fixed.
 5. Keep a regression checklist so previously fixed bugs are re-tested each iteration.
 
-### Phase 6 - Claude SDK Walkthrough Assistant (Required, Final Integration)
-1. Implement backend Claude service (new file suggested: `scripts/claude_timeline_service.py`) using Anthropic SDK.
-2. Build a prompt template that receives:
+### Phase 6 - Copilot API Walkthrough Assistant (Required, Final Integration)
+1. Use `/home/mitch/Documents/copilothax/demo_chat.py` + `mcp_server.py` as the integration reference pattern.
+2. Implement backend Copilot service (new file suggested: `scripts/copilot_timeline_service.py`) using the Copilot API client.
+3. Build a prompt template that receives:
    - patient summary (age, primary site, key mutations)
    - selected organ
    - treatment
    - timeline points (month/risk)
    - active month
-3. Require output JSON schema:
+4. Require output JSON schema:
    - `plain_explanation` (1-2 sentences)
    - `next_step_suggestion` (action user can take in UI)
    - `safety_note` ("This is not medical advice.")
-4. Add endpoint in FastAPI (suggested):
+5. Add endpoint in FastAPI (suggested):
    - `POST /assistant/timeline-explain`
-5. Add frontend panel (suggested component: `TimelineAssistantPanel.tsx`) that:
+6. Add frontend panel (suggested component: `TimelineAssistantPanel.tsx`) that:
    - refreshes explanation when month/treatment/organ changes
    - displays simple narrative + suggested next control action
 
@@ -118,14 +119,14 @@ Build a timeline experience that explains cancer risk changes in plain language 
    - `pause_timeline`
    - `focus_organ`
 3. Define strict parameter schema for each tool call (range checks and enum validation).
-4. Connect Claude tool-use flow to MCP:
-   - Claude decides action -> MCP tool call -> frontend animation update.
+4. Connect Copilot tool-use flow to MCP:
+   - Copilot decides action -> MCP tool call -> frontend animation update.
 5. In frontend, add command bridge (suggested: `oncopath-next/lib/timelineCommands.ts`) to apply MCP actions to UI state.
 6. Add user-visible action log:
-   - "Claude set month to 12"
-   - "Claude switched treatment to Immunotherapy"
+   - "Copilot set month to 12"
+   - "Copilot switched treatment to Immunotherapy"
 7. Final Playwright validation for this phase must include:
-   - Claude explanation panel refreshes on state change
+   - Copilot explanation panel refreshes on state change
    - MCP chatbot commands move animation state (`set_month`, `play_timeline`, etc.)
 
 Example MCP command payload:
@@ -153,6 +154,6 @@ Example MCP command payload:
 - [ ] Add non-medical explanation card + glossary
 - [ ] Add micro-scene using tumor + blood cell models
 - [ ] Actively test all timeline/chat/animation features with Playwright MCP before completion
-- [ ] Build Claude SDK timeline explanation endpoint (final integration phase)
+- [ ] Build Copilot API timeline explanation endpoint (final integration phase)
 - [ ] Build MCP server for animation control (final integration phase)
 - [ ] Add chat-controlled timeline actions (play, pause, month jump, treatment switch)

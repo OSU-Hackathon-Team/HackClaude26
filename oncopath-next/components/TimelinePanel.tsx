@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AlertCircle, ActivitySquare } from 'lucide-react';
-import { Select, SelectItem, Slider } from '@/components/ui';
+import { Select, SelectItem, Slider, ToggleSwitch } from '@/components/ui';
 import type { PredictionSnapshot } from '@/lib/api';
 import {
   DEFAULT_TIMELINE_MONTHS,
@@ -41,6 +41,60 @@ function asPercent(risk: number): string {
   return `${Math.round(risk * 100)}%`;
 }
 
+type RiskBandLabel = 'Low concern' | 'Moderate concern' | 'High concern';
+
+interface RiskBand {
+  label: RiskBandLabel;
+  textClassName: string;
+  badgeClassName: string;
+}
+
+function getRiskBand(risk: number): RiskBand {
+  if (risk < 0.2) {
+    return {
+      label: 'Low concern',
+      textClassName: 'text-blue-300',
+      badgeClassName: 'text-blue-200 border-blue-500/40 bg-blue-500/10',
+    };
+  }
+  if (risk < 0.5) {
+    return {
+      label: 'Moderate concern',
+      textClassName: 'text-amber-300',
+      badgeClassName: 'text-amber-200 border-amber-500/40 bg-amber-500/10',
+    };
+  }
+  return {
+    label: 'High concern',
+    textClassName: 'text-rose-300',
+    badgeClassName: 'text-rose-200 border-rose-500/40 bg-rose-500/10',
+  };
+}
+
+function getCurrentProjectionSentence({
+  activePoint,
+  baselineRisk,
+  treatmentLabel,
+}: {
+  activePoint: TimelinePoint | null;
+  baselineRisk: number | null;
+  treatmentLabel: string;
+}): string {
+  if (!activePoint || baselineRisk === null) {
+    return 'This is a projection estimate, and a baseline risk plus month selection are needed before a plain-language summary can be shown.';
+  }
+
+  const delta = activePoint.risk - baselineRisk;
+  const trendPhrase =
+    delta <= -0.03 ? 'a meaningful drop in concern' : delta >= 0.03 ? 'a rise in concern' : 'only a small change';
+
+  return `This projection estimates that with ${treatmentLabel}, risk is about ${asPercent(
+    activePoint.risk
+  )} at month ${activePoint.month} versus ${asPercent(
+    baselineRisk
+  )} at baseline, suggesting ${trendPhrase} and not a guaranteed outcome.`;
+}
+
 export function TimelinePanel({
   organOptions,
   selectedOrgan,
@@ -54,9 +108,17 @@ export function TimelinePanel({
   onTreatmentChange,
   onMonthChange,
 }: TimelinePanelProps) {
+  const [patientFriendlyMode, setPatientFriendlyMode] = useState(true);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
+
   const selectedOrganLabel = useMemo(
     () => organOptions.find((option) => option.key === selectedOrgan)?.label ?? selectedOrgan,
     [organOptions, selectedOrgan]
+  );
+  const selectedTreatmentLabel = useMemo(
+    () =>
+      TIMELINE_TREATMENT_PRESETS.find((preset) => preset.id === selectedTreatment)?.label ?? selectedTreatment,
+    [selectedTreatment]
   );
 
   const maxMonth = timeline.length
@@ -64,6 +126,16 @@ export function TimelinePanel({
     : DEFAULT_TIMELINE_MONTHS;
   const clampedMonth = Math.min(Math.max(selectedMonth, 0), maxMonth);
   const activePoint = getTimelinePointAtMonth(timeline, clampedMonth);
+  const activeRiskBand = useMemo(() => (activePoint ? getRiskBand(activePoint.risk) : null), [activePoint]);
+  const projectionSentence = useMemo(
+    () =>
+      getCurrentProjectionSentence({
+        activePoint,
+        baselineRisk,
+        treatmentLabel: selectedTreatmentLabel,
+      }),
+    [activePoint, baselineRisk, selectedTreatmentLabel]
+  );
 
   const chart = useMemo(() => {
     if (!timeline.length) {
@@ -111,9 +183,21 @@ export function TimelinePanel({
       .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
       .slice(0, 5);
   }, [prediction?.shap_values]);
+  const shapSnippets = useMemo(
+    () =>
+      shapEntries.slice(0, 3).map(([key, value]) => ({
+        key,
+        text: `${key} is estimated to ${value >= 0 ? 'push risk higher' : 'push risk lower'} (${Math.abs(
+          value
+        ).toFixed(3)} impact).`,
+        value,
+      })),
+    [shapEntries]
+  );
 
   const hasOrganOptions = organOptions.length > 0;
-  const sourceLabel = timelineSource === 'backend' ? 'Backend Projection' : 'Simulated Projection';
+  const sourceLabel =
+    timelineSource === 'backend' ? 'Live projection (backend)' : 'Instant estimate (local)';
 
   return (
     <section className="border-t border-slate-800/40 bg-[#060d1a]/90 backdrop-blur-sm px-6 py-4 z-20">
@@ -191,6 +275,12 @@ export function TimelinePanel({
                   {`${activePoint.risk >= baselineRisk ? '+' : ''}${Math.round(
                     (activePoint.risk - baselineRisk) * 100
                   )}%`}
+                </span>
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Risk band</span>
+                <span className={`font-semibold ${activeRiskBand?.textClassName ?? 'text-slate-300'}`}>
+                  {activeRiskBand?.label ?? 'Not available'}
                 </span>
               </div>
             </div>
@@ -301,57 +391,126 @@ export function TimelinePanel({
               </div>
             </div>
           )}
+
+          <div className="mt-3 rounded-lg border border-slate-700/60 bg-slate-900/50 p-3 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h4 className="text-[11px] font-semibold text-slate-100">What is happening now?</h4>
+              {activePoint && activeRiskBand && (
+                <span
+                  className={`text-[10px] font-semibold rounded-md px-2 py-0.5 border ${activeRiskBand.badgeClassName}`}
+                >
+                  {asPercent(activePoint.risk)} · {activeRiskBand.label}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-200 leading-relaxed">{projectionSentence}</p>
+          </div>
         </div>
 
         <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4 space-y-3">
-          <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Explainability</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Explainability</h3>
+            <div className="flex items-center gap-2">
+              <label htmlFor="patient-friendly-mode" className="text-[10px] text-slate-400 uppercase tracking-wider">
+                Patient-friendly mode
+              </label>
+              <ToggleSwitch
+                id="patient-friendly-mode"
+                checked={patientFriendlyMode}
+                onChange={setPatientFriendlyMode}
+              />
+            </div>
+          </div>
+          <p className="text-[10px] text-slate-500">
+            {patientFriendlyMode
+              ? 'Plain language is prioritized, and model-internal metrics are hidden.'
+              : 'Technical view enabled: confidence metrics and SHAP snippets are included.'}
+          </p>
 
           <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3 space-y-1">
-            <div className="flex justify-between text-[10px] text-slate-400">
-              <span>Prediction ID</span>
-              <span className="font-mono text-slate-200">{prediction?.prediction_id ?? 'Not available'}</span>
-            </div>
             <div className="flex justify-between text-[10px] text-slate-400">
               <span>Status</span>
               <span className="font-mono text-slate-200">{prediction?.status ?? 'Not available'}</span>
             </div>
-          </div>
-
-          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
-              Confidence Metrics
+            <div className="flex justify-between text-[10px] text-slate-400">
+              <span>Projection source</span>
+              <span className="font-mono text-slate-200">{sourceLabel}</span>
             </div>
-            {confidenceEntries.length ? (
-              <div className="space-y-1.5">
-                {confidenceEntries.slice(0, 4).map(([key, value]) => (
-                  <div key={key} className="flex justify-between text-[10px] text-slate-300">
-                    <span className="truncate pr-2">{key}</span>
-                    <span className="font-mono text-emerald-300">{value.toFixed(3)}</span>
-                  </div>
-                ))}
+            {!patientFriendlyMode && (
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Prediction ID</span>
+                <span className="font-mono text-slate-200">{prediction?.prediction_id ?? 'Not available'}</span>
               </div>
-            ) : (
-              <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
             )}
           </div>
 
-          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
-              SHAP Values
-            </div>
-            {shapEntries.length ? (
-              <div className="space-y-1.5">
-                {shapEntries.map(([key, value]) => (
-                  <div key={key} className="flex justify-between text-[10px] text-slate-300">
-                    <span className="truncate pr-2">{key}</span>
-                    <span className={`font-mono ${value >= 0 ? 'text-rose-300' : 'text-cyan-300'}`}>
-                      {value.toFixed(4)}
-                    </span>
-                  </div>
-                ))}
+          {!patientFriendlyMode && (
+            <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
+                Confidence Metrics
               </div>
-            ) : (
-              <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
+              {confidenceEntries.length ? (
+                <div className="space-y-1.5">
+                  {confidenceEntries.slice(0, 4).map(([key, value]) => (
+                    <div key={key} className="flex justify-between text-[10px] text-slate-300">
+                      <span className="truncate pr-2">{key}</span>
+                      <span className="font-mono text-emerald-300">{value.toFixed(3)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
+              )}
+            </div>
+          )}
+
+          {!patientFriendlyMode && (
+            <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
+                SHAP Snippets
+              </div>
+              {shapSnippets.length ? (
+                <div className="space-y-1.5">
+                  {shapSnippets.map(({ key, text, value }) => (
+                    <div key={key} className="text-[10px] text-slate-300 leading-relaxed">
+                      <span className={value >= 0 ? 'text-rose-300' : 'text-cyan-300'}>{text}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
+              )}
+            </div>
+          )}
+
+          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
+            <button
+              type="button"
+              className="w-full flex items-center justify-between text-[10px] text-slate-300 uppercase tracking-wider font-semibold"
+              onClick={() => setGlossaryOpen((prev) => !prev)}
+            >
+              <span>Glossary</span>
+              <span className="text-slate-500">{glossaryOpen ? 'Hide' : 'Show'}</span>
+            </button>
+            {glossaryOpen && (
+              <dl className="mt-2 space-y-2 text-[10px] text-slate-300">
+                <div>
+                  <dt className="text-slate-100 font-semibold">Metastasis</dt>
+                  <dd className="text-slate-400">When cancer spreads from where it started to another body area.</dd>
+                </div>
+                <div>
+                  <dt className="text-slate-100 font-semibold">Baseline risk</dt>
+                  <dd className="text-slate-400">Your starting estimated risk before projected treatment effects.</dd>
+                </div>
+                <div>
+                  <dt className="text-slate-100 font-semibold">Treatment response</dt>
+                  <dd className="text-slate-400">How risk is projected to change after a selected treatment plan.</dd>
+                </div>
+                <div>
+                  <dt className="text-slate-100 font-semibold">Projection horizon</dt>
+                  <dd className="text-slate-400">How many future months this estimate covers on the timeline.</dd>
+                </div>
+              </dl>
             )}
           </div>
         </div>

@@ -763,21 +763,41 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
                         if (!marker) return null;
                         const isSelected = selectedStructure?.id === marker.id;
                         
+                        const handleMarkerSelect = (clientX?: number, clientY?: number) => {
+                          if (isSelected) {
+                            setSelectedStructure(null);
+                            setSkinOpacity(0);
+                            return;
+                          }
+
+                          setSelectedStructure({
+                            id: marker.id,
+                            name: marker.meta.label,
+                            system: marker.meta.system,
+                            isMarker: true,
+                            position: new THREE.Vector3(...marker.meta.position).add(new THREE.Vector3(0, -1, 0))
+                          });
+
+                          if (clientX !== undefined && clientY !== undefined) {
+                            onOrganSelect?.(marker.id, marker.meta.label, clientX, clientY);
+                          }
+                        };
+
                         return (
-                           <button 
+                           <div
                              key={marker.id}
-                             onClick={(e) => {
-                               if (isSelected) {
-                                 setSelectedStructure(null);
-                                 setSkinOpacity(0);
-                               } else {
-                                 setSelectedStructure({ id: marker.id, name: marker.meta.label, system: marker.meta.system, isMarker: true, position: new THREE.Vector3(...marker.meta.position).add(new THREE.Vector3(0, -1, 0)) });
-                                 onOrganSelect?.(marker.id, marker.meta.label, e.clientX, e.clientY);
+                             role="button"
+                             tabIndex={0}
+                             onClick={(e) => handleMarkerSelect(e.clientX, e.clientY)}
+                             onKeyDown={(e) => {
+                               if (e.key === 'Enter' || e.key === ' ') {
+                                 e.preventDefault();
+                                 handleMarkerSelect(window.innerWidth * 0.5, window.innerHeight * 0.5);
                                }
                              }}
                              onMouseEnter={() => setHoveredOrgan(marker.id)}
                              onMouseLeave={() => setHoveredOrgan(null)}
-                             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all focus:outline-none flex items-center justify-between group ${isSelected ? 'bg-orange-600/30 border border-orange-500/40 shadow-[inset_0_0_15px_rgba(234,88,12,0.15)] text-orange-50' : 'border border-transparent text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-200'}`}
+                             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-orange-500/60 flex items-center justify-between group cursor-pointer ${isSelected ? 'bg-orange-600/30 border border-orange-500/40 shadow-[inset_0_0_15px_rgba(234,88,12,0.15)] text-orange-50' : 'border border-transparent text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-200'}`}
                            >
                               <div className="flex items-center gap-2.5">
                                  <div className={`w-1.5 h-1.5 rounded-full transition-shadow ${isSelected ? 'shadow-[0_0_8px_currentColor] scale-125' : 'group-hover:scale-110'}`} style={{ color: '#' + marker.color.getHexString(), backgroundColor: 'currentColor' }} />
@@ -789,7 +809,7 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
                                    <span className="text-[10px] font-mono opacity-60 bg-black/40 px-1.5 rounded">{Math.round(marker.prob * 100)}%</span>
                                  </div>
                                )}
-                           </button>
+                           </div>
                         );
                      })}
                   </div>
@@ -808,4 +828,3 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
     </div>
   );
 }
-

@@ -41,18 +41,25 @@ This document acts as the "Single Source of Truth" for all agents working on Onc
 ---
 
 ## 3. Timeline ↔ Frontend Contract
-**Endpoint**: `POST /simulate/temporal`
+**Endpoint**: `POST /predict/timeline`
 **Request Payload**:
 ```json
 {
-  "initial_risk": 0.45,
+  "baseline_risk": 0.45,
   "treatment": "CHEMOTHERAPY",
   "months": 24
 }
 ```
+**Field Constraints**:
+- `baseline_risk`: float in `[0.0, 1.0]`
+- `treatment`: string, one of `CHEMOTHERAPY`, `IMMUNOTHERAPY`, `TARGETED_THERAPY`, `RADIATION`, `OBSERVATION`
+- `months`: integer in `[1, 120]`
+
 **Response Payload**:
 ```json
 {
+  "status": "success",
+  "treatment": "CHEMOTHERAPY",
   "timeline": [
     {"month": 0, "risk": 0.45},
     {"month": 6, "risk": 0.25},
