@@ -22,6 +22,10 @@ OncoPath is a state-of-the-art AI-driven platform designed to predict organ-spec
 - `scripts/`: Python implementation for data processing, model training, and the API service.
   - `api_service.py`: FastAPI server for real-time inference.
   - `train_iteration_3.py`: Automated ML pipeline for multi-site model training.
+  - `extract_embeddings.py`: [NEW] Vision encoder for multimodal fusion.
+- `iterations/`: Historical reports and upcoming detailed iteration plans.
+- `tasks/`: Granular agent task lists for AI, Frontend, and Timeline modules.
+- `contracts.md`: The "Shared Language" defining API schemas for the team.
 - `models/`: Serialized models and preprocessing artifacts (`joblib`).
 - `data/`: Multi-omic datasets and diagnostic reports.
 

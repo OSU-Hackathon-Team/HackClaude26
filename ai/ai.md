@@ -42,12 +42,36 @@ By the time you have 100 "interns" working together, the team is incredibly smar
 
 ---
 
-## 4. Your First Mission: Iteration One 🚀
-For your first few weeks, we're keeping it simple. We’re building a **Baseline Model**. 
-*   **We're only using "Soil" data:** Age, Sex, and where the tumor started.
-*   **Why?** Because we need to know how much we can predict *without* the fancy genetic data. If we add the genetics later and the model doesn't get smarter, then we know the genetics weren't as important as we thought!
+## 4. Your First Mission: Iteration One (Multimodal Fusion) 🚀
+We are evolving from a "Tabular-only" model to a **Multimodal model**. 
+*   **The Mission**: Supplement our XGBoost models (the "Brain") with a Pre-trained Image Model (the "Eyes").
+*   **The Goal**: Prove that seeing the tumor's physical shape adds "Lift" to our genomic predictions.
 
-### 📊 Deep Dive: Understanding the Numbers
+### 🔬 Detailed Plan:
+1.  **Vision Encoder**: We'll use a Foundation Model called **Phikon**. 
+2.  **Embeddings**: We'll turn tumor images into 768-dimensional numerical fingerprints.
+3.  **The Fusion**: We "glue" these features to the existing patient data to create a "Super-Feature" set.
+
+---
+
+## 5. The Second Mission: Iteration Two (3D Timeline) 🕰️
+Next, we'll build the **Timeline System**. This turns our static scores into a movie of the patient's future.
+
+### 🔬 Detailed Plan:
+1.  **The Sim Engine**: We'll use the **Gompertz Growth Model** (math that simulates how tumors grow and shrink).
+2.  **What-If Logic**: We'll let doctors select treatments (Chemo, Immunotherapy) and see the 3D model shrink in real-time.
+3.  **The Assistant**: Claude will act as the "Interpreter" for the simulation, explaining the risks to the doctor.
+
+---
+
+## 6. How to Work Together (The Contract) 🤝
+Since we have 3 teams (AI, Frontend, Timeline) working in parallel, we use **API Contracts**.
+*   **Don't Wait**: If the AI model isn't ready, the Frontend team uses "Mock Data" (fake scores) to keep building the 3D UI.
+*   **Documentation**: Always check `contracts.md` before changing an API endpoint.
+
+---
+
+## 7. Deep Dive: Understanding the Numbers
 In our first run, you saw some numbers like `AUC=0.7323` and `Brier=0.2109`. Here is what they actually mean in the real world:
 
 #### 1. AUC-ROC (Area Under the Curve)
