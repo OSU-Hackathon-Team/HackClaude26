@@ -17,10 +17,12 @@ LEARNING POINTS:
 """
 
 import torch
-from PIL import Image
 from transformers import ViTImageProcessor, ViTModel
-import numpy as np
+from PIL import Image
 import os
+import io
+import base64
+import numpy as np
 
 class VisionEncoder:
     def __init__(self, model_name="owkin/phikon"):
@@ -30,19 +32,32 @@ class VisionEncoder:
         
         # Load Preprocessor and Model
         self.processor = ViTImageProcessor.from_pretrained(model_name)
-        self.model = ViTModel.from_pretrained(model_name, add_pooling_layer=False)
-        self.model.to(self.device)
-        self.model.eval()
+        self.model = ViTModel.from_pretrained(model_name, add_pooling_layer=False).to(self.device).eval()
 
-    def get_embeddings(self, image_path: str):
+    def get_embeddings(self, image_input):
         """
-        Takes an image path and returns a 768-dimensional embedding vector.
+        Supports:
+        - Absolute path (string)
+        - Base64 string (beginning with 'data:image')
+        - PIL Image object
         """
-        if not os.path.exists(image_path):
-            raise FileNotFoundError(f"Image not found at {image_path}")
+        if isinstance(image_input, str):
+            if image_input.startswith("data:image"):
+                # Handle Base64
+                header, encoded = image_input.split(",", 1)
+                image_data = base64.b64decode(encoded)
+                image = Image.open(io.BytesIO(image_data)).convert("RGB")
+            else:
+                # Handle File Path
+                if not os.path.exists(image_input):
+                    raise FileNotFoundError(f"Image not found at {image_input}")
+                image = Image.open(image_input).convert("RGB")
+        elif isinstance(image_input, Image.Image):
+            image = image_input
+        else:
+            raise ValueError("Unsupported image input type.")
 
-        # 1. Load and Preprocess Image
-        image = Image.open(image_path).convert("RGB")
+        # 1. Preprocess Image
         inputs = self.processor(images=image, return_tensors="pt").to(self.device)
 
         # 2. Inference (No Gradient Tracking)
@@ -51,13 +66,16 @@ class VisionEncoder:
             
         # 3. Mean Pooling (Average across all patches to get patient-level feature)
         # Phikon output shape: [batch, num_patches, 768]
-        last_hidden_state = outputs.last_hidden_state
-        embeddings = torch.mean(last_hidden_state, dim=1)
+        embeddings = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
         
-        return embeddings.cpu().numpy()
+        return embeddings
 
 if __name__ == "__main__":
-    # Test script with a dummy image if exists, else print status
-    encoder = VisionEncoder()
+    # Test path
+    test_path = "data/test_slide.png"
+    if os.path.exists(test_path):
+        encoder = VisionEncoder()
+        emb = encoder.get_embeddings(test_path)
+        print(f"Success! Embedding Shape: {emb.shape}")
     print("Vision Encoder ready for Iteration 1.")
     print("Contract: Input = Image Path | Output = [1, 768] Vector")

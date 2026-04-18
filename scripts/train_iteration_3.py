@@ -26,20 +26,43 @@ import os
 # Configuration
 DATA_PATH = r'c:\Users\pohfe\OneDrive - The Ohio State University\Desktop\Coding Projects\CancerPrediction\data\data_multiomic.tsv'
 MODEL_DIR = r'c:\Users\pohfe\OneDrive - The Ohio State University\Desktop\Coding Projects\CancerPrediction\models'
+EMBEDDINGS_PATH = 'data/image_embeddings.csv'
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 CLINICAL_COLS = ['AGE_AT_SEQUENCING', 'SEX', 'PRIMARY_SITE', 'ONCOTREE_CODE']
 
 def load_and_preprocess():
-    print(f"🚀 Loading multi-omic data from {os.path.basename(DATA_PATH)}...")
+    print(f"Loading multi-omic data from {os.path.basename(DATA_PATH)}...")
     df = pd.read_csv(DATA_PATH, sep='\t')
     
+    # 1. Load Vision Embeddings [TASK 4]
+    print(f"Loading image embeddings from {EMBEDDINGS_PATH}...")
+    if os.path.exists(EMBEDDINGS_PATH):
+        emb_df = pd.read_csv(EMBEDDINGS_PATH)
+        # Identify vision feature columns
+        VISION_COLS = [c for c in emb_df.columns if c.startswith('v_feat_')]
+        
+        # Join with main dataset
+        df = df.merge(emb_df, on='PATIENT_ID', how='left')
+        
+        # HAS_IMAGE Indicator
+        df['HAS_IMAGE'] = df[VISION_COLS[0]].notna().astype(int)
+        
+        # Mean Imputation for missing slides
+        mean_vector = emb_df[VISION_COLS].mean()
+        df[VISION_COLS] = df[VISION_COLS].fillna(mean_vector)
+        print(f"Integrated vision data for {len(emb_df)} patients. Filled remainder with mean vectors.")
+    else:
+        print("No vision embeddings found. Proceeding with tabular data only.")
+        VISION_COLS = []
+        df['HAS_IMAGE'] = 0
+
     # Identify all possible target sites (DMETS_DX)
     all_dmet_cols = [c for c in df.columns if 'DMETS_DX' in c]
     
     # Filter targets with enough data (> 100 cases for stability)
     VALID_TARGETS = [c for c in all_dmet_cols if (df[c] == 'Yes').sum() > 100]
-    print(f"🎯 Dynamic Discovery: Found {len(VALID_TARGETS)} valid metastatic sites.")
+    print(f"Dynamic Discovery: Found {len(VALID_TARGETS)} valid metastatic sites.")
     
     # Transformation
     for col in VALID_TARGETS:
@@ -61,7 +84,7 @@ def load_and_preprocess():
     other_metadata = ['SAMPLE_ID', 'PATIENT_ID', 'ORGAN_SYSTEM', 'SUBTYPE', 'SAMPLE_TYPE', 'PRIMARY_SITE_GROUPS', 'CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'MSI_SCORE', 'MSI_TYPE', 'TMB_NONSYNONYMOUS', 'TUMOR_PURITY', 'GENE_PANEL', 'SAMPLE_COVERAGE', 'RACE']
     
     # Exclude all clinical metadata and ALL target sites from the feature set
-    excluded = CLINICAL_COLS + all_dmet_cols + leakage_cols + other_metadata
+    excluded = CLINICAL_COLS + all_dmet_cols + leakage_cols + other_metadata + VISION_COLS + ['HAS_IMAGE']
     
     GENOMIC_COLS = [c for c in df.columns if c not in excluded and df[c].dtype in [np.int64, np.int32, np.float64, np.float32]]
     
@@ -76,67 +99,92 @@ def load_and_preprocess():
     X_num = scaler.fit_transform(X_clinical_raw[num_cols])
     X_genomic = df[GENOMIC_COLS].values
     
-    X = np.hstack([X_num, X_cat, X_genomic])
+    # Vision Stack
+    if VISION_COLS:
+        X_vision = df[VISION_COLS].values
+        X_indicator = df[['HAS_IMAGE']].values
+        X = np.hstack([X_num, X_cat, X_genomic, X_vision, X_indicator])
+    else:
+        X = np.hstack([X_num, X_cat, X_genomic])
     
     # Save the encoder and scaler for the API later!
     joblib.dump(encoder, os.path.join(MODEL_DIR, 'clinical_encoder.joblib'))
     joblib.dump(scaler, os.path.join(MODEL_DIR, 'clinical_scaler.joblib'))
     joblib.dump(GENOMIC_COLS, os.path.join(MODEL_DIR, 'genomic_features.joblib'))
+    if VISION_COLS:
+        joblib.dump(VISION_COLS, os.path.join(MODEL_DIR, 'vision_features.joblib'))
     
-    print(f"✅ Preprocessing complete. Feature count: {X.shape[1]}")
+    print(f"Preprocessing complete. Feature count: {X.shape[1]}")
     return df, X, VALID_TARGETS
 
 def train_all_models(df, X_global, targets):
     summary = []
     
-    # Pre-select index for clinical features (First X columns based on preprocessing)
-    # X_num (1) + X_cat (Sex, Primary, OncoTree)
-    # Let's dynamically find where genomics start
-    GENOMIC_START_IDX = 1 + joblib.load(os.path.join(MODEL_DIR, 'clinical_encoder.joblib')).get_feature_names_out().shape[0]
-    X_clinical = X_global[:, :GENOMIC_START_IDX]
+    # Dynamically find slice indices
+    MODEL_DIR = r'c:\Users\pohfe\OneDrive - The Ohio State University\Desktop\Coding Projects\CancerPrediction\models'
+    enc = joblib.load(os.path.join(MODEL_DIR, 'clinical_encoder.joblib'))
+    gen_feats = joblib.load(os.path.join(MODEL_DIR, 'genomic_features.joblib'))
+    
+    CLINICAL_END = 1 + enc.get_feature_names_out().shape[0]
+    GENOMIC_END = CLINICAL_END + len(gen_feats)
+    
+    X_clinical = X_global[:, :CLINICAL_END]
+    X_int = X_global[:, :GENOMIC_END] # Clinical + Genomic
+    X_multi = X_global # Clinical + Genomic + Vision + Indicator
 
     for site in targets:
-        print(f"\n📁 Training Model: {site}")
+        print(f"Training Model: {site}")
         y = df[site]
         
         # Cross-validation setup
         skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         
-        # 1. Train Clinical-Only Baseline
+        # 1. Clinical-Only
         aucs_clin = []
         for train_idx, val_idx in skf.split(X_clinical, y):
-            model_clin = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
-            model_clin.fit(X_clinical[train_idx], y.iloc[train_idx])
-            probs = model_clin.predict_proba(X_clinical[val_idx])[:, 1]
+            model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
+            model.fit(X_clinical[train_idx], y.iloc[train_idx])
+            probs = model.predict_proba(X_clinical[val_idx])[:, 1]
             aucs_clin.append(roc_auc_score(y.iloc[val_idx], probs))
         
-        mean_auc_clin = np.mean(aucs_clin)
-        
-        # 2. Train Integrated Model (Clinical + Genomic)
+        # 2. Integrated (Soil + Seed)
         aucs_int = []
-        for train_idx, val_idx in skf.split(X_global, y):
-            model_int = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
-            model_int.fit(X_global[train_idx], y.iloc[train_idx])
-            probs = model_int.predict_proba(X_global[val_idx])[:, 1]
+        for train_idx, val_idx in skf.split(X_int, y):
+            model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
+            model.fit(X_int[train_idx], y.iloc[train_idx])
+            probs = model.predict_proba(X_int[val_idx])[:, 1]
             aucs_int.append(roc_auc_score(y.iloc[val_idx], probs))
+            
+        # 3. Multimodal (Soil + Seed + Eyes)
+        aucs_multi = []
+        for train_idx, val_idx in skf.split(X_multi, y):
+            model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric='logloss')
+            model.fit(X_multi[train_idx], y.iloc[train_idx])
+            probs = model.predict_proba(X_multi[val_idx])[:, 1]
+            aucs_multi.append(roc_auc_score(y.iloc[val_idx], probs))
         
+        mean_auc_clin = np.mean(aucs_clin)
         mean_auc_int = np.mean(aucs_int)
-        lift = mean_auc_int - mean_auc_clin
+        mean_auc_multi = np.mean(aucs_multi)
         
-        print(f"   📊 Baseline (Soil): {mean_auc_clin:.4f}")
-        print(f"   🚀 Integrated (Seed+Soil): {mean_auc_int:.4f}")
-        print(f"   🧬 Genomic Lift: {lift:+.4f}")
+        gen_lift = mean_auc_int - mean_auc_clin
+        visual_lift = mean_auc_multi - mean_auc_int
         
-        # Train one final model on ALL data and save it
-        model_int.fit(X_global, y)
+        print(f"   Baseline (Soil): {mean_auc_clin:.4f}")
+        print(f"   Genomic (Seed+Soil): {mean_auc_int:.4f} [Lift: {gen_lift:+.4f}]")
+        print(f"   Multimodal (Fusion): {mean_auc_multi:.4f} [Vision Lift: {visual_lift:+.4f}]")
+        
+        # Save the BEST model (Multimodal)
+        model.fit(X_multi, y)
         model_name = f"model_{site.lower()}.joblib"
-        joblib.dump(model_int, os.path.join(MODEL_DIR, model_name))
+        joblib.dump(model, os.path.join(MODEL_DIR, model_name))
         
         summary.append({
             'Site': site, 
-            'Baseline_AUC': mean_auc_clin,
-            'Integrated_AUC': mean_auc_int,
-            'Lift': lift,
+            'Soil_AUC': mean_auc_clin,
+            'Seed_AUC': mean_auc_int,
+            'Eyes_AUC': mean_auc_multi,
+            'Visual_Lift': visual_lift,
             'Count': y.sum()
         })
 
@@ -146,11 +194,13 @@ if __name__ == "__main__":
     df, X, targets = load_and_preprocess()
     report = train_all_models(df, X, targets)
     
-    report.sort_values(by='Lift', ascending=False, inplace=True)
-    print("\n" + "="*60)
-    print("      GLOBAL ACCURACY REPORT (AUDITED FOR LIFT)")
-    print("="*60)
+    # Sort by Visual Lift to see where the images helped most
+    report.sort_values(by='Visual_Lift', ascending=False, inplace=True)
+    
+    print("\n" + "="*80)
+    print("      GLOBAL ACCURACY REPORT (MULTIMODAL FUSION AUDIT)")
+    print("="*80)
     print(report.to_string(index=False))
     
-    report.to_csv(os.path.join(MODEL_DIR, 'global_site_report_v2.csv'), index=False)
-    print("\n✅ All 21 models re-trained with Top 100 genes and Baselines.")
+    report.to_csv(os.path.join(MODEL_DIR, 'global_site_report_multimodal.csv'), index=False)
+    print(f"All {len(targets)} models re-trained with vision embeddings. Report saved.")
