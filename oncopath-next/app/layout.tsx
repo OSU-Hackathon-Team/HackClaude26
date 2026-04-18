@@ -26,10 +26,10 @@ export default function RootLayout({
         <ClerkProvider>
           <header className="absolute top-0 right-0 p-4 z-50 pointer-events-auto flex items-center justify-end gap-3 text-slate-100">
             <Show when="signed-out">
-              <SignInButton forceRedirectUrl="/viewer">
+              <SignInButton forceRedirectUrl="/viewer" mode="modal" asChild>
                  <button className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 backdrop-blur-md rounded-lg text-sm font-semibold transition-all border border-slate-700/50">Login</button>
               </SignInButton>
-              <SignUpButton forceRedirectUrl="/viewer">
+              <SignUpButton forceRedirectUrl="/viewer" mode="modal" asChild>
                  <button className="px-4 py-2 bg-blue-600/90 hover:bg-blue-500 backdrop-blur-md rounded-lg text-sm font-semibold transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]">Sign Up</button>
               </SignUpButton>
             </Show>
