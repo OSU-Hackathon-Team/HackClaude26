@@ -21,14 +21,14 @@ const AnatomicalBody3D = lazy(() =>
   import('@/components/AnatomicalBody3D').then((m) => ({ default: m.AnatomicalBody3D }))
 );
 
-// ─── Default patient (KRAS + TP53 colon cancer) ──────────────────────────── //
+// ─── Default patient (Breast Cancer) ──────────────────────────── //
 const DEFAULT_PROFILE: PatientProfile = {
-  name: 'John Doe',
-  age: 62,
-  sex: 'Male',
-  primary_site: 'Colon',
-  oncotree_code: 'COAD',
-  mutations: { KRAS: 1, TP53: 1 },
+  name: 'Jane Doe',
+  age: 55,
+  sex: 'Female',
+  primary_site: 'Breast',
+  oncotree_code: 'BRCA',
+  mutations: { TP53: 1, PIK3CA: 1, ERBB2: 1 },
 };
 
 const DEFAULT_TREATMENT: TreatmentPresetId = TIMELINE_TREATMENT_PRESETS[0].id;
@@ -36,6 +36,7 @@ const DEFAULT_TREATMENT: TreatmentPresetId = TIMELINE_TREATMENT_PRESETS[0].id;
 export function BodyDashboard() {
   const [profile, setProfile]           = useState<PatientProfile>(DEFAULT_PROFILE);
   const [simulationProfile, setSimulationProfile] = useState<PatientProfile>(DEFAULT_PROFILE);
+  const [simulationImage, setSimulationImage]     = useState<string | undefined>(undefined);
   const [risks, setRisks]               = useState<Record<string, number>>({});
   const [prediction, setPrediction]     = useState<PredictionSnapshot | null>(null);
   const [loading, setLoading]           = useState(false);
@@ -54,7 +55,7 @@ export function BodyDashboard() {
     (async () => {
       setLoading(true); setError(null);
       try {
-        const result = await simulateRisk(simulationProfile);
+        const result = await simulateRisk(simulationProfile, { image: simulationImage });
         if (!cancelled) { setPrediction(result); setRisks(result.risk_scores); }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : 'API unreachable');
@@ -63,7 +64,7 @@ export function BodyDashboard() {
       }
     })();
     return () => { cancelled = true; ctrl.abort(); };
-  }, [simulationProfile]);
+  }, [simulationProfile, simulationImage]);
 
   // ── 12-month projection for hovered organ ─────────────────────────────── //
   useEffect(() => {
@@ -119,7 +120,7 @@ export function BodyDashboard() {
             </div>
           </div>
         }>
-          <AnatomicalBody3D risks={risks} onOrganSelect={handleOrganSelect} />
+          <AnatomicalBody3D risks={risks} profile={simulationProfile} onOrganSelect={handleOrganSelect} />
         </Suspense>
 
         {/* Computing overlay */}
@@ -152,7 +153,14 @@ export function BodyDashboard() {
       <div className="absolute bottom-4 left-4 z-20 flex items-end pointer-events-none">
         {/* Parameters FAB */}
         <div className="pointer-events-auto">
-          <GenomicDrawer profile={profile} onChange={setProfile} onRunSimulation={() => setSimulationProfile(profile)} />
+          <GenomicDrawer 
+            profile={profile} 
+            onChange={setProfile} 
+            onRunSimulation={(slideImage?: string) => {
+              setSimulationProfile(profile);
+              setSimulationImage(slideImage);
+            }} 
+          />
         </div>
       </div>
 

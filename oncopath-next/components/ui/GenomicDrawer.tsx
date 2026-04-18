@@ -1,17 +1,20 @@
 'use client';
 import React, { useState } from 'react';
-import { FlaskConical, X } from 'lucide-react';
+import { FlaskConical, X, Image as ImageIcon, Upload, CheckCircle2 } from 'lucide-react';
 import { GenomicLab } from '@/components/GenomicLab';
 import { PatientProfile } from '@/lib/api';
 
 interface GenomicDrawerProps {
   profile: PatientProfile;
   onChange: (p: PatientProfile) => void;
-  onRunSimulation: () => void;
+  onRunSimulation: (image?: string) => void;
 }
 
 export function GenomicDrawer({ profile, onChange, onRunSimulation }: GenomicDrawerProps) {
   const [open, setOpen] = useState(false);
+  const [slideImage, setSlideImage] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  
   const mutationCount = Object.keys(profile.mutations).length;
 
   return (
@@ -55,9 +58,40 @@ export function GenomicDrawer({ profile, onChange, onRunSimulation }: GenomicDra
         <div className="flex-1 overflow-hidden">
           <GenomicLab profile={profile} onChange={onChange} />
         </div>
-        <div className="p-4 border-t border-zinc-800 bg-zinc-900/80">
+        <div className="p-4 border-t border-zinc-800 bg-zinc-900/80 space-y-3">
+          {/* File Upload UI */}
+          <div className="relative">
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setFileName(file.name);
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    if (typeof ev.target?.result === 'string') {
+                      setSlideImage(ev.target.result);
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+            <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${slideImage ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-zinc-800/50 border-zinc-700'} transition-colors`}>
+              <div className="flex items-center gap-2">
+                <ImageIcon size={14} className={slideImage ? 'text-emerald-400' : 'text-zinc-400'} />
+                <span className={`text-xs ${slideImage ? 'text-emerald-300 font-medium' : 'text-zinc-400'} truncate font-mono max-w-[180px]`}>
+                  {fileName || 'Upload tumor slide'}
+                </span>
+              </div>
+              {slideImage ? <CheckCircle2 size={14} className="text-emerald-400" /> : <Upload size={14} className="text-zinc-500" />}
+            </div>
+          </div>
+
           <button 
-            onClick={() => { onRunSimulation(); setOpen(false); }} 
+            onClick={() => { onRunSimulation(slideImage || undefined); setOpen(false); }} 
             className="w-full py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold tracking-wide transition-all shadow-[0_0_15px_rgba(234,88,12,0.4)]"
           >
             Run Simulation

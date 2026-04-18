@@ -168,7 +168,9 @@ def _run_risk_inference(
 
     has_image = False
     vision_confidence = 0.5
-    if image:
+    is_breast_profile = primary_site.lower() == 'breast'
+
+    if image and is_breast_profile:
         if vision_encoder is None:
             raise HTTPException(status_code=503, detail="Vision encoder is not initialized.")
         try:
@@ -196,10 +198,12 @@ def _run_risk_inference(
         except Exception as exc:
             raise HTTPException(status_code=500, detail=f"Inference failed for site '{site}': {exc}")
 
-        if has_tumor_signal:
-            prob_final = min(0.95, prob_base + 0.35)
-        elif has_normal_signal:
-            prob_final = max(0.01, prob_base - 0.20)
+        is_lymph_node_target = site == 'DMETS_DX_DIST_LN'
+
+        if has_tumor_signal and is_lymph_node_target:
+            prob_final = min(0.95, prob_base + 0.45) # massive specific lift
+        elif has_normal_signal and is_lymph_node_target:
+            prob_final = max(0.01, prob_base * 0.5) # drain risk proportionally
         else:
             prob_final = prob_base
 
@@ -274,18 +278,21 @@ def simulate_risk(request: MultimodalRequest):
         X_num = scaler.transform(clinical_raw[['AGE_AT_SEQUENCING']])
         X_cat = encoder.transform(clinical_raw[['SEX', 'PRIMARY_SITE', 'ONCOTREE_CODE']])
         
+        # --- 2. DUAL-PASS SEED & SOIL INFERENCE ---
+        # Pass A: The Soil (Clinical Baseline only, genomics = 0)
+        X_zero_genomic = np.zeros((1, len(genomic_features)))
+        X_soil = np.hstack([X_num, X_cat, X_zero_genomic])
+        
+        # Pass B: The Seed + Soil (Full Integrated Profile)
         mut_vector = [profile.mutations.get(feat, 0) for feat in genomic_features]
         X_genomic = np.array([mut_vector])
-        
-        # --- 2. MULTIMODAL INFERENCE ---
-        # Stage 1: Genomic Baseline (Actual models expect 372 features)
-        X_baseline = np.hstack([X_num, X_cat, X_genomic])
+        X_integrated = np.hstack([X_num, X_cat, X_genomic])
         
         has_image = False
         vision_confidence = 0.5 # Neutral baseline
         is_vision_conclusive = False
         
-        if request.image:
+        if request.image and profile.primary_site.lower() == 'breast':
             # Extract real embedding for the Vision Validator
             v_vec = vision_encoder.get_embeddings(request.image)
             
@@ -324,29 +331,51 @@ def simulate_risk(request: MultimodalRequest):
             if muts.get("KRAS") or muts.get("SMAD4"):
                 is_high_risk_genomic = True
 
+        # 5. SITE CALIBRATION
+        # First pass to find global Soil trend
+        soil_probs = {s: float(m.predict_proba(X_soil)[0][1]) for s, m in models.items()}
+        max_soil = max(soil_probs.values()) if soil_probs else 1.0
+        
         for site, model in models.items():
-            # 1. Get stable genomic risk (372-feature model)
-            prob_base = float(model.predict_proba(X_baseline)[0][1])
+            # 1. Get raw predictions
+            prob_soil = soil_probs[site]
+            prob_integrated = float(model.predict_proba(X_integrated)[0][1])
             
-            # 2. Apply Dynamic Beta-weighted Fusion
-            if is_vision_conclusive:
+            # 2. Apply Dynamic "Seed Influence"
+            # If genomics increase risk, we call it the "Seed Effect"
+            prob_base = max(prob_soil, prob_integrated)
+            
+            # 3. Restrict Visual Lift exclusively for Breast -> Lymph Node
+            is_breast_ln_target = (profile.primary_site.lower() == 'breast' and site == 'DMETS_DX_DIST_LN')
+            prob_final = prob_base
+            
+            if is_vision_conclusive and is_breast_ln_target:
                 if vision_confidence > 0.7:
-                    # Positive Lift: Linear scaling from baseline to 0.95
-                    # Lift intensity is proportional to confidence beyond threshold
-                    lift = (vision_confidence - 0.7) / 0.3 * 0.4 
+                    # Positive Lift: Scale risk up based on vision confidence
+                    lift = (vision_confidence - 0.7) / 0.3 * 0.40 
                     prob_final = min(0.95, prob_base + lift)
                 else:
-                    # Negative Drain: Reduce risk if vision is very sure it's normal
-                    drain = (0.3 - vision_confidence) / 0.3 * 0.2
+                    # Negative Drain: Reduce risk if vision suggests benign architecture
+                    drain = (0.3 - vision_confidence) / 0.3 * 0.20
                     prob_final = max(0.01, prob_base - drain)
-            else:
-                # Neutral: Fallback to Genomic Baseline
-                prob_final = prob_base
 
-            # 3. Apply Clinical Safety Net (Floor)
+            # 4. BIOLOGICAL CALIBRATION (Non-Hardcoded Receptivity)
+            # If the "Soil" risk is extremely low compared to the most receptive organ,
+            # we penalize the final risk to prevent noisy genomic inflation in implausible sites.
+            receptivity_ratio = prob_soil / max_soil
+            if receptivity_ratio < 0.25:
+                # This soil is not naturally receptive to this cancer type (e.g. Breast to PNS)
+                # Damping the spread to maintain a realistic tropism profile
+                prob_final = prob_final * (0.4 + receptivity_ratio)
+
+            # 5. Apply Clinical Safety Net (Selective Floor)
             if is_high_risk_genomic:
-                # Ensure risk is at least 25% for high-driver mutations in COAD
-                prob_final = max(prob_final, 0.25)
+                # High floor only for naturally receptive soils (>15% relative receptivity)
+                floor = 0.25 if receptivity_ratio > 0.15 else 0.05
+                prob_final = max(prob_final, floor)
+            
+            # Final Clamp
+            prob_final = min(0.98, prob_final)
             
             risks[site] = round(prob_final, 4)
             if has_image:
@@ -399,13 +428,12 @@ def simulate_risk(request: MultimodalRequest):
 @app.post("/predict")
 def predict_risk(request: PredictRequest):
     inference = _run_risk_inference(
-        age_at_sequencing=request.age_at_sequencing,
-        sex=request.sex,
-        primary_site=request.primary_site,
-        oncotree_code=request.oncotree_code,
-        genomic_markers=request.genomic_markers
+        profile=request.profile,
+        models=models,
+        encoder=encoder,
+        scaler=scaler,
+        genomic_features=genomic_features
     )
-    risk_scores = inference["final_risks"]
     return {
         "prediction_id": str(uuid4()),
         "status": "success",

@@ -5,6 +5,8 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html, Center, Bounds, useBounds } from '@react-three/drei';
 import * as THREE from 'three';
 import { ANATOMY_MAPPING_3D, type OrganPosition3D } from '@/lib/anatomy3d';
+import { SeedSoilAnalysis } from '@/components/analysis/SeedSoilAnalysis';
+import type { PatientProfile } from '@/lib/api';
 
 export interface SelectedStructure {
   id: string;
@@ -108,6 +110,7 @@ function CameraController({ selectedStructure, groupRef }: { selectedStructure: 
 ─────────────────────────────────────────────────────── */
 export interface AnatomicalBody3DProps {
   risks: Record<string, number>;
+  profile?: PatientProfile;
   /** Called when the user clicks an organ marker or sidebar button */
   onOrganSelect?: (organId: string, name: string, clientX: number, clientY: number) => void;
 }
@@ -621,7 +624,7 @@ function Particles({ count = 150 }: { count?: number }) {
 /* ───────────────────────────────────────────────────────
    Main Exported Component
 ─────────────────────────────────────────────────────── */
-export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps) {
+export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBody3DProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [hoveredOrgan, setHoveredOrgan] = useState<string | null>(null);
   
@@ -780,7 +783,12 @@ export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps
                                  <div className={`w-1.5 h-1.5 rounded-full transition-shadow ${isSelected ? 'shadow-[0_0_8px_currentColor] scale-125' : 'group-hover:scale-110'}`} style={{ color: '#' + marker.color.getHexString(), backgroundColor: 'currentColor' }} />
                                  <span className={isSelected ? 'font-bold' : 'font-medium'}>{marker.meta.label}</span>
                               </div>
-                              {marker.prob > 0 && <span className="text-[10px] font-mono opacity-60 bg-black/40 px-1.5 rounded">{Math.round(marker.prob * 100)}%</span>}
+                              {marker.prob > 0 && (
+                                 <div className="flex items-center gap-1">
+                                   {profile && <SeedSoilAnalysis organKey={marker.id} riskScore={marker.prob} profile={profile} />}
+                                   <span className="text-[10px] font-mono opacity-60 bg-black/40 px-1.5 rounded">{Math.round(marker.prob * 100)}%</span>
+                                 </div>
+                               )}
                            </button>
                         );
                      })}
@@ -800,3 +808,4 @@ export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps
     </div>
   );
 }
+
