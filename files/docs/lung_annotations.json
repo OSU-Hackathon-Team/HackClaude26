@@ -1,0 +1,290 @@
+{
+    "general_settings": {},
+    "id": "scaffold creator settings",
+    "metadata": {
+        "annotations": [
+            {
+                "id": "ILX:0793130",
+                "name": "anterior border of left lung"
+            },
+            {
+                "id": "ILX:0793129",
+                "name": "anterior border of right lung"
+            },
+            {
+                "id": "ILX:0778112",
+                "name": "apex of left lung"
+            },
+            {
+                "id": "ILX:0778113",
+                "name": "apex of right lung"
+            },
+            {
+                "id": "ILX:0793187",
+                "name": "base of left lung surface"
+            },
+            {
+                "id": "ILX:0793577",
+                "name": "base of lower lobe of left lung surface"
+            },
+            {
+                "id": "ILX:0793579",
+                "name": "base of lower lobe of right lung surface"
+            },
+            {
+                "id": "ILX:0793580",
+                "name": "base of middle lobe of right lung surface"
+            },
+            {
+                "id": "ILX:0793188",
+                "name": "base of right lung surface"
+            },
+            {
+                "id": "ILX:0793578",
+                "name": "base of upper lobe of left lung surface"
+            },
+            {
+                "id": "ILX:0793582",
+                "name": "horizontal fissure of middle lobe of right lung"
+            },
+            {
+                "id": "ILX:0746327",
+                "name": "horizontal fissure of right lung"
+            },
+            {
+                "id": "ILX:0793583",
+                "name": "horizontal fissure of upper lobe of right lung"
+            },
+            {
+                "id": "ILX:0793601",
+                "name": "lateral surface of left lung"
+            },
+            {
+                "id": "ILX:0793584",
+                "name": "lateral surface of lower lobe of left lung"
+            },
+            {
+                "id": "ILX:0793585",
+                "name": "lateral surface of lower lobe of right lung"
+            },
+            {
+                "id": "ILX:0793586",
+                "name": "lateral surface of middle lobe of right lung"
+            },
+            {
+                "id": "ILX:0793602",
+                "name": "lateral surface of right lung"
+            },
+            {
+                "id": "ILX:0793587",
+                "name": "lateral surface of upper lobe of left lung"
+            },
+            {
+                "id": "ILX:0793588",
+                "name": "lateral surface of upper lobe of right lung"
+            },
+            {
+                "id": "ILX:0778124",
+                "name": "laterodorsal tip of middle lobe of right lung"
+            },
+            {
+                "id": "UBERON:0002168",
+                "name": "left lung"
+            },
+            {
+                "id": "ILX:0793186",
+                "name": "left lung surface"
+            },
+            {
+                "id": "UBERON:0008953",
+                "name": "lower lobe of left lung"
+            },
+            {
+                "id": "ILX:0793192",
+                "name": "lower lobe of left lung surface"
+            },
+            {
+                "id": "UBERON:0002171",
+                "name": "lower lobe of right lung"
+            },
+            {
+                "id": "ILX:0793191",
+                "name": "lower lobe of right lung surface"
+            },
+            {
+                "id": "UBERON:0002048",
+                "name": "lung"
+            },
+            {
+                "id": "ILX:0778120",
+                "name": "medial base of left lung"
+            },
+            {
+                "id": "ILX:0778121",
+                "name": "medial base of right lung"
+            },
+            {
+                "id": "ILX:0793599",
+                "name": "medial surface of left lung"
+            },
+            {
+                "id": "ILX:0793589",
+                "name": "medial surface of lower lobe of left lung"
+            },
+            {
+                "id": "ILX:0793590",
+                "name": "medial surface of lower lobe of right lung"
+            },
+            {
+                "id": "ILX:0793591",
+                "name": "medial surface of middle lobe of right lung"
+            },
+            {
+                "id": "ILX:0793600",
+                "name": "medial surface of right lung"
+            },
+            {
+                "id": "ILX:0793592",
+                "name": "medial surface of upper lobe of left lung"
+            },
+            {
+                "id": "ILX:0793593",
+                "name": "medial surface of upper lobe of right lung"
+            },
+            {
+                "id": "UBERON:0002174",
+                "name": "middle lobe of right lung"
+            },
+            {
+                "id": "ILX:0793193",
+                "name": "middle lobe of right lung surface"
+            },
+            {
+                "id": "ILX:0778115",
+                "name": "oblique fissure of left lung"
+            },
+            {
+                "id": "ILX:0793594",
+                "name": "oblique fissure of lower lobe of left lung"
+            },
+            {
+                "id": "ILX:0793596",
+                "name": "oblique fissure of lower lobe of right lung"
+            },
+            {
+                "id": "ILX:0793597",
+                "name": "oblique fissure of middle lobe of right lung"
+            },
+            {
+                "id": "ILX:0778114",
+                "name": "oblique fissure of right lung"
+            },
+            {
+                "id": "ILX:0793595",
+                "name": "oblique fissure of upper lobe of left lung"
+            },
+            {
+                "id": "ILX:0793598",
+                "name": "oblique fissure of upper lobe of right lung"
+            },
+            {
+                "id": "UBERON:0002167",
+                "name": "right lung"
+            },
+            {
+                "id": "ILX:0793185",
+                "name": "right lung surface"
+            },
+            {
+                "id": "UBERON:0008952",
+                "name": "upper lobe of left lung"
+            },
+            {
+                "id": "ILX:0793194",
+                "name": "upper lobe of left lung surface"
+            },
+            {
+                "id": "UBERON:0002170",
+                "name": "upper lobe of right lung"
+            },
+            {
+                "id": "ILX:0793195",
+                "name": "upper lobe of right lung surface"
+            },
+            {
+                "id": "ILX:0778118",
+                "name": "ventral base of left lung"
+            },
+            {
+                "id": "ILX:0778122",
+                "name": "ventral base of right lung"
+            }
+        ]
+    },
+    "scaffold_settings": {
+        "deleteElementRanges": "",
+        "scaffoldPackage": {
+            "_ScaffoldPackage": true,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaffoldSettings": {
+                "Accessory lobe": false,
+                "Accessory lobe base midpoint x, y": [
+                    0.0,
+                    0.25
+                ],
+                "Accessory lobe dorsal height": 0.5,
+                "Accessory lobe dorsal width": 0.5,
+                "Accessory lobe length": 0.5,
+                "Accessory lobe medial curvature about z-axis": 0.0,
+                "Accessory lobe ventral height": 0.5,
+                "Accessory lobe ventral width": 0.5,
+                "Accessory lobe ventral-left rotation degrees": 0.0,
+                "Diaphragm centre x": 0.0,
+                "Diaphragm centre y": 0.0,
+                "Diaphragm curvature x": 1.0,
+                "Diaphragm curvature y": 1.0,
+                "Left lung base medial protrusion": 0.0,
+                "Left lung depth": 0.9,
+                "Left lung dorsal-ventral medial curvature": 3.0,
+                "Left lung dorsal-ventral medial curvature bias": 1.0,
+                "Left lung height": 1.0,
+                "Left lung ventral edge sharpness factor": 0.8,
+                "Left lung ventral-medial rotation degrees": 0.0,
+                "Left lung width": 0.7,
+                "Left-right apex medial shear displacement": 0.15,
+                "Left-right apex ventral shear displacement": -0.2,
+                "Left-right lung spacing": 0.7,
+                "Material Parameters": null,
+                "Number of left lung lobes": 2,
+                "Open fissures": false,
+                "Refine": false,
+                "Refine number of elements": 4,
+                "Right lung base medial protrusion": 0.0,
+                "Right lung depth": 0.9,
+                "Right lung dorsal-ventral medial curvature": 3.0,
+                "Right lung dorsal-ventral medial curvature bias": 1.0,
+                "Right lung height": 1.0,
+                "Right lung ventral edge sharpness factor": 0.8,
+                "Right lung ventral-medial rotation degrees": 0.0,
+                "Right lung width": 0.7
+            },
+            "scaffoldTypeName": "3D Lung 2",
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "segmentation_data_settings": {},
+    "version": "1.0.0"
+}

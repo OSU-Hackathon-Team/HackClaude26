@@ -1,0 +1,192 @@
+{
+    "general_settings": {},
+    "id": "scaffold creator settings",
+    "metadata": {
+        "annotations": [
+            {
+                "id": "ILX:0774405",
+                "name": "apex of urinary bladder"
+            },
+            {
+                "id": "UBERON:0009958",
+                "name": "bladder lumen"
+            },
+            {
+                "id": "ILX:0738433",
+                "name": "dome of the bladder"
+            },
+            {
+                "id": "ILX:0778155",
+                "name": "dorsal part of bladder"
+            },
+            {
+                "id": "ILX:0739250",
+                "name": "dorsal part of lumen of body of urinary bladder"
+            },
+            {
+                "id": "ILX:0739255",
+                "name": "dorsal part of lumen of neck of urinary bladder"
+            },
+            {
+                "id": "ILX:0739278",
+                "name": "dorsal part of serosa of body of urinary bladder"
+            },
+            {
+                "id": "ILX:0739280",
+                "name": "dorsal part of serosa of neck of urinary bladder"
+            },
+            {
+                "id": "ILX:0739248",
+                "name": "dorsal part of serosa of urinary bladder"
+            },
+            {
+                "id": "ILX:0777128",
+                "name": "dorsal part of urinary bladder lumen"
+            },
+            {
+                "id": "ILX:0778142",
+                "name": "left ureter junction with bladder"
+            },
+            {
+                "id": "ILX:0739252",
+                "name": "lumen of body of urinary bladder"
+            },
+            {
+                "id": "ILX:0739256",
+                "name": "lumen of neck of urinary bladder"
+            },
+            {
+                "id": "UBERON:0001258",
+                "name": "neck of urinary bladder"
+            },
+            {
+                "id": "ILX:0778143",
+                "name": "right ureter junction with bladder"
+            },
+            {
+                "id": "ILX:0739276",
+                "name": "serosa of body of urinary bladder"
+            },
+            {
+                "id": "ILX:0739277",
+                "name": "serosa of neck of urinary bladder"
+            },
+            {
+                "id": "UBERON:0001260",
+                "name": "serosa of urinary bladder"
+            },
+            {
+                "id": "UBERON:0001255",
+                "name": "urinary bladder"
+            },
+            {
+                "id": "ILX:0778156 ",
+                "name": "ventral part of bladder"
+            },
+            {
+                "id": "ILX:0739251",
+                "name": "ventral part of lumen of body of urinary bladder"
+            },
+            {
+                "id": "ILX:0739257",
+                "name": "ventral part of lumen of neck of urinary bladder"
+            },
+            {
+                "id": "ILX:0739279",
+                "name": "ventral part of serosa of body of urinary bladder"
+            },
+            {
+                "id": "ILX:0739281",
+                "name": "ventral part of serosa of neck of urinary bladder"
+            },
+            {
+                "id": "ILX:0739249",
+                "name": "ventral part of serosa of urinary bladder"
+            },
+            {
+                "id": "ILX:0777129",
+                "name": "ventral part of urinary bladder lumen"
+            }
+        ]
+    },
+    "scaffold_settings": {
+        "deleteElementRanges": "",
+        "scaffoldPackage": {
+            "_ScaffoldPackage": true,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaffoldSettings": {
+                "Central path": {
+                    "_ScaffoldPackage": true,
+                    "meshEdits": "EX Version: 3\nRegion: /\n!#nodeset nodes\nDefine node template: node1\nShape. Dimension=0\n#Fields=1\n1) coordinates, coordinate, rectangular cartesian, real, #Components=3\n x. #Values=6 (value,d/ds1,d/ds2,d2/ds1ds2,d/ds3,d2/ds1ds3)\n y. #Values=6 (value,d/ds1,d/ds2,d2/ds1ds2,d/ds3,d2/ds1ds3)\n z. #Values=6 (value,d/ds1,d/ds2,d2/ds1ds2,d/ds3,d2/ds1ds3)\nNode template: node1\nNode: 1\n  2.000000000000000e+00 -2.924000000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -2.707900000000000e-01 -2.649600000000000e-01  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  5.383500000000000e-01  1.434400000000000e-01\nNode: 2\n  1.701130000000000e+00 -3.053400000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -4.679700000000000e-01 -1.293900000000000e-01  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  6.771100000000000e-01  1.340600000000000e-01\nNode: 3\n  1.389310000000000e+00 -3.141000000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -5.266300000000000e-01 -3.310000000000000e-03  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  8.062800000000000e-01  1.150000000000000e-03\nNode: 4\n  1.072920000000000e+00 -3.056500000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -4.737700000000000e-01  8.253000000000001e-02  0.000000000000000e+00 -0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 -0.000000000000000e+00  6.775300000000000e-01 -1.333200000000000e-01\nNode: 5\n  7.780100000000000e-01 -2.922800000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -3.635800000000000e-01  1.093500000000000e-01  0.000000000000000e+00 -0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 -0.000000000000000e+00  5.399400000000000e-01 -1.549000000000000e-01\nNode: 6\n  4.883600000000000e-01 -2.669200000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -2.550400000000000e-01  9.572000000000000e-02  0.000000000000000e+00 -0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 -0.000000000000000e+00  3.680400000000000e-01 -1.627600000000000e-01\nNode: 7\n  2.441800000000000e-01 -2.441800000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -1.701300000000000e-01  7.176000000000000e-02  0.000000000000000e+00 -0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 -0.000000000000000e+00  2.129800000000000e-01 -1.361600000000000e-01\nNode: 8\n  0.000000000000000e+00 -2.441800000000000e-01  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00 -1.115300000000000e-01  4.545000000000000e-02  0.000000000000000e+00 -0.000000000000000e+00\n  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 -0.000000000000000e+00  9.572000000000000e-02 -9.837000000000000e-02\nGroup name: meshEdits\n!#nodeset nodes\nNode group:\n1..8\n",
+                    "rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scaffoldSettings": {
+                        "Coordinate dimensions": 3,
+                        "D2 derivatives": true,
+                        "D3 derivatives": true,
+                        "Length": 1.0,
+                        "Number of elements": 7
+                    },
+                    "scaffoldTypeName": "1D Path 1",
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "translation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "userAnnotationGroups": [
+                        {
+                            "_AnnotationGroup": true,
+                            "dimension": 1,
+                            "identifierRanges": "1-4",
+                            "name": "dome of the bladder",
+                            "ontId": "ILX:0738433"
+                        },
+                        {
+                            "_AnnotationGroup": true,
+                            "dimension": 1,
+                            "identifierRanges": "5-7",
+                            "name": "neck of urinary bladder",
+                            "ontId": "UBERON:0001258"
+                        }
+                    ]
+                },
+                "Number of elements along dome": 8,
+                "Number of elements along neck": 4,
+                "Number of elements around": 8,
+                "Number of elements through wall": 1,
+                "Refine": false,
+                "Refine number of elements along": 4,
+                "Refine number of elements around": 4,
+                "Refine number of elements through wall": 1,
+                "Ureter position around": 0.67,
+                "Use linear through wall": true,
+                "Wall thickness": 0.043
+            },
+            "scaffoldTypeName": "3D Bladder 1",
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "segmentation_data_settings": {},
+    "version": "1.0.0"
+}

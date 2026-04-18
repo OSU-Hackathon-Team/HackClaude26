@@ -1,0 +1,251 @@
+{
+    "general_settings": {},
+    "id": "scaffold creator settings",
+    "metadata": {
+        "annotations": [
+            {
+                "id": "ILX:0794592",
+                "name": "C1 spinal nerve"
+            },
+            {
+                "id": "ILX:0794595",
+                "name": "C2 spinal nerve"
+            },
+            {
+                "id": "ILX:0794598",
+                "name": "C3 spinal nerve"
+            },
+            {
+                "id": "ILX:0794601",
+                "name": "C4 spinal nerve"
+            },
+            {
+                "id": "ILX:0794604",
+                "name": "C5 spinal nerve"
+            },
+            {
+                "id": "ILX:0794607",
+                "name": "C6 spinal nerve"
+            },
+            {
+                "id": "ILX:0794610",
+                "name": "C7 spinal nerve"
+            },
+            {
+                "id": "ILX:0794613",
+                "name": "C8 spinal nerve"
+            },
+            {
+                "id": "ILX:0788972",
+                "name": "L1 spinal nerve"
+            },
+            {
+                "id": "ILX:0786362",
+                "name": "L2 spinal nerve"
+            },
+            {
+                "id": "ILX:0789374",
+                "name": "L3 spinal nerve"
+            },
+            {
+                "id": "ILX:0788896",
+                "name": "L4 spinal nerve"
+            },
+            {
+                "id": "ILX:0787261",
+                "name": "L5 spinal nerve"
+            },
+            {
+                "id": "ILX:0790504",
+                "name": "S1 spinal nerve"
+            },
+            {
+                "id": "ILX:0787528",
+                "name": "S2 spinal nerve"
+            },
+            {
+                "id": "ILX:0791971",
+                "name": "S3 spinal nerve"
+            },
+            {
+                "id": "ILX:0792327",
+                "name": "S4 spinal nerve"
+            },
+            {
+                "id": "ILX:0787432",
+                "name": "S5 spinal nerve"
+            },
+            {
+                "id": "ILX:0738397",
+                "name": "T1 spinal nerve"
+            },
+            {
+                "id": "ILX:0792933",
+                "name": "T10 spinal nerve"
+            },
+            {
+                "id": "ILX:0791454",
+                "name": "T11 spinal nerve"
+            },
+            {
+                "id": "ILX:0791046",
+                "name": "T12 spinal nerve"
+            },
+            {
+                "id": "ILX:0739243",
+                "name": "T2 spinal nerve"
+            },
+            {
+                "id": "ILX:0739246",
+                "name": "T3 spinal nerve"
+            },
+            {
+                "id": "ILX:0784755",
+                "name": "T4 spinal nerve"
+            },
+            {
+                "id": "ILX:0792589",
+                "name": "T5 spinal nerve"
+            },
+            {
+                "id": "ILX:0791122",
+                "name": "T6 spinal nerve"
+            },
+            {
+                "id": "ILX:0789008",
+                "name": "T7 spinal nerve"
+            },
+            {
+                "id": "ILX:0792754",
+                "name": "T8 spinal nerve"
+            },
+            {
+                "id": "ILX:0789545",
+                "name": "T9 spinal nerve"
+            },
+            {
+                "id": "UBERON:0000962",
+                "name": "cervical spinal nerve"
+            },
+            {
+                "id": "UBERON:0009629",
+                "name": "coccygeal nerve"
+            },
+            {
+                "id": "",
+                "name": "core"
+            },
+            {
+                "id": "UBERON:0000044",
+                "name": "dorsal root ganglion"
+            },
+            {
+                "id": "UBERON:0002261",
+                "name": "dorsal root of spinal cord"
+            },
+            {
+                "id": "",
+                "name": "left"
+            },
+            {
+                "id": "UBERON:0009624",
+                "name": "lumbar nerve"
+            },
+            {
+                "id": "",
+                "name": "right"
+            },
+            {
+                "id": "UBERON:0009625",
+                "name": "sacral nerve"
+            },
+            {
+                "id": "",
+                "name": "shell"
+            },
+            {
+                "id": "UBERON:0001780",
+                "name": "spinal nerve"
+            },
+            {
+                "id": "UBERON:0003726",
+                "name": "thoracic nerve"
+            },
+            {
+                "id": "UBERON:0002260",
+                "name": "ventral root of spinal cord"
+            }
+        ]
+    },
+    "scaffold_settings": {
+        "deleteElementRanges": "",
+        "scaffoldPackage": {
+            "_ScaffoldPackage": true,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaffoldSettings": {
+                "Base parameter set": "Human whole spine 1",
+                "Number of elements across core box minor": 2,
+                "Number of elements across core transition": 1,
+                "Number of elements along dorsal root beside DRG": 1,
+                "Number of elements along dorsal root ganglion": 3,
+                "Number of elements along nerve root": 3,
+                "Number of elements along ventral root": 5,
+                "Number of elements around spinal nerve": 8,
+                "Number of elements through shell": 1,
+                "Show trim surfaces": false,
+                "Spinal nerve network layout": {
+                    "_ScaffoldPackage": true,
+                    "rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scaffoldSettings": {
+                        "Base parameter set": "Human whole spine 1",
+                        "Define inner coordinates": true,
+                        "Distance between bifurcation to spinal cord": 0.1,
+                        "Dorsal root diameter": 0.1,
+                        "Dorsal root ganglion thickest diameter": 0.18,
+                        "Inner proportion default": 0.75,
+                        "Pitch angle degrees": 10.0,
+                        "Spinal cord major diameter": 1.5,
+                        "Spinal cord minor diameter": 0.5,
+                        "Spinal nerve root diameter": 0.1,
+                        "Spinal nerve root length": 0.5,
+                        "Structure": "1-2.1,2.2-3-4-5,2.3-6-7, 7-8-9-10-11, 11-12-13,14-15.1,15.2-16-17-18,15.3-19-20, 20-21-22-23-24, 24-25-26",
+                        "Ventral root diameter": 0.1
+                    },
+                    "scaffoldTypeName": "1D Human Spinal Nerve Network Layout 1",
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "translation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "Use Core": true
+            },
+            "scaffoldTypeName": "3D Spinal Nerve 1",
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "segmentation_data_settings": {},
+    "version": "1.0.0"
+}

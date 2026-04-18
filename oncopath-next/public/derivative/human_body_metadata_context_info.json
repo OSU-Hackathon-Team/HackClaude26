@@ -1,0 +1,19 @@
+{
+  "banner": "derivative/human_body_Layout1_thumbnail.jpeg",
+  "description": "Visualization of the whole-body with the vital organs, musculoskeletal, vasculature and nervous systems.",
+  "heading": "3D human whole-body with integrated organs, musculoskeletal, vasculature and nervous systems",
+  "id": "sparc.science.context_data",
+  "metadata": "derivative/human_body_metadata.json",
+  "samples": [],
+  "version": "0.2.0",
+  "views": [
+    {
+      "annotation": "UBERON:0000468",
+      "description": "Human whole-body with embedded organs, vasculature, musculoskeletal and nervous systems.",
+      "id": "View 1",
+      "path": "derivative/human_body_Layout1_view.json",
+      "sample": "--",
+      "thumbnail": "derivative/human_body_Layout1_thumbnail.jpeg"
+    }
+  ]
+}

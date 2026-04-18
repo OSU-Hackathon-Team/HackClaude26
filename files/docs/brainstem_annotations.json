@@ -1,0 +1,164 @@
+{
+    "general_settings": {},
+    "id": "scaffold creator settings",
+    "metadata": {
+        "annotations": [
+            {
+                "id": "UBERON:0002298",
+                "name": "brainstem"
+            },
+            {
+                "id": "ILX:0778144",
+                "name": "brainstem dorsal midline caudal point"
+            },
+            {
+                "id": "ILX:0778146 ",
+                "name": "brainstem dorsal midline cranial point"
+            },
+            {
+                "id": "ILX:0778150",
+                "name": "brainstem dorsal midline midbrain-pons junction"
+            },
+            {
+                "id": "ILX:0778148",
+                "name": "brainstem dorsal midline pons-medulla junction"
+            },
+            {
+                "id": "ILX:0778157",
+                "name": "brainstem exterior"
+            },
+            {
+                "id": "ILX:0778145",
+                "name": "brainstem ventral midline caudal point"
+            },
+            {
+                "id": "ILX:0778147",
+                "name": "brainstem ventral midline cranial point"
+            },
+            {
+                "id": "ILX:0778151",
+                "name": "brainstem ventral midline midbrain-pons junction"
+            },
+            {
+                "id": "ILX:0778149",
+                "name": "brainstem ventral midline pons-medulla junction"
+            },
+            {
+                "id": "ILX:0778162",
+                "name": "brainstem-spinal cord interface"
+            },
+            {
+                "id": "UBERON:0001896",
+                "name": "medulla oblongata"
+            },
+            {
+                "id": "ILX:0778159",
+                "name": "medulla oblongata exterior"
+            },
+            {
+                "id": "UBERON:0001891",
+                "name": "midbrain"
+            },
+            {
+                "id": "ILX:0778158",
+                "name": "midbrain exterior"
+            },
+            {
+                "id": "UBERON:0000988",
+                "name": "pons"
+            },
+            {
+                "id": "ILX:0778160",
+                "name": "pons exterior"
+            },
+            {
+                "id": "ILX:0778163",
+                "name": "thalamus-brainstem interface"
+            }
+        ]
+    },
+    "scaffold_settings": {
+        "deleteElementRanges": "",
+        "scaffoldPackage": {
+            "_ScaffoldPackage": true,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaffoldSettings": {
+                "Base parameter set": "Human 1",
+                "Central path": {
+                    "_ScaffoldPackage": true,
+                    "meshEdits": "EX Version: 3\nRegion: /\n!#nodeset nodes\nDefine node template: node1\nShape. Dimension=0\n#Fields=1\n1) coordinates, coordinate, rectangular cartesian, real, #Components=3\n x. #Values=6 (value,d/ds1,d/ds2,d2/ds1ds2,d/ds3,d2/ds1ds3)\n y. #Values=6 (value,d/ds1,d/ds2,d2/ds1ds2,d/ds3,d2/ds1ds3)\n z. #Values=6 (value,d/ds1,d/ds2,d2/ds1ds2,d/ds3,d2/ds1ds3)\nNode template: node1\nNode: 1\n  0.000000000000000e+00  0.000000000000000e+00  7.800000000000000e+00  5.000000000000000e-01 -0.000000000000000e+00  0.000000000000000e+00\n  1.890000000000000e+01 -3.200000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  6.100000000000000e+00  8.000000000000000e-01\n -5.070000000000000e+01  1.540000000000000e+01  0.000000000000000e+00  0.000000000000000e+00  1.300000000000000e+00  1.700000000000000e+00\nNode: 2\n  0.000000000000000e+00  0.000000000000000e+00  8.500000000000000e+00  9.000000000000000e-01 -0.000000000000000e+00  0.000000000000000e+00\n  1.460000000000000e+01 -5.400000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  7.200000000000000e+00  1.400000000000000e+00\n -3.630000000000000e+01  1.330000000000000e+01  0.000000000000000e+00  0.000000000000000e+00  2.900000000000000e+00  1.600000000000000e+00\nNode: 3\n  0.000000000000000e+00  0.000000000000000e+00  9.600000000000000e+00  4.400000000000000e+00 -0.000000000000000e+00  0.000000000000000e+00\n  8.300000000000001e+00 -6.400000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  8.900000000000000e+00  1.300000000000000e+00\n -2.410000000000000e+01  1.250000000000000e+01  0.000000000000000e+00  0.000000000000000e+00  4.600000000000000e+00  5.000000000000000e-01\nNode: 4\n  0.000000000000000e+00  0.000000000000000e+00  1.740000000000000e+01  5.300000000000000e+00 -0.000000000000000e+00  0.000000000000000e+00\n  1.800000000000000e+00 -5.300000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  9.800000000000001e+00  2.600000000000000e+00\n -1.140000000000000e+01  1.330000000000000e+01  0.000000000000000e+00  0.000000000000000e+00  3.900000000000000e+00 -2.000000000000000e-01\nNode: 5\n  0.000000000000000e+00  0.000000000000000e+00  2.020000000000000e+01 -4.000000000000000e-01 -0.000000000000000e+00  0.000000000000000e+00\n -2.300000000000000e+00 -3.900000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  1.410000000000000e+01  2.200000000000000e+00\n  2.400000000000000e+00  1.320000000000000e+01  0.000000000000000e+00  0.000000000000000e+00  4.200000000000000e+00 -5.000000000000000e-01\nNode: 6\n  0.000000000000000e+00  0.000000000000000e+00  1.680000000000000e+01 -2.400000000000000e+00 -0.000000000000000e+00  0.000000000000000e+00\n -6.000000000000000e+00 -2.600000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  1.440000000000000e+01  2.000000000000000e-01\n  1.500000000000000e+01  1.290000000000000e+01  0.000000000000000e+00  0.000000000000000e+00  2.900000000000000e+00 -1.900000000000000e+00\nNode: 7\n  0.000000000000000e+00  0.000000000000000e+00  1.530000000000000e+01 -6.000000000000000e-01 -0.000000000000000e+00  0.000000000000000e+00\n -7.500000000000000e+00 -4.000000000000000e-01  0.000000000000000e+00  0.000000000000000e+00  1.450000000000000e+01  0.000000000000000e+00\n  2.800000000000000e+01  1.310000000000000e+01  0.000000000000000e+00  0.000000000000000e+00  4.000000000000000e-01 -3.100000000000000e+00\nGroup name: meshEdits\n!#nodeset nodes\nNode group:\n1..7\n",
+                    "rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scaffoldSettings": {
+                        "Coordinate dimensions": 3,
+                        "D2 derivatives": true,
+                        "D3 derivatives": true,
+                        "Length": 1.0,
+                        "Number of elements": 6
+                    },
+                    "scaffoldTypeName": "1D Path 1",
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "translation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "userAnnotationGroups": [
+                        {
+                            "_AnnotationGroup": true,
+                            "dimension": 1,
+                            "identifierRanges": "1-2",
+                            "name": "medulla oblongata",
+                            "ontId": "UBERON:0001896"
+                        },
+                        {
+                            "_AnnotationGroup": true,
+                            "dimension": 1,
+                            "identifierRanges": "3-4",
+                            "name": "pons",
+                            "ontId": "UBERON:0000988"
+                        },
+                        {
+                            "_AnnotationGroup": true,
+                            "dimension": 1,
+                            "identifierRanges": "5-6",
+                            "name": "midbrain",
+                            "ontId": "UBERON:0001891"
+                        }
+                    ]
+                },
+                "Number of elements across major": 6,
+                "Number of elements across minor": 6,
+                "Number of elements along": 8,
+                "Refine": false,
+                "Refine number of elements across major and minor": 1,
+                "Refine number of elements along": 1,
+                "Use cross derivatives": false
+            },
+            "scaffoldTypeName": "3D Brainstem 1",
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "segmentation_data_settings": {},
+    "version": "1.0.0"
+}

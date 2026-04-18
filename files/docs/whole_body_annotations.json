@@ -1,0 +1,235 @@
+{
+    "general_settings": {},
+    "id": "scaffold creator settings",
+    "metadata": {
+        "annotations": [
+            {
+                "id": "UBERON:0000916",
+                "name": "abdomen"
+            },
+            {
+                "id": "UBERON:0003684",
+                "name": "abdominal cavity"
+            },
+            {
+                "id": "ILX:0796509",
+                "name": "abdominal cavity boundary surface"
+            },
+            {
+                "id": "",
+                "name": "arm to hand"
+            },
+            {
+                "id": "UBERON:0000468",
+                "name": "body"
+            },
+            {
+                "id": "",
+                "name": "core"
+            },
+            {
+                "id": "UBERON:0001103",
+                "name": "diaphragm"
+            },
+            {
+                "id": "",
+                "name": "dorsal"
+            },
+            {
+                "id": "ILX:0745450",
+                "name": "foot"
+            },
+            {
+                "id": "ILX:0104885",
+                "name": "hand"
+            },
+            {
+                "id": "UBERON:0000033",
+                "name": "head"
+            },
+            {
+                "id": "",
+                "name": "left"
+            },
+            {
+                "id": "UBERON:8300004",
+                "name": "left lower limb"
+            },
+            {
+                "id": "ILX:0796506",
+                "name": "left lower limb skin epidermis outer surface"
+            },
+            {
+                "id": "UBERON:8300002",
+                "name": "left upper limb"
+            },
+            {
+                "id": "ILX:0796504",
+                "name": "left upper limb skin epidermis outer surface"
+            },
+            {
+                "id": "",
+                "name": "leg to foot"
+            },
+            {
+                "id": "UBERON:0000978",
+                "name": "lower limb"
+            },
+            {
+                "id": "UBERON:0000974",
+                "name": "neck"
+            },
+            {
+                "id": "",
+                "name": "right"
+            },
+            {
+                "id": "UBERON:8300003",
+                "name": "right lower limb "
+            },
+            {
+                "id": "ILX:0796505",
+                "name": "right lower limb skin epidermis outer surface"
+            },
+            {
+                "id": "UBERON:8300001",
+                "name": "right upper limb"
+            },
+            {
+                "id": "ILX:0796503",
+                "name": "right upper limb skin epidermis outer surface"
+            },
+            {
+                "id": "",
+                "name": "shell"
+            },
+            {
+                "id": "UBERON:0001003",
+                "name": "skin epidermis outer surface"
+            },
+            {
+                "id": "UBERON:0002240",
+                "name": "spinal cord"
+            },
+            {
+                "id": "UBERON:0002224",
+                "name": "thoracic cavity"
+            },
+            {
+                "id": "ILX:0796508",
+                "name": "thoracic cavity boundary surface"
+            },
+            {
+                "id": "ILX:0742178",
+                "name": "thorax"
+            },
+            {
+                "id": "UBERON:0001460",
+                "name": "upper limb"
+            },
+            {
+                "id": "",
+                "name": "ventral"
+            }
+        ]
+    },
+    "scaffold_settings": {
+        "deleteElementRanges": "",
+        "scaffoldPackage": {
+            "_ScaffoldPackage": true,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaffoldSettings": {
+                "Base parameter set": "Human 1 Coarse",
+                "Body network layout": {
+                    "_ScaffoldPackage": true,
+                    "rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "scaffoldSettings": {
+                        "Abdomen length": 3.0,
+                        "Arm lateral angle degrees": 10.0,
+                        "Arm length": 7.5,
+                        "Arm top diameter": 1.0,
+                        "Arm twist angle degrees": 0.0,
+                        "Base parameter set": "Default",
+                        "Define inner coordinates": true,
+                        "Foot height": 1.25,
+                        "Foot length": 2.5,
+                        "Foot thickness": 0.3,
+                        "Foot width": 1.0,
+                        "Hand length": 2.0,
+                        "Hand thickness": 0.2,
+                        "Hand width": 1.0,
+                        "Head depth": 2.0,
+                        "Head length": 2.2,
+                        "Head width": 2.0,
+                        "Inner proportion default": 0.7,
+                        "Inner proportion head": 0.35,
+                        "Leg bottom diameter": 0.7,
+                        "Leg lateral angle degrees": 10.0,
+                        "Leg length": 10.0,
+                        "Leg top diameter": 2.0,
+                        "Neck length": 1.3,
+                        "Pelvis drop": 1.5,
+                        "Pelvis width": 2.0,
+                        "Shoulder drop": 1.0,
+                        "Shoulder width": 4.5,
+                        "Structure": "1-2-3-4,4-5-6.1,6.2-14-15-16-17-18-19,19-20,6.3-21-22-23-24-25-26,26-27,6.1-7-8-9,9-10-11-12-13.1,13.2-28-29-30-31-32,32-33-34,13.3-35-36-37-38-39,39-40-41",
+                        "Thorax length": 2.5,
+                        "Torso depth": 2.5,
+                        "Torso width": 3.2,
+                        "Wrist thickness": 0.5,
+                        "Wrist width": 0.7
+                    },
+                    "scaffoldTypeName": "1D Human Body Network Layout 1",
+                    "scale": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "translation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "Number of elements across core box minor": 2,
+                "Number of elements across core transition": 1,
+                "Number of elements along abdomen": 2,
+                "Number of elements along arm to hand": 5,
+                "Number of elements along foot": 2,
+                "Number of elements along hand": 1,
+                "Number of elements along head": 2,
+                "Number of elements along leg to foot": 4,
+                "Number of elements along neck": 1,
+                "Number of elements along thorax": 2,
+                "Number of elements around arm": 8,
+                "Number of elements around head": 12,
+                "Number of elements around leg": 8,
+                "Number of elements around torso": 12,
+                "Number of elements through shell": 1,
+                "Show trim surfaces": false,
+                "Use Core": true
+            },
+            "scaffoldTypeName": "3D Whole Body 2",
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "segmentation_data_settings": {},
+    "version": "1.0.0"
+}
