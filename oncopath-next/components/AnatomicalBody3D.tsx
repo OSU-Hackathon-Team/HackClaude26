@@ -496,18 +496,7 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
           />
         ))}
 
-        {/* Dynamic Inner Markers (Undergo same Orientation+Scale transformations) */}
-        {visibleMarkers.map((marker) => (
-          <OrganMarker 
-            key={marker.id} 
-            data={marker} 
-            isHovered={hoveredOrgan === marker.id} 
-            isSelected={selectedStructure?.id === marker.id} 
-            onHover={() => setHoveredOrgan(marker.id)} 
-            onUnhover={() => setHoveredOrgan(null)}
-            onSelect={onOrganSelect}
-          />
-        ))}
+        {/* Dot markers sacked per user request */}
       </group>
       {progress < 100 && (
          <Html position={[0, 2, 0]} center>
@@ -718,10 +707,10 @@ export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps
          </div>
       </div>
 
-      {/* Restored Top-left controls -> Now moved to Bottom Right */}
-      <div className="absolute z-20 space-y-3" style={{ bottom: '20px', right: '20px' }}>
-        <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
-           <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">Viewing Mode</div>
+      {/* Viewing Mode Filters — Moved to Left */}
+      <div className="absolute z-20 space-y-3" style={{ top: '80px', left: '20px' }}>
+        <div className="bg-zinc-900/80 backdrop-blur-xl rounded-xl border border-zinc-800 p-3 shadow-xl">
+           <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold mb-2">Viewing Mode</div>
            <div className="flex flex-col gap-2">
              {[
                { id: 'all', label: 'All Systems' },
@@ -731,7 +720,7 @@ export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps
                { id: 'circulatory', label: 'Circulatory' },
                { id: 'nervous', label: 'Nervous' }
              ].map(sys => (
-               <button key={sys.id} onClick={() => setActiveSystem(sys.id)} className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-bold transition-all text-left ${activeSystem === sys.id ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20 w-full' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}>
+               <button key={sys.id} onClick={() => setActiveSystem(sys.id)} className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-bold transition-all text-left ${activeSystem === sys.id ? 'bg-orange-600/80 text-white shadow-lg shadow-orange-600/20 w-full' : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'}`}>
                  {sys.label}
                </button>
              ))}
@@ -739,22 +728,22 @@ export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps
         </div>
 
         {activeSystem === 'all' && !selectedStructure && (
-          <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
+          <div className="bg-zinc-900/80 backdrop-blur-xl rounded-xl border border-zinc-800 p-3 shadow-xl">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Skin Layer</span>
-              <span className="text-[10px] text-blue-400 font-mono font-bold">{Math.round(skinOpacity * 100)}%</span>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Skin Layer</span>
+              <span className="text-[10px] text-orange-400 font-mono font-bold">{Math.round(skinOpacity * 100)}%</span>
             </div>
             <input type="range" min={0} max={0.8} step={0.05} value={skinOpacity} onChange={(e) => setSkinOpacity(parseFloat(e.target.value))} className="w-full" style={{ width: '120px' }} />
           </div>
         )}
       </div>
 
-      {/* Right Sidebar for Body Parts Selection */}
-      <div className="absolute z-20 w-[300px] flex flex-col pointer-events-auto overflow-hidden bg-[#0f172a]/90 backdrop-blur-xl rounded-xl border border-slate-700/60 shadow-2xl" style={{ top: '80px', right: '20px', maxHeight: '70vh' }}>
-         <div className="p-4 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
-            <h3 className="text-[12px] text-blue-400 uppercase tracking-widest font-bold">Anatomical Map</h3>
+      {/* Anatomical Map Selection — Restored to Right */}
+      <div className="absolute z-20 w-[300px] flex flex-col pointer-events-auto overflow-hidden bg-zinc-900/80 backdrop-blur-xl rounded-xl border border-zinc-800 shadow-2xl" style={{ top: '80px', right: '24px', maxHeight: '70vh' }}>
+         <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/40">
+            <h3 className="text-[12px] text-zinc-100 uppercase tracking-widest font-bold">Anatomical Map</h3>
             {selectedStructure && (
-               <button onClick={() => { setSelectedStructure(null); setSkinOpacity(0); }} className="text-[10px] text-white px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 transition-colors shadow shadow-blue-500/20 font-semibold uppercase tracking-wide">
+               <button onClick={() => { setSelectedStructure(null); setSkinOpacity(0); }} className="text-[10px] text-white px-3 py-1.5 rounded-md bg-orange-600 hover:bg-orange-500 transition-colors shadow shadow-orange-600/20 font-semibold uppercase tracking-wide">
                   Reset
                </button>
             )}
@@ -785,13 +774,13 @@ export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps
                              }}
                              onMouseEnter={() => setHoveredOrgan(marker.id)}
                              onMouseLeave={() => setHoveredOrgan(null)}
-                             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all focus:outline-none flex items-center justify-between group ${isSelected ? 'bg-blue-600/30 border border-blue-500/40 shadow-[inset_0_0_15px_rgba(59,130,246,0.15)] text-blue-50' : 'border border-transparent text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'}`}
+                             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all focus:outline-none flex items-center justify-between group ${isSelected ? 'bg-orange-600/30 border border-orange-500/40 shadow-[inset_0_0_15px_rgba(234,88,12,0.15)] text-orange-50' : 'border border-transparent text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-200'}`}
                            >
                               <div className="flex items-center gap-2.5">
                                  <div className={`w-1.5 h-1.5 rounded-full transition-shadow ${isSelected ? 'shadow-[0_0_8px_currentColor] scale-125' : 'group-hover:scale-110'}`} style={{ color: '#' + marker.color.getHexString(), backgroundColor: 'currentColor' }} />
                                  <span className={isSelected ? 'font-bold' : 'font-medium'}>{marker.meta.label}</span>
                               </div>
-                              {marker.prob > 0 && <span className="text-[10px] font-mono opacity-60 bg-black/20 px-1.5 rounded">{Math.round(marker.prob * 100)}%</span>}
+                              {marker.prob > 0 && <span className="text-[10px] font-mono opacity-60 bg-black/40 px-1.5 rounded">{Math.round(marker.prob * 100)}%</span>}
                            </button>
                         );
                      })}
@@ -807,17 +796,7 @@ export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps
          `}} />
       </div>
 
-      {/* Restored Bottom HUD */}
-      <div className="absolute z-20" style={{ bottom: '20px', left: '20px' }}>
-        <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
-          <div className="text-[9px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Active Risk Sites</div>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500 shadow-sm shadow-red-500/40" /><span className="text-[10px] text-slate-400 font-mono">{riskCount.high} high</span></div>
-            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/40" /><span className="text-[10px] text-slate-400 font-mono">{riskCount.medium} med</span></div>
-            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/40" /><span className="text-[10px] text-slate-400 font-mono">{riskCount.low} low</span></div>
-          </div>
-        </div>
-      </div>
+      {/* Bottom HUD removed completely per user request */}
     </div>
   );
 }

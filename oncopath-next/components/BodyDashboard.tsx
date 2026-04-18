@@ -148,35 +148,11 @@ export function BodyDashboard() {
       </div>
 
       {/* ── Bottom status bar ────────────────────────────────────────────── */}
-      <div className="absolute bottom-4 left-0 right-0 z-20 flex items-end justify-between px-4 pointer-events-none">
+      <div className="absolute bottom-4 left-4 z-20 flex items-end pointer-events-none">
         {/* Parameters FAB */}
         <div className="pointer-events-auto">
           <GenomicDrawer profile={profile} onChange={setProfile} />
         </div>
-
-        {/* Center risk legend */}
-        <div className="pointer-events-none flex items-center gap-4 bg-zinc-900/70 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-800">
-          {[
-            { c: 'bg-red-500',    label: '≥70% High'     },
-            { c: 'bg-amber-500',  label: '40–70% Mid'    },
-            { c: 'bg-emerald-500',label: '≤40% Low'      },
-          ].map(({ c, label }) => (
-            <div key={label} className="flex items-center gap-1.5">
-              <div className={`w-2 h-2 rounded-full ${c}`} />
-              <span className="text-[9px] text-zinc-500 font-mono font-bold tracking-widest">{label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Click hint — disappears after an organ is selected */}
-        {!popover && !loading && Object.keys(risks).length > 0 && (
-          <div className="pointer-events-none flex items-center gap-2 text-[10px] text-zinc-600 font-mono animate-slide-up">
-            <span className="w-1.5 h-1.5 rounded-full bg-orange-500/60 animate-pulse" />
-            Click any marker to inspect
-          </div>
-        )}
-        {/* Spacer when popover is open */}
-        {(popover || loading) && <div />}
       </div>
 
       {/* ── Organ Popover ────────────────────────────────────────────────── */}
