@@ -1,177 +1,90 @@
-'use client';
+import React from 'react';
+import { SignInButton, SignUpButton, Show } from "@clerk/nextjs";
+import { Activity, ShieldCheck, Database, Zap } from 'lucide-react';
 
-import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { GenomicLab } from '@/components/GenomicLab';
-import { PatientProfile, simulateRisk } from '@/lib/api';
-import { AlertCircle, Terminal, HelpCircle, Box, Layout } from 'lucide-react';
-
-const AnatomicalBody3D = lazy(() =>
-  import('@/components/AnatomicalBody3D').then(mod => ({ default: mod.AnatomicalBody3D }))
-);
-
-const MetastaticHeatmap = lazy(() =>
-  import('@/components/MetastaticHeatmap').then(mod => ({ default: mod.MetastaticHeatmap }))
-);
-
-const INITIAL_PROFILE: PatientProfile = {
-  age: 65,
-  sex: "Male",
-  primary_site: "Lung",
-  oncotree_code: "LUAD",
-  mutations: { "TP53": 1, "KRAS": 1 }
-};
-
-export default function Home() {
-  const [profile, setProfile] = useState<PatientProfile>(INITIAL_PROFILE);
-  const [risks, setRisks] = useState<{ [key: string]: number }>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
-
-  useEffect(() => {
-    async function runSimulation() {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await simulateRisk(profile);
-        setRisks(result.simulated_risks);
-      } catch (err: any) {
-        setError(err.message || "Failed to connect to backend");
-      } finally {
-        setLoading(false);
-      }
-    }
-    const timer = setTimeout(runSimulation, 300);
-    return () => clearTimeout(timer);
-  }, [profile]);
-
+export default function LandingPage() {
   return (
-    <main className="flex h-screen bg-[#030712] text-slate-100 overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-80 h-full flex-shrink-0">
-        <GenomicLab profile={profile} onChange={setProfile} />
-      </aside>
+    <main className="min-h-screen bg-[#030712] relative flex flex-col items-center overflow-hidden">
+       {/* Background Effects */}
+       <div className="absolute inset-0 z-0">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-900/20 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-[20%] left-[30%] w-[400px] h-[400px] bg-purple-900/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/dark-matter.png')] opacity-20" />
+       </div>
 
-      {/* Main Viewport */}
-      <section className="flex-1 relative flex flex-col">
-        {/* Header */}
-        <div className="absolute top-5 left-6 right-6 z-20 flex justify-between items-start pointer-events-none">
-          <div className="bg-[#0f172a]/60 backdrop-blur-xl p-4 rounded-xl border border-slate-800/40 pointer-events-auto shadow-xl">
-            <h1 className="text-lg font-bold tracking-tight mb-0.5 flex items-center gap-2">
-              Anatomical Risk Nexus
-              <span className="text-[9px] bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded-md border border-blue-500/20 uppercase font-semibold tracking-wider">
-                v5.0
-              </span>
-              {viewMode === '3d' && (
-                <span className="text-[9px] bg-purple-500/15 text-purple-400 px-2 py-0.5 rounded-md border border-purple-500/20 uppercase font-semibold tracking-wider">
-                  3D
-                </span>
-              )}
-            </h1>
-            <p className="text-[11px] text-slate-400">
-              Simulating{' '}
-              <span className="text-blue-400 font-mono font-medium">{profile.primary_site}</span>{' '}
-              metastasis for{' '}
-              <span className="text-emerald-400 font-mono font-medium italic">{profile.oncotree_code}</span>
-            </p>
+       {/* Navigation / Header */}
+       <nav className="w-full relative z-20 px-8 py-6 flex justify-between items-center max-w-7xl">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+               <Activity className="text-blue-500" size={20} />
+             </div>
+             <span className="text-xl font-bold tracking-tight text-slate-100 flex items-center gap-2">
+               OncoPath <span className="text-slate-600 font-mono text-sm tracking-widest uppercase">Nexus</span>
+             </span>
           </div>
 
-          <div className="flex gap-2 pointer-events-auto">
-            {/* View Mode Toggle */}
-            <button
-              onClick={() => setViewMode(viewMode === '3d' ? '2d' : '3d')}
-              className={`p-2.5 backdrop-blur-xl rounded-lg border transition-all shadow-lg flex items-center gap-2 ${
-                viewMode === '3d'
-                  ? 'bg-purple-500/15 border-purple-500/30 hover:bg-purple-500/25'
-                  : 'bg-[#0f172a]/60 border-slate-800/40 hover:bg-slate-800/60 hover:border-slate-700/60'
-              }`}
-              title={`Switch to ${viewMode === '3d' ? '2D' : '3D'} view`}
-            >
-              {viewMode === '3d' ? (
-                <>
-                  <Box size={14} className="text-purple-400" />
-                  <span className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider">3D</span>
-                </>
-              ) : (
-                <>
-                  <Layout size={14} className="text-slate-400" />
-                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">2D</span>
-                </>
-              )}
-            </button>
-            <button className="p-2.5 bg-[#0f172a]/60 backdrop-blur-xl rounded-lg border border-slate-800/40 hover:bg-slate-800/60 transition-all hover:border-slate-700/60 shadow-lg">
-              <Terminal size={14} className="text-slate-400" />
-            </button>
-            <button className="p-2.5 bg-[#0f172a]/60 backdrop-blur-xl rounded-lg border border-slate-800/40 hover:bg-slate-800/60 transition-all hover:border-slate-700/60 shadow-lg">
-              <HelpCircle size={14} className="text-slate-400" />
-            </button>
+          {/* Fallback buttons in header just in case layout header missed it */}
+          <div className="flex items-center gap-4">
+             <Show when="signed-out">
+                <SignInButton forceRedirectUrl="/viewer">
+                   <button className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Sign In</button>
+                </SignInButton>
+                <SignUpButton forceRedirectUrl="/viewer">
+                   <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
+                      Get Started Free
+                   </button>
+                </SignUpButton>
+             </Show>
+             <Show when="signed-in">
+                <a href="/viewer" className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all flex items-center gap-2">
+                   Access 3D Viewer <Zap size={14} />
+                </a>
+             </Show>
           </div>
-        </div>
+       </nav>
 
-        {/* Visualization */}
-        <div className="flex-1 relative">
-          <Suspense fallback={
-            <div className="w-full h-full bg-[#030712] flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 border-[3px] border-blue-500/15 rounded-full" />
-                  <div className="absolute inset-0 w-10 h-10 border-[3px] border-transparent border-t-blue-500 rounded-full animate-spin" />
-                </div>
-                <span className="text-[10px] font-mono text-blue-400/80 animate-pulse tracking-wider uppercase">
-                  Loading {viewMode === '3d' ? '3D renderer' : 'visualization'}...
-                </span>
-              </div>
+       {/* Hero Section */}
+       <div className="relative z-10 max-w-5xl w-full flex flex-col items-center justify-center flex-1 text-center px-6 mt-12 mb-32">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 text-xs font-semibold tracking-wider uppercase mb-8">
+             <ShieldCheck size={14} />
+             Authentication Required
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-8 leading-tight">
+             Simulate Metastasis in <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Full 3D</span>
+          </h1>
+          
+          <p className="text-lg md:text-xl text-slate-400 max-w-3xl mb-12 leading-relaxed">
+             OncoPath leverages probabilistic genomic models mapping to precise anatomical bounds yielding 3D interactive visualizations. Securely log in to load your personalized spatial environment.
+          </p>
+
+          <Show when="signed-out">
+             <div className="flex items-center gap-4">
+               <SignInButton forceRedirectUrl="/viewer">
+                  <button className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white text-lg font-semibold rounded-xl border border-slate-700 transition-all">
+                     Log In to Dashboard
+                  </button>
+               </SignInButton>
+               <SignUpButton forceRedirectUrl="/viewer">
+                  <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-lg font-bold rounded-xl shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] transition-all relative overflow-hidden group">
+                     Create Free Account
+                     <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  </button>
+               </SignUpButton>
+             </div>
+          </Show>
+
+          <Show when="signed-in">
+            <div className="p-8 border border-slate-800/60 bg-slate-900/50 backdrop-blur-md rounded-2xl animate-fade-in-up mt-8">
+              <Database className="mx-auto text-emerald-400 mb-4" size={32} />
+              <h3 className="text-2xl font-bold text-white mb-2">Welcome Back.</h3>
+              <p className="text-slate-400 mb-6 font-medium">Your 3D WebGL session has been authorized. Proceed to the engine.</p>
+              <a href="/viewer" className="inline-flex px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-bold rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] transition-all">
+                 Launch 3D Environment
+              </a>
             </div>
-          }>
-            {viewMode === '3d' ? (
-              <AnatomicalBody3D risks={risks} />
-            ) : (
-              <MetastaticHeatmap risks={risks} />
-            )}
-          </Suspense>
-
-          {loading && (
-            <div className="absolute inset-0 bg-[#030712]/40 backdrop-blur-[2px] z-30 flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 border-[3px] border-blue-500/15 rounded-full" />
-                  <div className="absolute inset-0 w-10 h-10 border-[3px] border-transparent border-t-blue-500 rounded-full animate-spin" />
-                </div>
-                <span className="text-[10px] font-mono text-blue-400/80 animate-pulse tracking-wider uppercase">Computing risks...</span>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div className="absolute bottom-6 right-6 z-40 bg-red-950/50 backdrop-blur-xl p-4 rounded-xl border border-red-500/20 flex items-start gap-3 shadow-xl">
-              <AlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={16} />
-              <div className="space-y-1">
-                <h4 className="text-xs font-semibold text-red-200">Connection Error</h4>
-                <p className="text-[10px] text-red-300/80 leading-relaxed">FastAPI server (port 8000) unreachable. Simulation suspended.</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Legend Bar */}
-        <div className="h-14 bg-[#0a0f1a]/80 backdrop-blur-sm border-t border-slate-800/40 flex items-center px-8 justify-between z-20">
-          <div className="flex gap-6">
-            {[
-              { color: 'bg-red-500', shadow: 'shadow-red-500/40', label: 'High Risk (≥70%)' },
-              { color: 'bg-amber-500', shadow: 'shadow-amber-500/40', label: 'Medium (40-70%)' },
-              { color: 'bg-emerald-500', shadow: 'shadow-emerald-500/40', label: 'Standard (≤40%)' },
-            ].map(({ color, shadow, label }) => (
-              <div key={label} className="flex items-center gap-2">
-                <div className={`w-2.5 h-2.5 rounded-full ${color} shadow-sm ${shadow}`} />
-                <span className="text-[9px] text-slate-500 uppercase font-semibold tracking-wider">{label}</span>
-              </div>
-            ))}
-          </div>
-          <div className="text-[9px] text-slate-600 font-mono">
-            Seeds+Soil Metastatic Affinity Model
-          </div>
-        </div>
-      </section>
+          </Show>
+       </div>
     </main>
   );
 }
