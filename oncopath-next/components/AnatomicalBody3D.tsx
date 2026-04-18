@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html, Center } from '@react-three/drei';
 import * as THREE from 'three';
 import { ANATOMY_MAPPING_3D, type OrganPosition3D } from '@/lib/anatomy3d';
+import { useSmoothedRisks } from '@/lib/useSmoothedRisks';
 
 export interface SelectedStructure {
   id: string;
@@ -87,6 +88,11 @@ function getRiskColor3D(prob: number): THREE.Color {
   if (risk > 70) return new THREE.Color('#ef4444');
   if (risk > 40) return new THREE.Color('#f59e0b');
   return new THREE.Color('#10b981');
+}
+
+function pseudoRandom(seed: number) {
+  const value = Math.sin(seed * 12.9898) * 43758.5453;
+  return value - Math.floor(value);
 }
 
 function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: string): THREE.Mesh | null {
@@ -523,12 +529,13 @@ function OrganMarker({ data, isHovered, isSelected, onHover, onUnhover }: { data
 ─────────────────────────────────────────────────────── */
 function Particles({ count = 150 }: { count?: number }) {
   const mesh = useRef<THREE.Points>(null);
+
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 20;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      arr[i * 3] = (pseudoRandom(i * 3 + 1) - 0.5) * 20;
+      arr[i * 3 + 1] = (pseudoRandom(i * 3 + 2) - 0.5) * 20;
+      arr[i * 3 + 2] = (pseudoRandom(i * 3 + 3) - 0.5) * 20;
     }
     return arr;
   }, [count]);
@@ -551,6 +558,7 @@ function Particles({ count = 150 }: { count?: number }) {
 export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [hoveredOrgan, setHoveredOrgan] = useState<string | null>(null);
+  const displayRisks = useSmoothedRisks(risks);
   
   // Restored UI State
   const [activeSystem, setActiveSystem] = useState<string>('all');
@@ -558,21 +566,21 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
   const [selectedStructure, setSelectedStructure] = useState<SelectedStructure | null>(null);
 
   const riskCount = useMemo(() => {
-    const entries = Object.entries(risks);
+    const entries = Object.entries(displayRisks);
     return {
       total: entries.length,
       high: entries.filter(([, p]) => p * 100 > 70).length,
       medium: entries.filter(([, p]) => p * 100 > 40 && p * 100 <= 70).length,
       low: entries.filter(([, p]) => p * 100 <= 40 && p * 100 >= 5).length,
     };
-  }, [risks]);
+  }, [displayRisks]);
   
   const allOrganMarkers = useMemo<OrganMarkerData[]>(() => {
     return Object.entries(ANATOMY_MAPPING_3D).map(([site, meta]) => {
-      const prob = risks[site] || 0;
+      const prob = displayRisks[site] || 0;
       return { id: site, meta, prob: prob as number, color: prob > 0 ? getRiskColor3D(prob as number) : new THREE.Color('#3b82f6') };
     });
-  }, [risks]);
+  }, [displayRisks]);
 
   const visibleMarkers = useMemo(() => {
     return allOrganMarkers.filter(m => m.prob > 0.03);

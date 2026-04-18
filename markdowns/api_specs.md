@@ -1,52 +1,112 @@
-# API Specification (Draft): OncoPath "What-If" Engine
+# API Specification: OncoPath Simulation Engine
 
-The OncoPath API is built with **FastAPI** to provide real-time metastatic risk simulations based on hypothetical patient profiles.
+The OncoPath API is built with **FastAPI** and currently exposes two simulation endpoints:
+1. `POST /simulate` for single-snapshot metastatic risk inference
+2. `POST /simulate/temporal` for month-by-month progression trajectories
 
-## Endpoint: `POST /predict`
+---
+
+## Endpoint: `POST /simulate`
 
 ### Request Body (JSON)
 ```json
 {
-  "age_at_sequencing": 62,
-  "sex": "Female",
-  "primary_site": "Lung",
-  "oncotree_code": "LUAD",
-  "genomic_markers": {
-    "tp53": 1,
-    "kras": 0,
-    "egfr": 1,
-    "msi_score": 1.2,
-    "tmb": 5.4,
-    "fga": 0.35
-  }
+  "profile": {
+    "age": 62,
+    "sex": "Female",
+    "primary_site": "Lung",
+    "oncotree_code": "LUAD",
+    "mutations": {
+      "TP53": 1,
+      "KRAS": 0,
+      "EGFR": 1
+    }
+  },
+  "image": "data:image/png;base64,..."
 }
 ```
 
 ### Response Body (JSON)
 ```json
 {
-  "prediction_id": "uuid-1234",
-  "status": "success",
-  "risk_scores": {
-    "liver": 0.45,
-    "lung": 0.12,
-    "bone": 0.38,
-    "brain": 0.05
+  "simulated_risks": {
+    "DMETS_DX_LIVER": 0.45,
+    "DMETS_DX_BONE": 0.38,
+    "DMETS_DX_CNS_BRAIN": 0.05
   },
-  "confidence_metrics": {
-    "standard_deviation": 0.03,
-    "calibration_score": 0.92
-  },
-  "shap_values": {
-    "egfr_positive": 0.15,
-    "age_62": -0.02,
-    "luad_histology": 0.08
-  }
+  "visual_lift": 0.08,
+  "has_visual_data": true
 }
 ```
 
-## Explainability Layer
-The `shap_values` object in the response body will power the frontend visualization (e.g., force plots or waterfall charts), showing the user which features contributed most to the calculated risk for the selected organ.
+---
+
+## Endpoint: `POST /simulate/temporal`
+
+### Request Body (JSON)
+```json
+{
+  "profile": {
+    "age": 62,
+    "sex": "Female",
+    "primary_site": "Lung",
+    "oncotree_code": "LUAD",
+    "mutations": {
+      "TP53": 1,
+      "KRAS": 0,
+      "EGFR": 1
+    }
+  },
+  "image": "data:image/png;base64,...",
+  "months": 24,
+  "mode": "treatment_adjusted",
+  "treatment": "CHEMOTHERAPY"
+}
+```
+
+### Modes
+- `untreated`: natural progression trend
+- `treatment_adjusted`: treatment-response trajectory (requires `treatment`)
+
+### Supported Treatments
+- `CHEMOTHERAPY`
+- `IMMUNOTHERAPY`
+- `ORAL_DRUG`
+
+### Response Body (JSON)
+```json
+{
+  "mode": "treatment_adjusted",
+  "treatment": "CHEMOTHERAPY",
+  "months": 24,
+  "baseline_risks": {
+    "DMETS_DX_LIVER": 0.45,
+    "DMETS_DX_BONE": 0.38
+  },
+  "timeline": [
+    {
+      "month": 0,
+      "risks": {
+        "DMETS_DX_LIVER": 0.45,
+        "DMETS_DX_BONE": 0.38
+      },
+      "max_risk": 0.45,
+      "mean_risk": 0.415
+    },
+    {
+      "month": 1,
+      "risks": {
+        "DMETS_DX_LIVER": 0.43,
+        "DMETS_DX_BONE": 0.36
+      },
+      "max_risk": 0.43,
+      "mean_risk": 0.395
+    }
+  ],
+  "visual_lift": 0.08,
+  "has_visual_data": true
+}
+```
 
 ---
 

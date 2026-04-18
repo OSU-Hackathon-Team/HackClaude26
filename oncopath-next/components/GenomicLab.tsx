@@ -17,7 +17,7 @@ interface GenomicLabProps {
 }
 
 export function GenomicLab({ profile, onChange }: GenomicLabProps) {
-    const updateField = (field: keyof PatientProfile, value: any) => {
+    const updateField = <K extends keyof PatientProfile>(field: K, value: PatientProfile[K]) => {
         onChange({ ...profile, [field]: value });
     };
 
