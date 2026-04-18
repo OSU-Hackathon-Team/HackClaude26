@@ -8,6 +8,7 @@ def run_stress_test():
     
     # Standard Patient Profile (High-Risk Colon Cancer)
     profile = {
+        "name": "Jane Doe (Demo)",
         "age": 62,
         "sex": "Female",
         "primary_site": "COLON",
@@ -34,7 +35,11 @@ def run_stress_test():
             else:
                 print(f"Warning: {scen['image']} not found. Skipping image logic.")
 
-        payload = {"profile": profile, "image": img_b64}
+        payload = {
+            "profile": profile, 
+            "image": img_b64,
+            "doctor_id": "user_2p5X7t9YVnK9m2jLq6R4W" # Mock Clerk ID
+        }
         try:
             r = requests.post(url, json=payload).json()
             liver_risk = r['simulated_risks'].get('DMETS_DX_LIVER', 0)

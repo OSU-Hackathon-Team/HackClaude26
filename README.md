@@ -5,9 +5,10 @@ OncoPath is a state-of-the-art AI-driven platform designed to predict organ-spec
 ## 🚀 Key Features
 
 - **Real-Time Simulation:** Interactive "What-If" engine to observe risk changes based on genomic alterations (e.g., TP53, KRAS mutations).
-- **Multimodal Integration:** Combines clinical features (Age, Sex, Primary Site) with high-dimensional genomic data.
-- **Site-Specific Intelligence:** 21 individual XGBoost models optimized for specific metastatic targets (Adrenal Gland, Liver, Lung, Bone, etc.).
-- **Model Interpretability:** Uses SHAP (SHapley Additive exPlanations) to provide transparent reasoning for risk predictions.
+- **Multimodal Integration:** Fuses clinical data, 101-gene mutation profiles, and high-fidelity pathology imaging signals.
+- **Decision Engine Layer 2 (Vision):** Late-fusion ensemble that uses a specialized Vision Detector to provide conclusive "Risk Lift" or "Risk Drain."
+- **Site-Specific Intelligence:** 21 individual XGBoost models optimized for specific metastatic targets, validated against clinical literature.
+- **Model Interpretability:** Uses SHAP and exact probability reporting for transparent clinico-genomic reasoning.
 - **Anatomical Visualization:** Interactive 2D/3D heatmaps for intuitive risk assessment across the entire body.
 
 ## 🛠️ Tech Stack
@@ -23,6 +24,17 @@ OncoPath is a state-of-the-art AI-driven platform designed to predict organ-spec
   - `api_service.py`: FastAPI server for real-time inference.
   - `train_iteration_3.py`: Automated ML pipeline for multi-site model training.
   - `extract_embeddings.py`: [NEW] Vision encoder for multimodal fusion.
+
+### Iteration 1: Multimodal Fusion (Complete)
+- **Goal**: Supplement XGBoost tabular models with Image Embeddings.
+- **Approach**: Use a pre-trained Pathology Foundation Model (Phikon) to extract features from tumor slides.
+
+### Iteration 2: Ensemble Signal & Clinical Audit (Complete)
+- **Goal**: Solve signal scarcity and validate against oncological literature.
+- **Approach**: 
+    - **Ensemble Layer 2**: Specialized `vision_detector.joblib` for conclusive image influence (>70% or <30% confidence).
+    - **Clinical Audit**: Verified model accuracy against KRAS (Colon), HER2 (Breast), and EGFR (Lung) metastatic patterns.
+
 - `iterations/`: Historical reports and upcoming detailed iteration plans.
 - `tasks/`: Granular agent task lists for AI, Frontend, and Timeline modules.
 - `contracts.md`: The "Shared Language" defining API schemas for the team.

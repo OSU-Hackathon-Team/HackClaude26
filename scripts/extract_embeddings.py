@@ -34,6 +34,16 @@ class VisionEncoder:
         self.processor = ViTImageProcessor.from_pretrained(model_name)
         self.model = ViTModel.from_pretrained(model_name, add_pooling_layer=False).to(self.device).eval()
 
+    def get_embeddings_batch(self, images):
+        """
+        Supports a list of PIL Image objects.
+        """
+        inputs = self.processor(images=images, return_tensors="pt").to(self.device)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+        embeddings = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
+        return embeddings
+
     def get_embeddings(self, image_input):
         """
         Supports:
