@@ -1,42 +1,39 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs';
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
+const inter = Inter({ variable: '--font-inter', subsets: ['latin'], weight: ['400','500','600','700'] });
 
 export const metadata: Metadata = {
-  title: "OncoPath — Metastatic Risk Nexus",
-  description: "AI-powered anatomical risk visualization for cancer metastasis prediction",
+  title: 'OncoPath — Metastatic Risk Nexus',
+  description: 'AI-powered anatomical metastatic risk visualization',
 };
 
-import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} antialiased`} style={{ fontFamily: 'var(--font-inter), Inter, -apple-system, sans-serif' }}>
+    <html lang="en" className="h-full">
+      <body className={`${inter.variable} h-full overflow-hidden bg-zinc-950 antialiased`}>
         <ClerkProvider>
-          <header className="absolute top-0 right-0 p-4 z-50 pointer-events-auto flex items-center justify-end gap-3 text-slate-100">
+          {/* Minimal fixed auth — top-right glass pill */}
+          <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
             <Show when="signed-out">
-              <SignInButton forceRedirectUrl="/viewer" mode="modal" asChild>
-                 <button className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 backdrop-blur-md rounded-lg text-sm font-semibold transition-all border border-slate-700/50">Login</button>
+              <SignInButton forceRedirectUrl="/viewer" mode="modal">
+                <button className="px-3 py-1.5 rounded-lg bg-zinc-900/80 backdrop-blur-md border border-zinc-800 text-zinc-300 text-xs font-semibold hover:text-zinc-100 hover:border-zinc-700 transition-all">
+                  Sign In
+                </button>
               </SignInButton>
-              <SignUpButton forceRedirectUrl="/viewer" mode="modal" asChild>
-                 <button className="px-4 py-2 bg-blue-600/90 hover:bg-blue-500 backdrop-blur-md rounded-lg text-sm font-semibold transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]">Sign Up</button>
+              <SignUpButton forceRedirectUrl="/viewer" mode="modal">
+                <button className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold transition-all shadow-[0_0_12px_rgba(234,88,12,0.4)]">
+                  Get Started
+                </button>
               </SignUpButton>
             </Show>
             <Show when="signed-in">
               <UserButton />
             </Show>
-          </header>
+          </div>
+
           {children}
         </ClerkProvider>
       </body>

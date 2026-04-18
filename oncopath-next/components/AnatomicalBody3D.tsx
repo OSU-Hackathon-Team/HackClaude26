@@ -14,7 +14,7 @@ export interface SelectedStructure {
   position: THREE.Vector3;
 }
 
-function CameraController({ selectedStructure, groupRef }: { selectedStructure: SelectedStructure | null, groupRef: React.RefObject<THREE.Group> }) {
+function CameraController({ selectedStructure, groupRef }: { selectedStructure: SelectedStructure | null, groupRef: React.RefObject<THREE.Group | null> }) {
   const { camera, controls, size } = useThree() as any;
   const targetCenter = useRef(new THREE.Vector3(0, 0, 0));
   const targetDistance = useRef(11);
@@ -108,6 +108,8 @@ function CameraController({ selectedStructure, groupRef }: { selectedStructure: 
 ─────────────────────────────────────────────────────── */
 export interface AnatomicalBody3DProps {
   risks: Record<string, number>;
+  /** Called when the user clicks an organ marker or sidebar button */
+  onOrganSelect?: (organId: string, name: string, clientX: number, clientY: number) => void;
 }
 
 interface OrganMarkerData {
@@ -280,7 +282,7 @@ function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: str
 /* ───────────────────────────────────────────────────────
    Procedural ZygoteBody JSON Loader
 ─────────────────────────────────────────────────────── */
-function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, visibleMarkers = [], hoveredOrgan = null, setHoveredOrgan = () => {} }: { activeSystem: string, skinOpacity: number, selectedStructure: SelectedStructure | null, visibleMarkers?: any[], hoveredOrgan?: string | null, setHoveredOrgan?: (id: string | null) => void }) {
+function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, visibleMarkers = [], hoveredOrgan = null, setHoveredOrgan = () => {}, onOrganSelect }: { activeSystem: string, skinOpacity: number, selectedStructure: SelectedStructure | null, visibleMarkers?: any[], hoveredOrgan?: string | null, setHoveredOrgan?: (id: string | null) => void, onOrganSelect?: (id: string, name: string, x: number, y: number) => void }) {
   const [meshes, setMeshes] = useState<THREE.Mesh[]>([]);
   const [progress, setProgress] = useState(0);
   
@@ -502,7 +504,8 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
             isHovered={hoveredOrgan === marker.id} 
             isSelected={selectedStructure?.id === marker.id} 
             onHover={() => setHoveredOrgan(marker.id)} 
-            onUnhover={() => setHoveredOrgan(null)} 
+            onUnhover={() => setHoveredOrgan(null)}
+            onSelect={onOrganSelect}
           />
         ))}
       </group>
@@ -525,7 +528,7 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
 /* ───────────────────────────────────────────────────────
    Pulsing Organ Risk Marker
 ─────────────────────────────────────────────────────── */
-function OrganMarker({ data, isHovered, isSelected, onHover, onUnhover }: { data: OrganMarkerData; isHovered: boolean; isSelected: boolean; onHover: () => void; onUnhover: () => void; }) {
+function OrganMarker({ data, isHovered, isSelected, onHover, onUnhover, onSelect }: { data: OrganMarkerData; isHovered: boolean; isSelected: boolean; onHover: () => void; onUnhover: () => void; onSelect?: (id: string, name: string, x: number, y: number) => void; }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
@@ -562,7 +565,7 @@ function OrganMarker({ data, isHovered, isSelected, onHover, onUnhover }: { data
         ref={meshRef} 
         onPointerOver={(e) => { e.stopPropagation(); onHover(); }} 
         onPointerOut={onUnhover}
-        onClick={() => console.log('Marker clicked')}
+        onClick={(e) => { e.stopPropagation(); onSelect?.(data.id, data.meta.label, e.clientX, e.clientY); }}
         userData={{ isMarker: true }}
       >
         <sphereGeometry args={[data.meta.size, 32, 32]} />
@@ -629,7 +632,7 @@ function Particles({ count = 150 }: { count?: number }) {
 /* ───────────────────────────────────────────────────────
    Main Exported Component
 ─────────────────────────────────────────────────────── */
-export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
+export function AnatomicalBody3D({ risks, onOrganSelect }: AnatomicalBody3DProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [hoveredOrgan, setHoveredOrgan] = useState<string | null>(null);
   
@@ -661,10 +664,10 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
   }, [allOrganMarkers]);
 
   return (
-    <div className="w-full h-full bg-[#030712] relative overflow-hidden flex justify-start items-stretch">
+    <div className="w-full h-full bg-zinc-950 relative overflow-hidden">
       
-      {/* Viewport dynamically constrained to strictly the left workspace, protecting the sidebar. Flex and height explicit. */}
-      <div className="relative w-[calc(100%-340px)] h-full flex-grow-0 flex-shrink-0">
+      {/* Viewport fills parent completely — sidebar overlays are managed externally */}
+      <div className="relative w-full h-full flex-grow-0 flex-shrink-0">
         <Canvas 
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
           camera={{ position: [0, 0, 14], fov: 45 }} 
@@ -687,6 +690,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
                  visibleMarkers={visibleMarkers}
                  hoveredOrgan={hoveredOrgan}
                  setHoveredOrgan={setHoveredOrgan}
+                 onOrganSelect={onOrganSelect}
               />
           </Suspense>
         </group>
@@ -770,12 +774,13 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
                         return (
                            <button 
                              key={marker.id}
-                             onClick={() => {
+                             onClick={(e) => {
                                if (isSelected) {
                                  setSelectedStructure(null);
                                  setSkinOpacity(0);
                                } else {
                                  setSelectedStructure({ id: marker.id, name: marker.meta.label, system: marker.meta.system, isMarker: true, position: new THREE.Vector3(...marker.meta.position).add(new THREE.Vector3(0, -1, 0)) });
+                                 onOrganSelect?.(marker.id, marker.meta.label, e.clientX, e.clientY);
                                }
                              }}
                              onMouseEnter={() => setHoveredOrgan(marker.id)}
