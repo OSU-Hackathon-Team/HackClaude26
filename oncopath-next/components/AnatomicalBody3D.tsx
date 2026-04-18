@@ -55,10 +55,33 @@ function CameraController({ selectedStructure, groupRef }: { selectedStructure: 
           targetDistance.current = Math.max(dist * 1.15, 2.0); 
         }
       } else {
-        // FULL BODY - Fall back to mathematically perfect hardcoded coordinates 
-        // to bypass hidden floating matrices in the parent GLTF file breaking the scale!
-        targetCenter.current.set(0, -3.0, 0);
-        targetDistance.current = 10.5;
+        // FULL BODY - Calculate perfect dynamic bounds by isolating the "Skin" outer mesh layer strictly.
+        // This solves the problem of invisible mathematical geometric skeletons destroying the bounds while ensuring exact height!
+        const humanBox = new THREE.Box3();
+        let foundSkin = false;
+        groupRef.current.traverse((child: any) => {
+          if (child.isMesh && child.name.includes('Skin') && !child.userData?.isMarker) {
+             const childBox = new THREE.Box3().setFromObject(child);
+             if (!childBox.isEmpty()) {
+                humanBox.union(childBox);
+                foundSkin = true;
+             }
+          }
+        });
+
+        if (foundSkin) {
+          humanBox.getCenter(targetCenter.current);
+          const boxSize = humanBox.getSize(new THREE.Vector3());
+          const maxDim = Math.max(boxSize.x, boxSize.y, boxSize.z);
+          const fov = camera.fov * (Math.PI / 180);
+          
+          let dist = Math.abs(maxDim / Math.sin(fov / 2));
+          // Apply padding margin scalar so it breathes slightly from the viewport edges
+          targetDistance.current = Math.max(dist * 0.95, 8.0); 
+        } else {
+          targetCenter.current.set(0, -1.0, 0);
+          targetDistance.current = 15;
+        }
       }
     }, 50);
   }, [selectedStructure, camera.fov, size, groupRef]);
@@ -614,6 +637,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
   const [activeSystem, setActiveSystem] = useState<string>('all');
   const [skinOpacity, setSkinOpacity] = useState(0.4);
   const [selectedStructure, setSelectedStructure] = useState<SelectedStructure | null>(null);
+  const [modelRotation, setModelRotation] = useState<number>(0);
 
   const riskCount = useMemo(() => {
     const entries = Object.entries(risks);
@@ -654,7 +678,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
         <directionalLight position={[-5, 4, -5]} intensity={0.5} color="#93c5fd" />
         <pointLight position={[0, 2, 6]} intensity={1.2} color="#e2e8f0" distance={15} />
 
-        <group ref={groupRef} position={[0, -1, 0]}>
+        <group ref={groupRef} position={[0, -1, 0]} rotation={[0, modelRotation, 0]}>
           <Suspense fallback={null}>
               <AnatomyModelRawJSON 
                  activeSystem={activeSystem} 
@@ -668,11 +692,27 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
         </group>
         
         <Particles />
-        <OrbitControls makeDefault enablePan={true} minDistance={1} maxDistance={20} minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} enableDamping dampingFactor={0.05} autoRotate={false} />
+        <OrbitControls makeDefault enablePan={true} enableZoom={true} enableRotate={false} minDistance={1} maxDistance={20} minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} enableDamping dampingFactor={0.05} autoRotate={false} />
       </Canvas>
       </div>
 
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, #030712 90%)' }} />
+
+      {/* Z-Axis Rotation Slider */}
+      <div className="absolute z-20 left-1/2 -translate-x-[calc(50%+170px)]" style={{ bottom: '20px' }}>
+         <div className="bg-[#0f172a]/80 backdrop-blur-xl rounded-full border border-slate-700/50 px-6 py-3 flex items-center gap-4 shadow-xl">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 font-mono">Rotate Z-Axis</span>
+            <input 
+               type="range" 
+               min="0" 
+               max={Math.PI * 2} 
+               step={0.01} 
+               value={modelRotation} 
+               onChange={(e) => setModelRotation(parseFloat(e.target.value))}
+               className="w-[200px] accent-blue-500 cursor-pointer" 
+            />
+         </div>
+      </div>
 
       {/* Restored Top-left controls -> Now moved to Bottom Right */}
       <div className="absolute z-20 space-y-3" style={{ bottom: '20px', right: '20px' }}>
