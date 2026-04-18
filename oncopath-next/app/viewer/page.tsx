@@ -243,7 +243,7 @@ export default function Home() {
           )}
 
           {error && (
-            <div className="absolute bottom-6 right-6 z-40 bg-red-950/50 backdrop-blur-xl p-4 rounded-xl border border-red-500/20 flex items-start gap-3 shadow-xl">
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 bg-red-950/80 backdrop-blur-xl p-4 rounded-xl border border-red-500/30 flex items-start gap-3 shadow-2xl">
               <AlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={16} />
               <div className="space-y-1">
                 <h4 className="text-xs font-semibold text-red-200">Connection Error</h4>

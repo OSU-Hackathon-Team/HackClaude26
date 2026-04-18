@@ -4,6 +4,7 @@ import React, { useRef, useMemo, useState, Suspense, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html, Center, Bounds, useBounds } from '@react-three/drei';
 import * as THREE from 'three';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ANATOMY_MAPPING_3D, type OrganPosition3D } from '@/lib/anatomy3d';
 
 export interface SelectedStructure {
@@ -159,7 +160,7 @@ const ORGAN_CATEGORIES = [
   },
   {
     name: "Systemic & Others",
-    items: ["DMETS_DX_DIST_LN", "DMETS_DX_ADRENAL_GLAND", "DMETS_DX_BLADDER_UT", "SYS_ARTERIES", "SYS_VEINS", "SYS_SPINAL_NERVES", "DMETS_DX_UNSPECIFIED"]
+    items: ["DMETS_DX_DIST_LN", "DMETS_DX_ADRENAL_GLAND", "DMETS_DX_BLADDER_UT", "SYS_ARTERIES", "SYS_VEINS", "SYS_SPINAL_NERVES"]
   }
 ];
 
@@ -449,8 +450,7 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
         
         // Digestive & Urinary
         if (id === 'DMETS_DX_BLADDER_UT' && region.includes('Bladder')) isMatch = true;
-        if (['DMETS_DX_BOWEL', 'DMETS_DX_LIVER', 'DMETS_DX_BILIARY_TRACT', 'DMETS_DX_INTRA_ABDOMINAL'].includes(id) && region.includes('Gastrointestinal')) isMatch = true;
-        if (['DMETS_DX_KIDNEY', 'DMETS_DX_ADRENAL_GLAND'].includes(id) && region.includes('Gastrointestinal')) isMatch = true; // Fallback mapping
+        if (['DMETS_DX_BOWEL', 'DMETS_DX_INTRA_ABDOMINAL'].includes(id) && region.includes('Gastrointestinal')) isMatch = true;
 
         // Muscular & Vascular
         if (id === 'SYS_MUSCLES' && region.includes('Muscles')) isMatch = true;
@@ -491,18 +491,24 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
   }, [meshes, activeSystem, skinOpacity, selectedStructure]);
 
 /* ───────────────────────────────────────────────────────
-   Procedural Reproductive Models
+   Procedural Organs (Reproductive, Liver, Kidneys, etc)
 ─────────────────────────────────────────────────────── */
-function ReproductiveOrgans({ selectedStructure, activeSystem }: { selectedStructure: SelectedStructure | null, activeSystem: string }) {
-  const color = '#f472b6'; // Base pink color for reproductive parts
+function ProceduralOrgans({ selectedStructure, activeSystem }: { selectedStructure: SelectedStructure | null, activeSystem: string }) {
   const showAll = activeSystem === 'all';
   
   const isBreastVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_BREAST';
   const isOvaryVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_OVARY';
   const isFemaleGenitalVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL';
   const isMaleGenitalVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_MALE_GENITAL';
+  
+  const isLiverVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_LIVER';
+  const isBiliaryVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_BILIARY_TRACT' || selectedStructure?.id === 'DMETS_DX_LIVER'; // Show with liver context
+  const isKidneyVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_KIDNEY';
+  const isAdrenalVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_ADRENAL_GLAND' || selectedStructure?.id === 'DMETS_DX_KIDNEY'; // Show with kidney context
 
-  const matProps = {
+  const repColor = '#f472b6'; // Base pink color for reproductive parts
+  
+  const matProps = (color: string) => ({
     color,
     roughness: 0.4,
     metalness: 0.1,
@@ -510,74 +516,155 @@ function ReproductiveOrgans({ selectedStructure, activeSystem }: { selectedStruc
     opacity: 0.9,
     depthWrite: true,
     emissive: new THREE.Color(0x222222)
-  };
+  });
 
-  const highlightProps = {
-    ...matProps,
-    transparent: false,
-    opacity: 1.0,
-    emissive: new THREE.Color(0x552233)
-  };
+  const highlightProps = (color: string, isHighlighted: boolean) => ({
+    ...matProps(color),
+    ...(isHighlighted ? {
+      transparent: false,
+      opacity: 1.0,
+      emissive: new THREE.Color(color).multiplyScalar(0.4)
+    } : {
+      opacity: 0.1, // Fade procedurals if they aren't the primary selected organ
+      transparent: true,
+      depthWrite: false
+    })
+  });
 
   return (
     <group>
+      {/* Abdominal Procedural Organs */}
+      {/* Liver */}
+      <group visible={isLiverVisible}>
+        {/* Right and Left Lobes of Liver */}
+        <mesh position={[-0.12, 1.62, 0.18]} scale={[2.0, 1.1, 1.4]} rotation={[0, 0.1, Math.PI / 10]}>
+          <sphereGeometry args={[0.07, 32, 32]} />
+          <meshPhysicalMaterial {...highlightProps('#611b15', selectedStructure?.id === 'DMETS_DX_LIVER')} />
+        </mesh>
+        <mesh position={[-0.04, 1.63, 0.20]} scale={[1.2, 1.0, 1.1]} rotation={[0, 0, -Math.PI / 12]}>
+          <sphereGeometry args={[0.06, 32, 32]} />
+          <meshPhysicalMaterial {...highlightProps('#611b15', selectedStructure?.id === 'DMETS_DX_LIVER')} />
+        </mesh>
+      </group>
+
+      {/* Gallbladder / Biliary Tract */}
+      <group visible={isBiliaryVisible}>
+        <mesh position={[-0.15, 1.54, 0.24]} scale={[1, 1.8, 1]} rotation={[-Math.PI / 4, 0, -Math.PI / 8]}>
+          <sphereGeometry args={[0.015, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps('#275924', selectedStructure?.id === 'DMETS_DX_BILIARY_TRACT')} />
+        </mesh>
+      </group>
+
+      {/* Kidneys */}
+      <group visible={isKidneyVisible}>
+        <mesh position={[-0.15, 1.6, 0.05]} scale={[1, 1.7, 1]} rotation={[0, 0, Math.PI / 16]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps('#782a20', selectedStructure?.id === 'DMETS_DX_KIDNEY')} />
+        </mesh>
+        <mesh position={[0.15, 1.6, 0.05]} scale={[1, 1.7, 1]} rotation={[0, 0, -Math.PI / 16]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps('#782a20', selectedStructure?.id === 'DMETS_DX_KIDNEY')} />
+        </mesh>
+      </group>
+
+      {/* Adrenal Glands */}
+      <group visible={isAdrenalVisible}>
+        <mesh position={[-0.14, 1.66, 0.05]} scale={[1.4, 0.8, 1.2]} rotation={[0, 0, -Math.PI / 8]}>
+          <sphereGeometry args={[0.012, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps('#dcb043', selectedStructure?.id === 'DMETS_DX_ADRENAL_GLAND')} />
+        </mesh>
+        <mesh position={[0.14, 1.66, 0.05]} scale={[1.4, 0.8, 1.2]} rotation={[0, 0, Math.PI / 8]}>
+          <sphereGeometry args={[0.012, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps('#dcb043', selectedStructure?.id === 'DMETS_DX_ADRENAL_GLAND')} />
+        </mesh>
+      </group>
+
+      {/* Reproductive Organs */}
       {/* Breasts */}
       <group visible={isBreastVisible}>
-        <mesh position={[0.22, 2.35, 0.42]} scale={[1.2, 1, 1.1]}>
-          <sphereGeometry args={[0.08, 32, 32]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_BREAST' ? highlightProps : matProps)} />
+        <mesh position={[0.18, 2.34, 0.43]} scale={[1.15, 0.95, 1.1]} rotation={[0.1, -0.1, 0]}>
+          <sphereGeometry args={[0.1, 32, 32]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_BREAST')} />
         </mesh>
-        <mesh position={[-0.22, 2.35, 0.42]} scale={[1.2, 1, 1.1]}>
-          <sphereGeometry args={[0.08, 32, 32]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_BREAST' ? highlightProps : matProps)} />
+        <mesh position={[0.18, 2.34, 0.54]}>
+           <sphereGeometry args={[0.015, 16, 16]} />
+           <meshPhysicalMaterial {...highlightProps('#c05c7e', selectedStructure?.id === 'DMETS_DX_BREAST')} />
+        </mesh>
+        <mesh position={[-0.18, 2.34, 0.43]} scale={[1.15, 0.95, 1.1]} rotation={[0.1, 0.1, 0]}>
+          <sphereGeometry args={[0.1, 32, 32]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_BREAST')} />
+        </mesh>
+        <mesh position={[-0.18, 2.34, 0.54]}>
+           <sphereGeometry args={[0.015, 16, 16]} />
+           <meshPhysicalMaterial {...highlightProps('#c05c7e', selectedStructure?.id === 'DMETS_DX_BREAST')} />
         </mesh>
       </group>
 
       {/* Ovaries */}
       <group visible={isOvaryVisible}>
-        <mesh position={[0.25, 0.75, 0.12]} scale={[1.5, 1, 1]}>
-          <sphereGeometry args={[0.04, 16, 16]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_OVARY' ? highlightProps : matProps)} />
+        <mesh position={[0.12, 0.55, 0.12]} scale={[1, 1.6, 0.8]} rotation={[0, 0, Math.PI / 6]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_OVARY')} />
         </mesh>
-        <mesh position={[-0.25, 0.75, 0.12]} scale={[1.5, 1, 1]}>
-          <sphereGeometry args={[0.04, 16, 16]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_OVARY' ? highlightProps : matProps)} />
+        <mesh position={[-0.12, 0.55, 0.12]} scale={[1, 1.6, 0.8]} rotation={[0, 0, -Math.PI / 6]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_OVARY')} />
         </mesh>
       </group>
 
       {/* Female Genitals (Uterus + Tubes) */}
-      <group visible={isFemaleGenitalVisible} position={[0, 0.5, 0.18]}>
-        <mesh>
-          <sphereGeometry args={[0.06, 32, 32]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+      <group visible={isFemaleGenitalVisible} position={[0, 0.48, 0.18]}>
+        {/* Uterus Body (Pear shaped) */}
+        <mesh position={[0, 0.02, 0]}>
+          <cylinderGeometry args={[0.05, 0.02, 0.08, 32]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL')} />
         </mesh>
-        <mesh position={[0, -0.08, 0]}>
-          <cylinderGeometry args={[0.02, 0.02, 0.08]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+        {/* Uterus Fundus (Top dome) */}
+        <mesh position={[0, 0.06, 0]} scale={[1, 0.6, 1]}>
+          <sphereGeometry args={[0.05, 32, 32]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL')} />
         </mesh>
-        <mesh position={[0.08, 0.04, 0]} rotation={[0, 0, -Math.PI / 6]}>
-          <capsuleGeometry args={[0.012, 0.08]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+        {/* Cervix/Vagina */}
+        <mesh position={[0, -0.05, 0]}>
+          <cylinderGeometry args={[0.015, 0.02, 0.06]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL')} />
         </mesh>
-        <mesh position={[-0.08, 0.04, 0]} rotation={[0, 0, Math.PI / 6]}>
-          <capsuleGeometry args={[0.012, 0.08]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+        {/* Fallopian Tubes */}
+        <mesh position={[0.06, 0.05, 0]} rotation={[0, 0, -Math.PI / 4]}>
+          <capsuleGeometry args={[0.008, 0.06]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL')} />
+        </mesh>
+        <mesh position={[-0.06, 0.05, 0]} rotation={[0, 0, Math.PI / 4]}>
+          <capsuleGeometry args={[0.008, 0.06]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL')} />
         </mesh>
       </group>
 
-      {/* Male Genitals (Prostate base + Testes) */}
+      {/* Male Genitals (Prostate, Shaft, Testes) */}
       <group visible={isMaleGenitalVisible} position={[0, 0.4, 0.25]}>
-        <mesh position={[0, 0.06, -0.05]}>
-          <sphereGeometry args={[0.04, 32, 32]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_MALE_GENITAL' ? highlightProps : matProps)} />
+        {/* Prostate */}
+        <mesh position={[0, 0.08, -0.05]} scale={[1.2, 1, 1]}>
+          <sphereGeometry args={[0.025, 32, 32]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_MALE_GENITAL')} />
         </mesh>
-        <mesh position={[0.03, 0, 0]} scale={[1, 1.3, 1]}>
-          <sphereGeometry args={[0.03, 16, 16]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_MALE_GENITAL' ? highlightProps : matProps)} />
+        {/* Shaft */}
+        <mesh position={[0, 0.02, 0.08]} rotation={[Math.PI / 3, 0, 0]}>
+          <cylinderGeometry args={[0.022, 0.022, 0.12, 16]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_MALE_GENITAL')} />
         </mesh>
-        <mesh position={[-0.03, 0, 0]} scale={[1, 1.3, 1]}>
-          <sphereGeometry args={[0.03, 16, 16]} />
-          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_MALE_GENITAL' ? highlightProps : matProps)} />
+        {/* Glans */}
+        <mesh position={[0, -0.01, 0.13]} rotation={[Math.PI / 3, 0, 0]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_MALE_GENITAL')} />
+        </mesh>
+        {/* Testes */}
+        <mesh position={[0.025, 0, 0.05]} scale={[1, 1.4, 1]} rotation={[0, 0, Math.PI / 12]}>
+          <sphereGeometry args={[0.02, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_MALE_GENITAL')} />
+        </mesh>
+        <mesh position={[-0.025, 0, 0.05]} scale={[1, 1.4, 1]} rotation={[0, 0, -Math.PI / 12]}>
+          <sphereGeometry args={[0.02, 16, 16]} />
+          <meshPhysicalMaterial {...highlightProps(repColor, selectedStructure?.id === 'DMETS_DX_MALE_GENITAL')} />
         </mesh>
       </group>
     </group>
@@ -601,7 +688,7 @@ function ReproductiveOrgans({ selectedStructure, activeSystem }: { selectedStruc
           />
         ))}
 
-        <ReproductiveOrgans selectedStructure={selectedStructure} activeSystem={activeSystem} />
+        <ProceduralOrgans selectedStructure={selectedStructure} activeSystem={activeSystem} />
 
         {/* Dynamic Inner Markers (Undergo same Orientation+Scale transformations) */}
         {visibleMarkers.map((marker) => (
@@ -769,11 +856,22 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
     return allOrganMarkers.filter(m => m.prob > 0.03);
   }, [allOrganMarkers]);
 
+  const FLAT_ORGAN_IDS = useMemo(() => ORGAN_CATEGORIES.flatMap(c => c.items), []);
+  const currentOrganIndex = selectedStructure ? FLAT_ORGAN_IDS.indexOf(selectedStructure.id) : -1;
+  const currentOrganLabel = selectedStructure ? selectedStructure.name : 'Select Organ';
+
+  const handleSelectOrgan = (id: string) => {
+    const marker = allOrganMarkers.find(m => m.id === id);
+    if (marker) {
+      setSelectedStructure({ id: marker.id, name: marker.meta.label, system: marker.meta.system, isMarker: true, position: new THREE.Vector3(...marker.meta.position).add(new THREE.Vector3(0, -1, 0)) });
+    }
+  };
+
   return (
-    <div className="w-full h-full bg-[#030712] relative overflow-hidden flex justify-start items-stretch">
+    <div className="w-full h-full bg-[#030712] relative overflow-hidden flex justify-center items-stretch">
       
       {/* Viewport dynamically constrained to strictly the left workspace, protecting the sidebar. Flex and height explicit. */}
-      <div className="relative w-[calc(100%-340px)] h-full flex-grow-0 flex-shrink-0">
+      <div className="relative w-full h-full flex-grow-0 flex-shrink-0">
         <Canvas 
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
           camera={{ position: [0, 2.5, 14], fov: 45 }} 
@@ -808,7 +906,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, #030712 90%)' }} />
 
       {/* Z-Axis Rotation Slider */}
-      <div className="absolute z-20 left-1/2 -translate-x-[calc(50%+170px)]" style={{ bottom: '20px' }}>
+      <div className="absolute z-20 left-1/2 -translate-x-1/2" style={{ bottom: '20px' }}>
          <div className="bg-[#0f172a]/80 backdrop-blur-xl rounded-full border border-slate-700/50 px-6 py-3 flex items-center gap-4 shadow-xl">
             <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 font-mono">Rotate Z-Axis</span>
             <input 
@@ -824,65 +922,44 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
       </div>
 
 
-      {/* Right Sidebar for Body Parts Selection */}
-      <div className="absolute z-20 w-[300px] flex flex-col pointer-events-auto overflow-hidden bg-[#0f172a]/90 backdrop-blur-xl rounded-xl border border-slate-700/60 shadow-2xl" style={{ top: '80px', right: '20px', maxHeight: '70vh' }}>
-         <div className="p-4 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
-            <h3 className="text-[12px] text-blue-400 uppercase tracking-widest font-bold">Anatomical Map</h3>
-            {selectedStructure && (
-               <button onClick={() => { setSelectedStructure(null); setSkinOpacity(0); }} className="text-[10px] text-white px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 transition-colors shadow shadow-blue-500/20 font-semibold uppercase tracking-wide">
-                  Reset
-               </button>
-            )}
-         </div>
-         <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-            {ORGAN_CATEGORIES.map(category => (
-               <div key={category.name} className="mb-4">
-                  <div className="px-3 py-2 text-[9px] uppercase tracking-[0.15em] font-bold text-slate-500 mb-1 border-b border-slate-800/50">
-                     {category.name}
-                  </div>
-                  <div className="space-y-0.5">
-                     {category.items.map(itemId => {
-                        const marker = allOrganMarkers.find(m => m.id === itemId);
-                        if (!marker) return null;
-                        const isSelected = selectedStructure?.id === marker.id;
-                        
-                        return (
-                           <button 
-                             key={marker.id}
-                             onClick={() => {
-                               if (isSelected) {
-                                 setSelectedStructure(null);
-                                 setSkinOpacity(0);
-                               } else {
-                                 setSelectedStructure({ id: marker.id, name: marker.meta.label, system: marker.meta.system, isMarker: true, position: new THREE.Vector3(...marker.meta.position).add(new THREE.Vector3(0, -1, 0)) });
-                               }
-                             }}
-                             onMouseEnter={() => setHoveredOrgan(marker.id)}
-                             onMouseLeave={() => setHoveredOrgan(null)}
-                             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all focus:outline-none flex items-center justify-between group ${isSelected ? 'bg-blue-600/30 border border-blue-500/40 shadow-[inset_0_0_15px_rgba(59,130,246,0.15)] text-blue-50' : 'border border-transparent text-slate-400 hover:bg-slate-800/80 hover:text-slate-200'}`}
-                           >
-                              <div className="flex items-center gap-2.5">
-                                 <div className={`w-1.5 h-1.5 rounded-full transition-shadow ${isSelected ? 'shadow-[0_0_8px_currentColor] scale-125' : 'group-hover:scale-110'}`} style={{ color: '#' + marker.color.getHexString(), backgroundColor: 'currentColor' }} />
-                                 <span className={isSelected ? 'font-bold' : 'font-medium'}>{marker.meta.label}</span>
-                              </div>
-                              {marker.prob > 0 && <span className="text-[10px] font-mono opacity-60 bg-black/20 px-1.5 rounded">{Math.round(marker.prob * 100)}%</span>}
-                           </button>
-                        );
-                     })}
-                  </div>
-               </div>
-            ))}
-         </div>
-         <style dangerouslySetInnerHTML={{__html: `
-            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-            .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
-         `}} />
+      {/* Organ Selector (Replaces Anatomical Map) */}
+      <div className="absolute z-20 flex flex-col pointer-events-auto bg-[#0f172a]/90 backdrop-blur-xl rounded-xl border border-slate-700/60 shadow-2xl p-3" style={{ top: '80px', right: '20px' }}>
+        <h3 className="text-[10px] text-blue-400 uppercase tracking-widest font-bold mb-2">Anatomical Map</h3>
+        <div className="flex items-center justify-between border border-slate-800/60 bg-[#060c18] rounded-md h-10 px-2 w-[220px]">
+          <button 
+            onClick={() => {
+              if (currentOrganIndex > 0) handleSelectOrgan(FLAT_ORGAN_IDS[currentOrganIndex - 1]);
+              else if (currentOrganIndex === -1 && FLAT_ORGAN_IDS.length > 0) handleSelectOrgan(FLAT_ORGAN_IDS[0]);
+            }}
+            disabled={currentOrganIndex <= 0 && currentOrganIndex !== -1}
+            className="p-1 hover:bg-slate-800 rounded disabled:opacity-30 transition-colors"
+          >
+            <ChevronLeft size={16} className="text-slate-400" />
+          </button>
+          <div className="text-sm font-semibold text-slate-200 truncate px-2 text-center flex-1 pointer-events-none">{currentOrganLabel}</div>
+          <button 
+            onClick={() => {
+              if (currentOrganIndex < FLAT_ORGAN_IDS.length - 1) handleSelectOrgan(FLAT_ORGAN_IDS[currentOrganIndex + 1]);
+              else if (currentOrganIndex === -1 && FLAT_ORGAN_IDS.length > 0) handleSelectOrgan(FLAT_ORGAN_IDS[0]);
+            }}
+            disabled={currentOrganIndex >= FLAT_ORGAN_IDS.length - 1}
+            className="p-1 hover:bg-slate-800 rounded disabled:opacity-30 transition-colors"
+          >
+            <ChevronRight size={16} className="text-slate-400" />
+          </button>
+        </div>
+        {selectedStructure && (
+          <button 
+            onClick={() => { setSelectedStructure(null); setSkinOpacity(0); }} 
+            className="mt-3 text-[10px] text-white px-3 py-2 rounded-md bg-transparent hover:bg-slate-800 transition-colors border border-slate-700/60 font-semibold uppercase tracking-wide w-full"
+          >
+            Reset View
+          </button>
+        )}
       </div>
 
-      {/* Restored Bottom HUD */}
-      <div className="absolute z-20" style={{ bottom: '20px', left: '20px' }}>
+      {/* Restored HUD */}
+      <div className="absolute z-20" style={{ top: '120px', left: '24px' }}>
         <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
           <div className="text-[9px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Active Risk Sites</div>
           <div className="flex gap-4">
