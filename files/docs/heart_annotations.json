@@ -1,0 +1,143 @@
+{
+    "general_settings": {},
+    "id": "scaffold creator settings",
+    "metadata": {
+        "annotations": [
+            {
+                "id": "UBERON:0003983",
+                "name": "conus arteriosus"
+            },
+            {
+                "id": "UBERON:0003369",
+                "name": "fossa ovalis"
+            },
+            {
+                "id": "ILX:0738358",
+                "name": "inferior vena cava inlet"
+            },
+            {
+                "id": "UBERON:0002085",
+                "name": "interatrial septum"
+            },
+            {
+                "id": "UBERON:0002094",
+                "name": "interventricular septum"
+            },
+            {
+                "id": "UBERON:0003380",
+                "name": "left atrium myocardium"
+            },
+            {
+                "id": "ILX:0744169",
+                "name": "left inferior pulmonary vein"
+            },
+            {
+                "id": "ILX:0745914",
+                "name": "left superior pulmonary vein"
+            },
+            {
+                "id": "UBERON:0006566",
+                "name": "left ventricle myocardium"
+            },
+            {
+                "id": "UBERON:0003379",
+                "name": "right atrium myocardium"
+            },
+            {
+                "id": "ILX:0742603",
+                "name": "right inferior pulmonary vein"
+            },
+            {
+                "id": "ILX:0745243",
+                "name": "right superior pulmonary vein"
+            },
+            {
+                "id": "UBERON:0006567",
+                "name": "right ventricle myocardium"
+            },
+            {
+                "id": "ILX:0738367",
+                "name": "superior vena cava inlet"
+            }
+        ]
+    },
+    "scaffold_settings": {
+        "deleteElementRanges": "",
+        "scaffoldPackage": {
+            "_ScaffoldPackage": true,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaffoldSettings": {
+                "Atria base inner major axis length": 0.55,
+                "Atria base inner minor axis length": 0.42,
+                "Atria major axis rotation degrees": 40.0,
+                "Atria outer height": 0.4,
+                "Atria outer major arc up degrees": 100.0,
+                "Atria outer minor arc up degrees": 125.0,
+                "Atrial base slope degrees": 30.0,
+                "Atrial base wall thickness": 0.05,
+                "Atrial free wall thickness": 0.02,
+                "Atrial septum thickness": 0.06,
+                "Base height": 0.12,
+                "Base thickness": 0.06,
+                "Fibrous ring thickness": 0.01,
+                "Inferior vena cava inner diameter": 0.22,
+                "Inferior vena cava wall thickness": 0.015,
+                "LV apex thickness": 0.06,
+                "LV free wall thickness": 0.12,
+                "LV outer height": 0.95,
+                "LV outer radius": 0.5,
+                "LV outlet inner diameter": 0.3,
+                "LV outlet outer diameter": 0.35,
+                "LV outlet wall thickness": 0.025,
+                "Left pulmonary vein inner diameter": 0.11,
+                "Left pulmonary vein wall thickness": 0.009,
+                "Number of elements around LV free wall": 5,
+                "Number of elements around atria": 8,
+                "Number of elements around atrial septum": 2,
+                "Number of elements around ventricular septum": 7,
+                "Number of elements up LV apex": 1,
+                "Number of elements up atria": 4,
+                "Number of elements up ventricular septum": 4,
+                "RV arc around degrees": 200.0,
+                "RV extra cross radius base": 0.1,
+                "RV free wall thickness": 0.04,
+                "RV inner height": 0.8,
+                "RV outlet inner diameter": 0.27,
+                "RV outlet wall thickness": 0.025,
+                "RV width": 0.4,
+                "Refine": false,
+                "Refine number of elements surface": 4,
+                "Refine number of elements through LV wall": 1,
+                "Refine number of elements through RV wall": 1,
+                "Refine number of elements through atrial wall": 1,
+                "Right pulmonary vein inner diameter": 0.12,
+                "Right pulmonary vein wall thickness": 0.009,
+                "Superior vena cava inner diameter": 0.2,
+                "Superior vena cava wall thickness": 0.015,
+                "Use cross derivatives": false,
+                "Ventricles outlet element length": 0.1,
+                "Ventricles outlet incline degrees": 15.0,
+                "Ventricles outlet spacing": 0.04,
+                "Ventricular septum base radial displacement": 0.15,
+                "Ventricular septum thickness": 0.1
+            },
+            "scaffoldTypeName": "3D Heart 2",
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "segmentation_data_settings": {},
+    "version": "1.0.0"
+}

@@ -1,0 +1,51 @@
+[General]
+version=0.25.0
+id=map-client-workflow
+
+[view]
+scale=1
+rect=@Variant(\0\0\0\x14@$\0\0\0\0\0\0@$\0\0\0\0\0\0@\x96\x84\0\0\0\0\0@\x8b\x18\0\0\0\0\0)
+transform=@Variant(\0\0\0Q?\xf0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0?\xf0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0?\xf0\0\0\0\0\0\0)
+
+[nodes]
+nodelist\1\source_uri=https://github.com/mapclient-plugins/mapclientplugins.argonviewerstep
+nodelist\1\name=Argon Viewer
+nodelist\1\position=@Variant(\0\0\0\x1a@\x83p\x9f\x9b\x92\x9b @p\xfd\x16\\\x8f\x83q)
+nodelist\1\selected=false
+nodelist\1\identifier=Argon_Viewer
+nodelist\1\unique_identifier=df3c76ce-b1c3-11ef-b901-00090faa0001
+nodelist\1\connections\size=2
+nodelist\2\source_uri=https://github.com/mapclient-plugins/multiplefilechooser
+nodelist\2\name=Multiple File Chooser
+nodelist\2\position=@Variant(\0\0\0\x1a@w\xe\xe9\xe0\x87\x8e\xda@p\xef\x91h\n\x15\xe)
+nodelist\2\selected=false
+nodelist\2\identifier=Multiple_File_Chooser
+nodelist\2\unique_identifier=e7fd36c7-b1c3-11ef-93c4-00090faa0001
+nodelist\2\connections\1\connectedFromIndex=0
+nodelist\2\connections\1\connectedTo=0
+nodelist\2\connections\1\connectedToIndex=0
+nodelist\2\connections\1\selected=false
+nodelist\2\connections\size=1
+nodelist\size=4
+nodelist\3\source_uri=https://github.com/mapclient-plugins/mapclientplugins.argonsceneexporterstep
+nodelist\3\name=Argon Scene Exporter
+nodelist\3\position=@Variant(\0\0\0\x1a@\x8c\xcdO\x9b-D\xc0@h\x83\x81\x99I\xa8\xda)
+nodelist\3\selected=false
+nodelist\3\identifier=WebGL
+nodelist\3\unique_identifier=073995e9-b1c8-11ef-b4cf-00090faa0001
+nodelist\3\connections\size=0
+nodelist\4\source_uri=https://github.com/mapclient-plugins/mapclientplugins.argonsceneexporterstep
+nodelist\4\name=Argon Scene Exporter
+nodelist\4\position=@Variant(\0\0\0\x1a@\x8c\xf5\xd4n_\xd9\xfa@w\xadub\xf3+\xb8)
+nodelist\4\selected=false
+nodelist\4\identifier=Thumbnail
+nodelist\4\unique_identifier=eac2258c-b358-11ef-afee-00090faa0001
+nodelist\4\connections\size=0
+nodelist\1\connections\1\connectedFromIndex=1
+nodelist\1\connections\1\connectedTo=2
+nodelist\1\connections\1\connectedToIndex=0
+nodelist\1\connections\1\selected=false
+nodelist\1\connections\2\connectedFromIndex=1
+nodelist\1\connections\2\connectedTo=3
+nodelist\1\connections\2\connectedToIndex=0
+nodelist\1\connections\2\selected=false

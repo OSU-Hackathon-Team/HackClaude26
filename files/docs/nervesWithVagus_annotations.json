@@ -1,0 +1,3893 @@
+{
+    "general_settings": {},
+    "id": "scaffold creator settings",
+    "metadata": {
+        "annotations": [
+            {
+                "id": "ILX:0796922",
+                "name": "Anterior branch of lateral cutaneous branch of left eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796934",
+                "name": "Anterior branch of lateral cutaneous branch of left eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796910",
+                "name": "Anterior branch of lateral cutaneous branch of left fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796906",
+                "name": "Anterior branch of lateral cutaneous branch of left fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796926",
+                "name": "Anterior branch of lateral cutaneous branch of left ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796918",
+                "name": "Anterior branch of lateral cutaneous branch of left seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796914",
+                "name": "Anterior branch of lateral cutaneous branch of left sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796946",
+                "name": "Anterior branch of lateral cutaneous branch of left subcostal nerve"
+            },
+            {
+                "id": "ILX:0796930",
+                "name": "Anterior branch of lateral cutaneous branch of left tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796902",
+                "name": "Anterior branch of lateral cutaneous branch of left third intercostal nerve"
+            },
+            {
+                "id": "ILX:0796921",
+                "name": "Anterior branch of lateral cutaneous branch of right eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796933",
+                "name": "Anterior branch of lateral cutaneous branch of right eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796909",
+                "name": "Anterior branch of lateral cutaneous branch of right fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796905",
+                "name": "Anterior branch of lateral cutaneous branch of right fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796925",
+                "name": "Anterior branch of lateral cutaneous branch of right ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796917",
+                "name": "Anterior branch of lateral cutaneous branch of right seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796913",
+                "name": "Anterior branch of lateral cutaneous branch of right sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796945",
+                "name": "Anterior branch of lateral cutaneous branch of right subcostal nerve"
+            },
+            {
+                "id": "ILX:0796929",
+                "name": "Anterior branch of lateral cutaneous branch of right tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796901",
+                "name": "Anterior branch of lateral cutaneous branch of right third intercostal nerve"
+            },
+            {
+                "id": "ILX:0795071",
+                "name": "Anterior branch of left inferior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796838",
+                "name": "Anterior branch of left medial cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0797008",
+                "name": "Anterior branch of left obturator nerve"
+            },
+            {
+                "id": "ILX:0795070",
+                "name": "Anterior branch of right inferior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796837",
+                "name": "Anterior branch of right medial cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0797007",
+                "name": "Anterior branch of right obturator nerve"
+            },
+            {
+                "id": "ILX:0790742",
+                "name": "Anterior cutaneous branch of left eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0788209",
+                "name": "Anterior cutaneous branch of left eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0787642",
+                "name": "Anterior cutaneous branch of left fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0785658",
+                "name": "Anterior cutaneous branch of left first intercostal nerve"
+            },
+            {
+                "id": "ILX:0792330",
+                "name": "Anterior cutaneous branch of left fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796984",
+                "name": "Anterior cutaneous branch of left iliohypogastric nerve"
+            },
+            {
+                "id": "ILX:0786167",
+                "name": "Anterior cutaneous branch of left ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0791347",
+                "name": "Anterior cutaneous branch of left second intercostal nerve"
+            },
+            {
+                "id": "ILX:0790269",
+                "name": "Anterior cutaneous branch of left seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0786968",
+                "name": "Anterior cutaneous branch of left sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796942",
+                "name": "Anterior cutaneous branch of left subcostal nerve"
+            },
+            {
+                "id": "ILX:0792701",
+                "name": "Anterior cutaneous branch of left tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0792071",
+                "name": "Anterior cutaneous branch of left third intercostal nerve"
+            },
+            {
+                "id": "ILX:0785523",
+                "name": "Anterior cutaneous branch of right eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0788497",
+                "name": "Anterior cutaneous branch of right eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0785138",
+                "name": "Anterior cutaneous branch of right fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0788117",
+                "name": "Anterior cutaneous branch of right first intercostal nerve"
+            },
+            {
+                "id": "ILX:0789497",
+                "name": "Anterior cutaneous branch of right fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796983",
+                "name": "Anterior cutaneous branch of right iliohypogastric nerve"
+            },
+            {
+                "id": "ILX:0790052",
+                "name": "Anterior cutaneous branch of right ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0787801",
+                "name": "Anterior cutaneous branch of right second intercostal nerve"
+            },
+            {
+                "id": "ILX:0785264",
+                "name": "Anterior cutaneous branch of right seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0792714",
+                "name": "Anterior cutaneous branch of right sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796941",
+                "name": "Anterior cutaneous branch of right subcostal nerve"
+            },
+            {
+                "id": "ILX:0788354",
+                "name": "Anterior cutaneous branch of right tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0791847",
+                "name": "Anterior cutaneous branch of right third intercostal nerve"
+            },
+            {
+                "id": "ILX:0794854",
+                "name": "Anterior esophageal vagus trunk"
+            },
+            {
+                "id": "ILX:0789344",
+                "name": "Auricular branch of left vagus nerve"
+            },
+            {
+                "id": "ILX:0785879",
+                "name": "Auricular branch of right vagus nerve"
+            },
+            {
+                "id": "ILX:0796812",
+                "name": "Brachial plexus anterior division of left inferior trunk"
+            },
+            {
+                "id": "ILX:0791599",
+                "name": "Brachial plexus anterior division of left middle trunk"
+            },
+            {
+                "id": "ILX:0796810",
+                "name": "Brachial plexus anterior division of left superior trunk"
+            },
+            {
+                "id": "ILX:0796811",
+                "name": "Brachial plexus anterior division of right inferior trunk"
+            },
+            {
+                "id": "ILX:0790678",
+                "name": "Brachial plexus anterior division of right middle trunk"
+            },
+            {
+                "id": "ILX:0796809",
+                "name": "Brachial plexus anterior division of right superior trunk"
+            },
+            {
+                "id": "ILX:0786221",
+                "name": "Brachial plexus left C5 root"
+            },
+            {
+                "id": "ILX:0789680",
+                "name": "Brachial plexus left C6 root"
+            },
+            {
+                "id": "ILX:0785035",
+                "name": "Brachial plexus left C7 root"
+            },
+            {
+                "id": "ILX:0789806",
+                "name": "Brachial plexus left C8 root"
+            },
+            {
+                "id": "ILX:0795115",
+                "name": "Brachial plexus left T1 root"
+            },
+            {
+                "id": "ILX:0796808",
+                "name": "Brachial plexus left inferior trunk"
+            },
+            {
+                "id": "ILX:0796818",
+                "name": "Brachial plexus left lateral cord"
+            },
+            {
+                "id": "ILX:0796822",
+                "name": "Brachial plexus left medial cord"
+            },
+            {
+                "id": "ILX:0791092",
+                "name": "Brachial plexus left middle trunk"
+            },
+            {
+                "id": "ILX:0796820",
+                "name": "Brachial plexus left posterior cord"
+            },
+            {
+                "id": "ILX:0796806",
+                "name": "Brachial plexus left superior trunk"
+            },
+            {
+                "id": "ILX:0796816",
+                "name": "Brachial plexus posterior division of left inferior trunk"
+            },
+            {
+                "id": "ILX:0793034",
+                "name": "Brachial plexus posterior division of left middle trunk"
+            },
+            {
+                "id": "ILX:0796814",
+                "name": "Brachial plexus posterior division of left superior trunk"
+            },
+            {
+                "id": "ILX:0796815",
+                "name": "Brachial plexus posterior division of right inferior trunk"
+            },
+            {
+                "id": "ILX:0785546",
+                "name": "Brachial plexus posterior division of right middle trunk"
+            },
+            {
+                "id": "ILX:0796813",
+                "name": "Brachial plexus posterior division of right superior trunk"
+            },
+            {
+                "id": "ILX:0784742",
+                "name": "Brachial plexus right C5 root"
+            },
+            {
+                "id": "ILX:0788869",
+                "name": "Brachial plexus right C6 root"
+            },
+            {
+                "id": "ILX:0789112",
+                "name": "Brachial plexus right C7 root"
+            },
+            {
+                "id": "ILX:0784638",
+                "name": "Brachial plexus right C8 root"
+            },
+            {
+                "id": "ILX:0795114",
+                "name": "Brachial plexus right T1 root"
+            },
+            {
+                "id": "ILX:0796807",
+                "name": "Brachial plexus right inferior trunk"
+            },
+            {
+                "id": "ILX:0796817",
+                "name": "Brachial plexus right lateral cord"
+            },
+            {
+                "id": "ILX:0796821",
+                "name": "Brachial plexus right medial cord"
+            },
+            {
+                "id": "ILX:0790353",
+                "name": "Brachial plexus right middle trunk"
+            },
+            {
+                "id": "ILX:0796819",
+                "name": "Brachial plexus right posterior cord"
+            },
+            {
+                "id": "ILX:0796805",
+                "name": "Brachial plexus right superior trunk"
+            },
+            {
+                "id": "ILX:0786464",
+                "name": "Branch from left C5 root to long thoracic nerve"
+            },
+            {
+                "id": "ILX:0791366",
+                "name": "Branch from left C6 root to long thoracic nerve"
+            },
+            {
+                "id": "ILX:0791095",
+                "name": "Branch from left C7 root to long thoracic nerve"
+            },
+            {
+                "id": "ILX:0786720",
+                "name": "Branch from right C5 root to long thoracic nerve"
+            },
+            {
+                "id": "ILX:0789227",
+                "name": "Branch from right C6 root to long thoracic nerve"
+            },
+            {
+                "id": "ILX:0792451",
+                "name": "Branch from right C7 root to long thoracic nerve"
+            },
+            {
+                "id": "ILX:0797093",
+                "name": "Branch of greater anterior gastric nerve to coeliac nerve plexus"
+            },
+            {
+                "id": "ILX:0795085",
+                "name": "Branch of left recurrent laryngeal nerve to muscle of larynx"
+            },
+            {
+                "id": "ILX:0794310",
+                "name": "Branch of left vagus nerve to oesophageal nerve plexus"
+            },
+            {
+                "id": "ILX:0795084",
+                "name": "Branch of right recurrent laryngeal nerve to muscle of larynx"
+            },
+            {
+                "id": "ILX:0796776",
+                "name": "Branch of right vagus nerve to oesophageal nerve plexus"
+            },
+            {
+                "id": "ILX:0788132",
+                "name": "Buccal branch of left facial nerve"
+            },
+            {
+                "id": "ILX:0786016",
+                "name": "Buccal branch of right facial nerve"
+            },
+            {
+                "id": "ILX:0794160",
+                "name": "Cardiopulmonary branch A of left vagus nerve"
+            },
+            {
+                "id": "ILX:0794154",
+                "name": "Cardiopulmonary branch A of right vagus nerve"
+            },
+            {
+                "id": "ILX:0794161",
+                "name": "Cardiopulmonary branch B of left vagus nerve"
+            },
+            {
+                "id": "ILX:0794155",
+                "name": "Cardiopulmonary branch B of right vagus nerve"
+            },
+            {
+                "id": "ILX:0785396",
+                "name": "Cervical branch of left facial nerve"
+            },
+            {
+                "id": "ILX:0789750",
+                "name": "Cervical branch of right facial nerve"
+            },
+            {
+                "id": "ILX:0795106",
+                "name": "Chorda tympani branch of left facial nerve"
+            },
+            {
+                "id": "ILX:0795105",
+                "name": "Chorda tympani branch of right facial nerve"
+            },
+            {
+                "id": "ILX:0789580",
+                "name": "Coeliac branch of posterior vagal trunk"
+            },
+            {
+                "id": "ILX:0787673",
+                "name": "Communicating branch of auricular branch of left vagus nerve with left facial nerve"
+            },
+            {
+                "id": "ILX:0786219",
+                "name": "Communicating branch of auricular branch of left vagus nerve with left posterior auricular nerve"
+            },
+            {
+                "id": "ILX:0786954",
+                "name": "Communicating branch of auricular branch of right vagus nerve with right posterior auricular nerve"
+            },
+            {
+                "id": "ILX:0795124",
+                "name": "Communicating branch of left common palmar digital branch of ulnar nerve with left median nerve"
+            },
+            {
+                "id": "ILX:0787107",
+                "name": "Communicating branch of left external laryngeal nerve with left superior cardiac nerve"
+            },
+            {
+                "id": "ILX:0788944",
+                "name": "Communicating branch of left glossopharyngeal nerve with auricular branch of left vagus nerve"
+            },
+            {
+                "id": "ILX:0789900",
+                "name": "Communicating branch of left internal laryngeal nerve with left recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0790685",
+                "name": "Communicating branch of left vagus nerve with left glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0795123",
+                "name": "Communicating branch of right common palmar digital branch of ulnar nerve with right median nerve"
+            },
+            {
+                "id": "ILX:0787405",
+                "name": "Communicating branch of right external laryngeal nerve with right superior cardiac nerve"
+            },
+            {
+                "id": "ILX:0789837",
+                "name": "Communicating branch of right glossopharyngeal nerve with auricular branch of right vagus nerve"
+            },
+            {
+                "id": "ILX:0791006",
+                "name": "Communicating branch of right internal laryngeal nerve with right recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0790506",
+                "name": "Communicating branch of right vagus nerve with right glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0794061",
+                "name": "Communicating branch of superior cervical ganglion with left vagus nerve"
+            },
+            {
+                "id": "ILX:0794055",
+                "name": "Communicating branch of superior cervical ganglion with right vagus nerve"
+            },
+            {
+                "id": "ILX:0797097",
+                "name": "Cranial roots of left accessory nerve"
+            },
+            {
+                "id": "ILX:0797096",
+                "name": "Cranial roots of right accessory nerve"
+            },
+            {
+                "id": "ILX:0797012",
+                "name": "Cutaneous branch of left obturator nerve"
+            },
+            {
+                "id": "ILX:0797011",
+                "name": "Cutaneous branch of right obturator nerve"
+            },
+            {
+                "id": "ILX:0796846",
+                "name": "Dorsal branch of left ulnar nerve"
+            },
+            {
+                "id": "ILX:0796845",
+                "name": "Dorsal branch of right ulnar nerve"
+            },
+            {
+                "id": "ILX:0795069",
+                "name": "Extra-laryngeal branch of left recurrent laryngeal nerve to larynx"
+            },
+            {
+                "id": "ILX:0795068",
+                "name": "Extra-laryngeal branch of right recurrent laryngeal nerve to larynx"
+            },
+            {
+                "id": "ILX:0796721",
+                "name": "Ganglionic branch of left maxillary nerve to pterygopalatine ganglion"
+            },
+            {
+                "id": "ILX:0796720",
+                "name": "Ganglionic branch of right maxillary nerve to pterygopalatine ganglion"
+            },
+            {
+                "id": "ILX:0797016",
+                "name": "Gluteal branch A of left posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0797015",
+                "name": "Gluteal branch A of right posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0793831",
+                "name": "Greater anterior gastric nerve"
+            },
+            {
+                "id": "ILX:0788809",
+                "name": "Greater posterior gastric nerve"
+            },
+            {
+                "id": "ILX:0784595",
+                "name": "Hepatic branch of anterior vagal trunk"
+            },
+            {
+                "id": "ILX:0794244",
+                "name": "Inferior cervical cardiac branch of left recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0786047",
+                "name": "Inferior cervical cardiac branch of left vagus nerve"
+            },
+            {
+                "id": "ILX:0794235",
+                "name": "Inferior cervical cardiac branch of right recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0789456",
+                "name": "Inferior cervical cardiac branch of right vagus nerve"
+            },
+            {
+                "id": "ILX:0785467",
+                "name": "Inferior ramus of left internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0789165",
+                "name": "Inferior ramus of right internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0797004",
+                "name": "Infrapatellar branch of left saphenous nerve"
+            },
+            {
+                "id": "ILX:0797003",
+                "name": "Infrapatellar branch of right saphenous nerve"
+            },
+            {
+                "id": "ILX:0784704",
+                "name": "Lateral cutaneous branch of left eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0788296",
+                "name": "Lateral cutaneous branch of left eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0791624",
+                "name": "Lateral cutaneous branch of left fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0784609",
+                "name": "Lateral cutaneous branch of left fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796986",
+                "name": "Lateral cutaneous branch of left iliohypogastric nerve"
+            },
+            {
+                "id": "ILX:0792090",
+                "name": "Lateral cutaneous branch of left ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0787958",
+                "name": "Lateral cutaneous branch of left seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0788966",
+                "name": "Lateral cutaneous branch of left sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796944",
+                "name": "Lateral cutaneous branch of left subcostal nerve"
+            },
+            {
+                "id": "ILX:0788982",
+                "name": "Lateral cutaneous branch of left tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0791002",
+                "name": "Lateral cutaneous branch of left third intercostal nerve"
+            },
+            {
+                "id": "ILX:0791344",
+                "name": "Lateral cutaneous branch of right eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0792325",
+                "name": "Lateral cutaneous branch of right eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0786198",
+                "name": "Lateral cutaneous branch of right fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0789581",
+                "name": "Lateral cutaneous branch of right fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796985",
+                "name": "Lateral cutaneous branch of right iliohypogastric nerve"
+            },
+            {
+                "id": "ILX:0787811",
+                "name": "Lateral cutaneous branch of right ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0784520",
+                "name": "Lateral cutaneous branch of right seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0791592",
+                "name": "Lateral cutaneous branch of right sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796943",
+                "name": "Lateral cutaneous branch of right subcostal nerve"
+            },
+            {
+                "id": "ILX:0790044",
+                "name": "Lateral cutaneous branch of right tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0786857",
+                "name": "Lateral cutaneous branch of right third intercostal nerve"
+            },
+            {
+                "id": "ILX:0795133",
+                "name": "Lateral portion of left median nerve"
+            },
+            {
+                "id": "ILX:0795132",
+                "name": "Lateral portion of right median nerve"
+            },
+            {
+                "id": "ILX:0796880",
+                "name": "Lateral root of left median nerve"
+            },
+            {
+                "id": "ILX:0796879",
+                "name": "Lateral root of right median nerve"
+            },
+            {
+                "id": "ILX:0795200",
+                "name": "Left C1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794594",
+                "name": "Left C1 spinal nerve"
+            },
+            {
+                "id": "ILX:0794580",
+                "name": "Left C1 spinal nerve branch to left ansa cervicalis"
+            },
+            {
+                "id": "ILX:0795202",
+                "name": "Left C2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794597",
+                "name": "Left C2 spinal nerve"
+            },
+            {
+                "id": "ILX:0794582",
+                "name": "Left C2 spinal nerve branch to left ansa cervicalis"
+            },
+            {
+                "id": "ILX:0796794",
+                "name": "Left C2 spinal nerve branch to left great auricular nerve"
+            },
+            {
+                "id": "ILX:0792398",
+                "name": "Left C2 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0784626",
+                "name": "Left C2 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795204",
+                "name": "Left C3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794600",
+                "name": "Left C3 spinal nerve"
+            },
+            {
+                "id": "ILX:0796796",
+                "name": "Left C3 spinal nerve branch to left great auricular nerve"
+            },
+            {
+                "id": "ILX:0796798",
+                "name": "Left C3 spinal nerve branch to left supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0791211",
+                "name": "Left C3 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0786642",
+                "name": "Left C3 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795206",
+                "name": "Left C4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794603",
+                "name": "Left C4 spinal nerve"
+            },
+            {
+                "id": "ILX:0786456",
+                "name": "Left C4 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791423",
+                "name": "Left C4 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795208",
+                "name": "Left C5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794606",
+                "name": "Left C5 spinal nerve"
+            },
+            {
+                "id": "ILX:0786130",
+                "name": "Left C5 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791009",
+                "name": "Left C5 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795210",
+                "name": "Left C6 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794609",
+                "name": "Left C6 spinal nerve"
+            },
+            {
+                "id": "ILX:0784736",
+                "name": "Left C6 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0790098",
+                "name": "Left C6 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795212",
+                "name": "Left C7 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794612",
+                "name": "Left C7 spinal nerve"
+            },
+            {
+                "id": "ILX:0795214",
+                "name": "Left C8 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794615",
+                "name": "Left C8 spinal nerve"
+            },
+            {
+                "id": "ILX:0796956",
+                "name": "Left L1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0785490",
+                "name": "Left L1 spinal nerve"
+            },
+            {
+                "id": "ILX:0796958",
+                "name": "Left L1 spinal nerve branch to left genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0786635",
+                "name": "Left L1 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0784506",
+                "name": "Left L1 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0785376",
+                "name": "Left L1 white ramus communicans"
+            },
+            {
+                "id": "ILX:0796960",
+                "name": "Left L2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0789476",
+                "name": "Left L2 spinal nerve"
+            },
+            {
+                "id": "ILX:0795373",
+                "name": "Left L2 spinal nerve branch to left femoral nerve"
+            },
+            {
+                "id": "ILX:0796962",
+                "name": "Left L2 spinal nerve branch to left genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0795375",
+                "name": "Left L2 spinal nerve branch to left lateral femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0796964",
+                "name": "Left L2 spinal nerve branch to left obturator nerve"
+            },
+            {
+                "id": "ILX:0785297",
+                "name": "Left L2 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0790256",
+                "name": "Left L2 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0788743",
+                "name": "Left L2 white ramus communicans"
+            },
+            {
+                "id": "ILX:0796966",
+                "name": "Left L3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0784426",
+                "name": "Left L3 spinal nerve"
+            },
+            {
+                "id": "ILX:0786775",
+                "name": "Left L3 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788843",
+                "name": "Left L3 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0795365",
+                "name": "Left L4 branch to left common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795355",
+                "name": "Left L4 branch to left tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0796968",
+                "name": "Left L4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787065",
+                "name": "Left L4 spinal nerve"
+            },
+            {
+                "id": "ILX:0795367",
+                "name": "Left L5 branch to left common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795357",
+                "name": "Left L5 branch to left tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0796970",
+                "name": "Left L5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0789454",
+                "name": "Left L5 spinal nerve"
+            },
+            {
+                "id": "ILX:0795369",
+                "name": "Left S1 branch to left common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795359",
+                "name": "Left S1 branch to left tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0797026",
+                "name": "Left S1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0795177",
+                "name": "Left S1 sacral splanchnic nerve"
+            },
+            {
+                "id": "ILX:0790445",
+                "name": "Left S1 spinal nerve"
+            },
+            {
+                "id": "ILX:0795371",
+                "name": "Left S2 branch to left common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795361",
+                "name": "Left S2 branch to left tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0797028",
+                "name": "Left S2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0795180",
+                "name": "Left S2 sacral splanchnic nerve"
+            },
+            {
+                "id": "ILX:0786242",
+                "name": "Left S2 spinal nerve"
+            },
+            {
+                "id": "ILX:0797030",
+                "name": "Left S2 spinal nerve branch to left pudendal nerve"
+            },
+            {
+                "id": "ILX:0795363",
+                "name": "Left S3 branch to left tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0797032",
+                "name": "Left S3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0792824",
+                "name": "Left S3 spinal nerve"
+            },
+            {
+                "id": "ILX:0797034",
+                "name": "Left S3 spinal nerve branch to left pudendal nerve"
+            },
+            {
+                "id": "ILX:0797036",
+                "name": "Left S4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787791",
+                "name": "Left S4 spinal nerve"
+            },
+            {
+                "id": "ILX:0797038",
+                "name": "Left S4 spinal nerve branch to left pudendal nerve"
+            },
+            {
+                "id": "ILX:0797040",
+                "name": "Left S5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0788517",
+                "name": "Left S5 spinal nerve"
+            },
+            {
+                "id": "ILX:0787836",
+                "name": "Left T1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0788064",
+                "name": "Left T1 spinal nerve"
+            },
+            {
+                "id": "ILX:0785509",
+                "name": "Left T1 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0787822",
+                "name": "Left T1 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0790177",
+                "name": "Left T1 white ramus communicans"
+            },
+            {
+                "id": "ILX:0788881",
+                "name": "Left T10 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0785427",
+                "name": "Left T10 spinal nerve"
+            },
+            {
+                "id": "ILX:0789719",
+                "name": "Left T10 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0785316",
+                "name": "Left T10 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0790059",
+                "name": "Left T10 white ramus communicans"
+            },
+            {
+                "id": "ILX:0785012",
+                "name": "Left T11 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0789848",
+                "name": "Left T11 spinal nerve"
+            },
+            {
+                "id": "ILX:0790669",
+                "name": "Left T11 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788642",
+                "name": "Left T11 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0785203",
+                "name": "Left T11 white ramus communicans"
+            },
+            {
+                "id": "ILX:0796938",
+                "name": "Left T12 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0790834",
+                "name": "Left T12 spinal nerve"
+            },
+            {
+                "id": "ILX:0792652",
+                "name": "Left T12 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0789235",
+                "name": "Left T12 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0796940",
+                "name": "Left T12 white ramus communicans"
+            },
+            {
+                "id": "ILX:0788878",
+                "name": "Left T2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0789698",
+                "name": "Left T2 spinal nerve"
+            },
+            {
+                "id": "ILX:0792142",
+                "name": "Left T2 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0785962",
+                "name": "Left T2 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0792582",
+                "name": "Left T2 white ramus communicans"
+            },
+            {
+                "id": "ILX:0786284",
+                "name": "Left T3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0791381",
+                "name": "Left T3 spinal nerve"
+            },
+            {
+                "id": "ILX:0786756",
+                "name": "Left T3 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0790085",
+                "name": "Left T3 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0786149",
+                "name": "Left T3 white ramus communicans"
+            },
+            {
+                "id": "ILX:0787027",
+                "name": "Left T4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0791893",
+                "name": "Left T4 spinal nerve"
+            },
+            {
+                "id": "ILX:0790204",
+                "name": "Left T4 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0784410",
+                "name": "Left T4 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0784975",
+                "name": "Left T4 white ramus communicans"
+            },
+            {
+                "id": "ILX:0785586",
+                "name": "Left T5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0792079",
+                "name": "Left T5 spinal nerve"
+            },
+            {
+                "id": "ILX:0784744",
+                "name": "Left T5 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791683",
+                "name": "Left T5 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0784717",
+                "name": "Left T5 white ramus communicans"
+            },
+            {
+                "id": "ILX:0785908",
+                "name": "Left T6 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0792687",
+                "name": "Left T6 spinal nerve"
+            },
+            {
+                "id": "ILX:0791294",
+                "name": "Left T6 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0786423",
+                "name": "Left T6 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0784809",
+                "name": "Left T6 white ramus communicans"
+            },
+            {
+                "id": "ILX:0784546",
+                "name": "Left T7 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787961",
+                "name": "Left T7 spinal nerve"
+            },
+            {
+                "id": "ILX:0791051",
+                "name": "Left T7 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0784611",
+                "name": "Left T7 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0789195",
+                "name": "Left T7 white ramus communicans"
+            },
+            {
+                "id": "ILX:0792485",
+                "name": "Left T8 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0788490",
+                "name": "Left T8 spinal nerve"
+            },
+            {
+                "id": "ILX:0791921",
+                "name": "Left T8 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791289",
+                "name": "Left T8 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0789865",
+                "name": "Left T8 white ramus communicans"
+            },
+            {
+                "id": "ILX:0787311",
+                "name": "Left T9 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0788523",
+                "name": "Left T9 spinal nerve"
+            },
+            {
+                "id": "ILX:0791392",
+                "name": "Left T9 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0787872",
+                "name": "Left T9 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0786234",
+                "name": "Left T9 white ramus communicans"
+            },
+            {
+                "id": "ILX:0787864",
+                "name": "Left accessory nerve"
+            },
+            {
+                "id": "ILX:0796804",
+                "name": "Left accessory phrenic nerve"
+            },
+            {
+                "id": "ILX:0794578",
+                "name": "Left ansa cervicalis"
+            },
+            {
+                "id": "ILX:0796755",
+                "name": "Left anterior division of mandibular nerve"
+            },
+            {
+                "id": "ILX:0796715",
+                "name": "Left anterior ethmoidal nerve"
+            },
+            {
+                "id": "ILX:0796992",
+                "name": "Left anterior femoral cutaneous branch A"
+            },
+            {
+                "id": "ILX:0796898",
+                "name": "Left anterior interosseous nerve"
+            },
+            {
+                "id": "ILX:0795160",
+                "name": "Left anterior scrotal nerve"
+            },
+            {
+                "id": "ILX:0796749",
+                "name": "Left anterior superior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796788",
+                "name": "Left anterior supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796771",
+                "name": "Left auriculotemporal nerve"
+            },
+            {
+                "id": "ILX:0796858",
+                "name": "Left axillary nerve"
+            },
+            {
+                "id": "ILX:0796862",
+                "name": "Left axillary nerve anterior branch"
+            },
+            {
+                "id": "ILX:0796864",
+                "name": "Left axillary nerve posterior branch"
+            },
+            {
+                "id": "ILX:0796769",
+                "name": "Left buccal nerve"
+            },
+            {
+                "id": "ILX:0796779",
+                "name": "Left caroticotympanic nerve"
+            },
+            {
+                "id": "ILX:0792731",
+                "name": "Left carotid sinus nerve"
+            },
+            {
+                "id": "ILX:0795352",
+                "name": "Left coccygeal grey ramus communicans"
+            },
+            {
+                "id": "ILX:0786807",
+                "name": "Left coccygeal spinal nerve"
+            },
+            {
+                "id": "ILX:0788705",
+                "name": "Left cochlear nerve"
+            },
+            {
+                "id": "ILX:0784912",
+                "name": "Left common fibular nerve"
+            },
+            {
+                "id": "ILX:0795183",
+                "name": "Left common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0796850",
+                "name": "Left common palmar digital nerve A"
+            },
+            {
+                "id": "ILX:0795139",
+                "name": "Left common palmar digital nerve B"
+            },
+            {
+                "id": "ILX:0795142",
+                "name": "Left common palmar digital nerve C"
+            },
+            {
+                "id": "ILX:0795195",
+                "name": "Left common plantar digital nerve B"
+            },
+            {
+                "id": "ILX:0795192",
+                "name": "Left common plantar digital nerve C"
+            },
+            {
+                "id": "ILX:0795189",
+                "name": "Left common plantar digital nerve D"
+            },
+            {
+                "id": "ILX:0797068",
+                "name": "Left common plantar digital nerve E"
+            },
+            {
+                "id": "ILX:0797070",
+                "name": "Left common plantar digital nerve F"
+            },
+            {
+                "id": "ILX:0796707",
+                "name": "Left communicating branch of nasociliary nerve with ciliary ganglion"
+            },
+            {
+                "id": "ILX:0797090",
+                "name": "Left deep fibular nerve"
+            },
+            {
+                "id": "ILX:0796773",
+                "name": "Left deep petrosal nerve"
+            },
+            {
+                "id": "ILX:0797022",
+                "name": "Left dorsal nerve of penis"
+            },
+            {
+                "id": "ILX:0791128",
+                "name": "Left eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0786143",
+                "name": "Left eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0789760",
+                "name": "Left external laryngeal nerve"
+            },
+            {
+                "id": "ILX:0789550",
+                "name": "Left external laryngeal nerve branch to inferior pharyngeal constrictor"
+            },
+            {
+                "id": "ILX:0790963",
+                "name": "Left external laryngeal nerve branch to pharyngeal plexus"
+            },
+            {
+                "id": "ILX:0792123",
+                "name": "Left facial nerve"
+            },
+            {
+                "id": "ILX:0796996",
+                "name": "Left femoral branch of genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0796990",
+                "name": "Left femoral nerve"
+            },
+            {
+                "id": "ILX:0795163",
+                "name": "Left femoral nerve posterior division"
+            },
+            {
+                "id": "ILX:0785767",
+                "name": "Left fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0788357",
+                "name": "Left first intercostal nerve"
+            },
+            {
+                "id": "ILX:0796974",
+                "name": "Left first lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0789275",
+                "name": "Left fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796980",
+                "name": "Left fourth lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0796699",
+                "name": "Left frontal nerve"
+            },
+            {
+                "id": "ILX:0796998",
+                "name": "Left genital branch of genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0796994",
+                "name": "Left genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0789473",
+                "name": "Left glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0794584",
+                "name": "Left great auricular nerve"
+            },
+            {
+                "id": "ILX:0796784",
+                "name": "Left great auricular nerve anterior branch"
+            },
+            {
+                "id": "ILX:0796786",
+                "name": "Left great auricular nerve posterior branch"
+            },
+            {
+                "id": "ILX:0784626",
+                "name": "Left greater occipital nerve"
+            },
+            {
+                "id": "ILX:0796739",
+                "name": "Left greater palatine nerve"
+            },
+            {
+                "id": "ILX:0786547",
+                "name": "Left greater petrosal nerve"
+            },
+            {
+                "id": "ILX:0796950",
+                "name": "Left greater splanchnic nerve"
+            },
+            {
+                "id": "ILX:0796984",
+                "name": "Left hypogastric nerve"
+            },
+            {
+                "id": "ILX:0796982",
+                "name": "Left iliohypogastric nerve"
+            },
+            {
+                "id": "ILX:0796988",
+                "name": "Left ilioinguinal nerve"
+            },
+            {
+                "id": "ILX:0796763",
+                "name": "Left incisive branch of inferior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796761",
+                "name": "Left inferior alveolar nerve"
+            },
+            {
+                "id": "UBERON:0011766",
+                "name": "Left inferior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796868",
+                "name": "Left inferior lateral cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0796751",
+                "name": "Left inferior palpebral branch of infraorbital nerve"
+            },
+            {
+                "id": "ILX:0797018",
+                "name": "Left inferior rectal nerve"
+            },
+            {
+                "id": "ILX:0796743",
+                "name": "Left infraorbital nerve"
+            },
+            {
+                "id": "ILX:0796709",
+                "name": "Left infratrochlear nerve"
+            },
+            {
+                "id": "ILX:0796832",
+                "name": "Left intercostobrachial nerve"
+            },
+            {
+                "id": "ILX:0797084",
+                "name": "Left intermediate dorsal cutaneous nerve"
+            },
+            {
+                "id": "ILX:0795108",
+                "name": "Left internal carotid nerve"
+            },
+            {
+                "id": "ILX:0791167",
+                "name": "Left internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796697",
+                "name": "Left lacrimal nerve"
+            },
+            {
+                "id": "ILX:0796781",
+                "name": "Left laryngopharyngeal branch of superior cervical ganglion"
+            },
+            {
+                "id": "ILX:0797076",
+                "name": "Left lateral calcaneal branch A of left sural nerve"
+            },
+            {
+                "id": "ILX:0796830",
+                "name": "Left lateral cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0795118",
+                "name": "Left lateral cutaneous nerve of forearm anterior branch"
+            },
+            {
+                "id": "ILX:0795121",
+                "name": "Left lateral cutaneous nerve of forearm posterior branch"
+            },
+            {
+                "id": "ILX:0797078",
+                "name": "Left lateral dorsal cutaneous nerve"
+            },
+            {
+                "id": "ILX:0797086",
+                "name": "Left lateral dorsal digital nerve of the third toe"
+            },
+            {
+                "id": "ILX:0797000",
+                "name": "Left lateral femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0797046",
+                "name": "Left lateral plantar nerve"
+            },
+            {
+                "id": "ILX:0797092",
+                "name": "Left lateral sural cutaneous nerve"
+            },
+            {
+                "id": "ILX:0796954",
+                "name": "Left least splanchnic nerve"
+            },
+            {
+                "id": "ILX:0796782",
+                "name": "Left lesser occipital nerve"
+            },
+            {
+                "id": "ILX:0796741",
+                "name": "Left lesser palatine nerve"
+            },
+            {
+                "id": "ILX:0791855",
+                "name": "Left lesser petrosal nerve"
+            },
+            {
+                "id": "ILX:0796952",
+                "name": "Left lesser splanchnic nerve"
+            },
+            {
+                "id": "ILX:0796775",
+                "name": "Left lingual branch of glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0796767",
+                "name": "Left lingual nerve"
+            },
+            {
+                "id": "ILX:0796711",
+                "name": "Left long ciliary nerve A"
+            },
+            {
+                "id": "ILX:0796713",
+                "name": "Left long ciliary nerve B"
+            },
+            {
+                "id": "ILX:0796826",
+                "name": "Left long thoracic nerve"
+            },
+            {
+                "id": "ILX:0796972",
+                "name": "Left lumbosacral trunk"
+            },
+            {
+                "id": "ILX:0788473",
+                "name": "Left mandibular nerve"
+            },
+            {
+                "id": "ILX:0789106",
+                "name": "Left maxillary nerve"
+            },
+            {
+                "id": "ILX:0796834",
+                "name": "Left medial cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0796836",
+                "name": "Left medial cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0797082",
+                "name": "Left medial dorsal cutaneous nerve"
+            },
+            {
+                "id": "ILX:0797088",
+                "name": "Left medial dorsal digital nerve of the fourth toe"
+            },
+            {
+                "id": "ILX:0797044",
+                "name": "Left medial plantar nerve"
+            },
+            {
+                "id": "ILX:0796725",
+                "name": "Left medial posterior superior nasal nerve"
+            },
+            {
+                "id": "ILX:0797074",
+                "name": "Left medial sural cutaneous nerve"
+            },
+            {
+                "id": "ILX:0795154",
+                "name": "Left medial visceral branch of left T10 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795156",
+                "name": "Left medial visceral branch of left T11 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795158",
+                "name": "Left medial visceral branch of left T12 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795144",
+                "name": "Left medial visceral branch of left T5 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795146",
+                "name": "Left medial visceral branch of left T6 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795148",
+                "name": "Left medial visceral branch of left T7 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795150",
+                "name": "Left medial visceral branch of left T8 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795152",
+                "name": "Left medial visceral branch of left T9 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0796878",
+                "name": "Left median nerve"
+            },
+            {
+                "id": "ILX:0795093",
+                "name": "Left meningeal branch of anterior ethmoidal nerve"
+            },
+            {
+                "id": "ILX:0796759",
+                "name": "Left meningeal branch of mandibular nerve"
+            },
+            {
+                "id": "ILX:0796765",
+                "name": "Left mental nerve"
+            },
+            {
+                "id": "ILX:0796719",
+                "name": "Left middle meningeal nerve"
+            },
+            {
+                "id": "ILX:0796747",
+                "name": "Left middle superior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796790",
+                "name": "Left middle supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796828",
+                "name": "Left musculocutaneous nerve"
+            },
+            {
+                "id": "ILX:0796705",
+                "name": "Left nasociliary nerve"
+            },
+            {
+                "id": "ILX:0796737",
+                "name": "Left nasopalatine nerve"
+            },
+            {
+                "id": "ILX:0795102",
+                "name": "Left nerve of the pterygoid canal"
+            },
+            {
+                "id": "ILX:0795104",
+                "name": "Left nervus intermedius"
+            },
+            {
+                "id": "ILX:0789279",
+                "name": "Left ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0797006",
+                "name": "Left obturator nerve"
+            },
+            {
+                "id": "ILX:0790283",
+                "name": "Left oculomotor nerve"
+            },
+            {
+                "id": "ILX:0796691",
+                "name": "Left olfactory nerve"
+            },
+            {
+                "id": "ILX:0791564",
+                "name": "Left ophthalmic nerve"
+            },
+            {
+                "id": "ILX:0796693",
+                "name": "Left optic nerve"
+            },
+            {
+                "id": "ILX:0795096",
+                "name": "Left orbital branch of maxillary nerve"
+            },
+            {
+                "id": "ILX:0795100",
+                "name": "Left palpebral branch of infraorbital nerve"
+            },
+            {
+                "id": "ILX:0795090",
+                "name": "Left palpebral branch of lacrimal nerve"
+            },
+            {
+                "id": "ILX:0797020",
+                "name": "Left perineal nerve"
+            },
+            {
+                "id": "ILX:0795098",
+                "name": "Left pharyngeal nerve"
+            },
+            {
+                "id": "ILX:0796800",
+                "name": "Left phrenic nerve"
+            },
+            {
+                "id": "ILX:0793040",
+                "name": "Left posterior auricular nerve"
+            },
+            {
+                "id": "ILX:0796870",
+                "name": "Left posterior cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0796872",
+                "name": "Left posterior cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0796757",
+                "name": "Left posterior division of mandibular nerve"
+            },
+            {
+                "id": "ILX:0796717",
+                "name": "Left posterior ethmoidal nerve"
+            },
+            {
+                "id": "ILX:0797014",
+                "name": "Left posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0796874",
+                "name": "Left posterior interosseous nerve"
+            },
+            {
+                "id": "ILX:0797024",
+                "name": "Left posterior scrotal nerve"
+            },
+            {
+                "id": "ILX:0796745",
+                "name": "Left posterior superior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796723",
+                "name": "Left posterior superior lateral nasal branch of maxillary nerve"
+            },
+            {
+                "id": "ILX:0796792",
+                "name": "Left posterior supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796852",
+                "name": "Left proper palmar digital nerve A"
+            },
+            {
+                "id": "ILX:0796854",
+                "name": "Left proper palmar digital nerve B"
+            },
+            {
+                "id": "ILX:0796856",
+                "name": "Left proper palmar digital nerve C"
+            },
+            {
+                "id": "ILX:0796890",
+                "name": "Left proper palmar digital nerve D"
+            },
+            {
+                "id": "ILX:0796892",
+                "name": "Left proper palmar digital nerve E"
+            },
+            {
+                "id": "ILX:0796894",
+                "name": "Left proper palmar digital nerve F"
+            },
+            {
+                "id": "ILX:0796896",
+                "name": "Left proper palmar digital nerve G"
+            },
+            {
+                "id": "ILX:0796884",
+                "name": "Left proper palmar digital nerve H"
+            },
+            {
+                "id": "ILX:0796886",
+                "name": "Left proper palmar digital nerve I"
+            },
+            {
+                "id": "ILX:0796888",
+                "name": "Left proper palmar digital nerve J"
+            },
+            {
+                "id": "ILX:0797048",
+                "name": "Left proper plantar digital nerve A"
+            },
+            {
+                "id": "ILX:0797050",
+                "name": "Left proper plantar digital nerve B"
+            },
+            {
+                "id": "ILX:0797052",
+                "name": "Left proper plantar digital nerve C"
+            },
+            {
+                "id": "ILX:0797054",
+                "name": "Left proper plantar digital nerve D"
+            },
+            {
+                "id": "ILX:0797056",
+                "name": "Left proper plantar digital nerve E"
+            },
+            {
+                "id": "ILX:0797058",
+                "name": "Left proper plantar digital nerve F"
+            },
+            {
+                "id": "ILX:0797060",
+                "name": "Left proper plantar digital nerve G"
+            },
+            {
+                "id": "ILX:0797062",
+                "name": "Left proper plantar digital nerve H"
+            },
+            {
+                "id": "ILX:0797064",
+                "name": "Left proper plantar digital nerve I"
+            },
+            {
+                "id": "ILX:0797066",
+                "name": "Left proper plantar digital nerve J"
+            },
+            {
+                "id": "ILX:0791486",
+                "name": "Left pudendal nerve"
+            },
+            {
+                "id": "ILX:0796866",
+                "name": "Left radial nerve"
+            },
+            {
+                "id": "UBERON:0011766",
+                "name": "Left recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0797002",
+                "name": "Left saphenous nerve"
+            },
+            {
+                "id": "ILX:0787971",
+                "name": "Left sciatic nerve"
+            },
+            {
+                "id": "ILX:0784983",
+                "name": "Left second intercostal nerve"
+            },
+            {
+                "id": "ILX:0796976",
+                "name": "Left second lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0791263",
+                "name": "Left seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0791617",
+                "name": "Left sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796824",
+                "name": "Left subclavian nerve"
+            },
+            {
+                "id": "ILX:0789453",
+                "name": "Left subcostal nerve"
+            },
+            {
+                "id": "ILX:0796876",
+                "name": "Left superficial branch of radial nerve"
+            },
+            {
+                "id": "ILX:0795130",
+                "name": "Left superficial branch of radial nerve lateral branch"
+            },
+            {
+                "id": "ILX:0795127",
+                "name": "Left superficial branch of radial nerve medial branch"
+            },
+            {
+                "id": "ILX:0797080",
+                "name": "Left superficial fibular nerve"
+            },
+            {
+                "id": "ILX:0791998",
+                "name": "Left superior cervical cardiac nerve"
+            },
+            {
+                "id": "ILX:0796753",
+                "name": "Left superior labial branch of infraorbital nerve"
+            },
+            {
+                "id": "ILX:0788780",
+                "name": "Left superior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796860",
+                "name": "Left superior lateral cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0794902",
+                "name": "Left supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796703",
+                "name": "Left supraorbital nerve"
+            },
+            {
+                "id": "ILX:0796701",
+                "name": "Left supratrochlear nerve"
+            },
+            {
+                "id": "ILX:0795198",
+                "name": "Left sural communicating branch"
+            },
+            {
+                "id": "ILX:0797072",
+                "name": "Left sural nerve"
+            },
+            {
+                "id": "ILX:0792282",
+                "name": "Left sympathetic trunk"
+            },
+            {
+                "id": "ILX:0797099",
+                "name": "Left sympathetic trunk branch to internal carotid nerve plexus"
+            },
+            {
+                "id": "ILX:0787917",
+                "name": "Left tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796695",
+                "name": "Left tentorial nerve"
+            },
+            {
+                "id": "ILX:0790356",
+                "name": "Left third intercostal nerve"
+            },
+            {
+                "id": "ILX:0796978",
+                "name": "Left third lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0786826",
+                "name": "Left third occipital nerve"
+            },
+            {
+                "id": "ILX:0791992",
+                "name": "Left tibial nerve"
+            },
+            {
+                "id": "ILX:0795186",
+                "name": "Left tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0794899",
+                "name": "Left transverse cervical nerve"
+            },
+            {
+                "id": "ILX:0792811",
+                "name": "Left trigeminal nerve"
+            },
+            {
+                "id": "ILX:0790207",
+                "name": "Left tympanic nerve"
+            },
+            {
+                "id": "ILX:0796842",
+                "name": "Left ulnar nerve"
+            },
+            {
+                "id": "UBERON:0035020",
+                "name": "Left vagus nerve"
+            },
+            {
+                "id": "ILX:0792150",
+                "name": "Left vestibular nerve"
+            },
+            {
+                "id": "ILX:0796731",
+                "name": "Left zygomatic nerve"
+            },
+            {
+                "id": "ILX:0796735",
+                "name": "Left zygomaticofacial nerve"
+            },
+            {
+                "id": "ILX:0796733",
+                "name": "Left zygomaticotemporal nerve"
+            },
+            {
+                "id": "ILX:0791548",
+                "name": "Lingual branch of left vagus nerve"
+            },
+            {
+                "id": "ILX:0787083",
+                "name": "Lingual branch of right vagus nerve"
+            },
+            {
+                "id": "ILX:0789222",
+                "name": "Marginal mandibular branch of left facial nerve"
+            },
+            {
+                "id": "ILX:0790890",
+                "name": "Marginal mandibular branch of right facial nerve"
+            },
+            {
+                "id": "ILX:0797042",
+                "name": "Medial calcaneal branch A of left tibial nerve"
+            },
+            {
+                "id": "ILX:0797041",
+                "name": "Medial calcaneal branch A of right tibial nerve"
+            },
+            {
+                "id": "ILX:0795168",
+                "name": "Medial crural cutaneous nerve A of left saphenous nerve"
+            },
+            {
+                "id": "ILX:0795167",
+                "name": "Medial crural cutaneous nerve A of right saphenous nerve"
+            },
+            {
+                "id": "ILX:0795136",
+                "name": "Medial portion of left median nerve"
+            },
+            {
+                "id": "ILX:0795135",
+                "name": "Medial portion of right median nerve"
+            },
+            {
+                "id": "ILX:0796882",
+                "name": "Medial root of left median nerve"
+            },
+            {
+                "id": "ILX:0796881",
+                "name": "Medial root of right median nerve"
+            },
+            {
+                "id": "ILX:0792358",
+                "name": "Meningeal branch of left vagus nerve"
+            },
+            {
+                "id": "ILX:0785804",
+                "name": "Meningeal branch of right vagus nerve"
+            },
+            {
+                "id": "ILX:0797095",
+                "name": "Middle ramus of left internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0797094",
+                "name": "Middle ramus of right internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0791513",
+                "name": "Oesophageal branch of left recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0785794",
+                "name": "Oesophageal branch of right recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796727",
+                "name": "Orbital branch of left maxillary nerve to left ethmoidal sinus"
+            },
+            {
+                "id": "ILX:0796729",
+                "name": "Orbital branch of left maxillary nerve to left sphenoidal sinus"
+            },
+            {
+                "id": "ILX:0796726",
+                "name": "Orbital branch of right maxillary nerve to right ethmoidal sinus"
+            },
+            {
+                "id": "ILX:0796728",
+                "name": "Orbital branch of right maxillary nerve to right sphenoidal sinus"
+            },
+            {
+                "id": "ILX:0796900",
+                "name": "Palmar branch of left median nerve"
+            },
+            {
+                "id": "ILX:0796899",
+                "name": "Palmar branch of right median nerve"
+            },
+            {
+                "id": "ILX:0796844",
+                "name": "Palmar cutaneous branch of left ulnar nerve"
+            },
+            {
+                "id": "ILX:0796843",
+                "name": "Palmar cutaneous branch of right ulnar nerve"
+            },
+            {
+                "id": "ILX:0796802",
+                "name": "Pericardial branch of left phrenic nerve"
+            },
+            {
+                "id": "ILX:0796801",
+                "name": "Pericardial branch of right phrenic nerve"
+            },
+            {
+                "id": "ILX:0795171",
+                "name": "Perineal branch A of left posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0795170",
+                "name": "Perineal branch A of right posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0795174",
+                "name": "Perineal branch B of left posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0795173",
+                "name": "Perineal branch B of right posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0793073",
+                "name": "Pharyngeal branch of left glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0789210",
+                "name": "Pharyngeal branch of left vagus nerve to pharyngeal nerve plexus"
+            },
+            {
+                "id": "ILX:0792461",
+                "name": "Pharyngeal branch of right glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0792814",
+                "name": "Pharyngeal branch of right vagus nerve to pharyngeal nerve plexus"
+            },
+            {
+                "id": "ILX:0795113",
+                "name": "Phrenicoabdominal branch of left phrenic nerve"
+            },
+            {
+                "id": "ILX:0795112",
+                "name": "Phrenicoabdominal branch of right phrenic nerve"
+            },
+            {
+                "id": "ILX:0796924",
+                "name": "Posterior branch of lateral cutaneous branch of left eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796936",
+                "name": "Posterior branch of lateral cutaneous branch of left eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796912",
+                "name": "Posterior branch of lateral cutaneous branch of left fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796908",
+                "name": "Posterior branch of lateral cutaneous branch of left fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796928",
+                "name": "Posterior branch of lateral cutaneous branch of left ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796920",
+                "name": "Posterior branch of lateral cutaneous branch of left seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796916",
+                "name": "Posterior branch of lateral cutaneous branch of left sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796948",
+                "name": "Posterior branch of lateral cutaneous branch of left subcostal nerve"
+            },
+            {
+                "id": "ILX:0796932",
+                "name": "Posterior branch of lateral cutaneous branch of left tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796904",
+                "name": "Posterior branch of lateral cutaneous branch of left third intercostal nerve"
+            },
+            {
+                "id": "ILX:0796923",
+                "name": "Posterior branch of lateral cutaneous branch of right eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796935",
+                "name": "Posterior branch of lateral cutaneous branch of right eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796911",
+                "name": "Posterior branch of lateral cutaneous branch of right fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796907",
+                "name": "Posterior branch of lateral cutaneous branch of right fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796927",
+                "name": "Posterior branch of lateral cutaneous branch of right ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796919",
+                "name": "Posterior branch of lateral cutaneous branch of right seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0796915",
+                "name": "Posterior branch of lateral cutaneous branch of right sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796947",
+                "name": "Posterior branch of lateral cutaneous branch of right subcostal nerve"
+            },
+            {
+                "id": "ILX:0796931",
+                "name": "Posterior branch of lateral cutaneous branch of right tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796903",
+                "name": "Posterior branch of lateral cutaneous branch of right third intercostal nerve"
+            },
+            {
+                "id": "ILX:0795073",
+                "name": "Posterior branch of left inferior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796840",
+                "name": "Posterior branch of left medial cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0797010",
+                "name": "Posterior branch of left obturator nerve"
+            },
+            {
+                "id": "ILX:0795072",
+                "name": "Posterior branch of right inferior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796839",
+                "name": "Posterior branch of right medial cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0797009",
+                "name": "Posterior branch of right obturator nerve"
+            },
+            {
+                "id": "ILX:0794858",
+                "name": "Posterior esophageal vagus trunk"
+            },
+            {
+                "id": "ILX:0795079",
+                "name": "Pulmonary branch A of left vagus nerve"
+            },
+            {
+                "id": "ILX:0795074",
+                "name": "Pulmonary branch A of right vagus nerve"
+            },
+            {
+                "id": "ILX:0795080",
+                "name": "Pulmonary branch B of left vagus nerve"
+            },
+            {
+                "id": "ILX:0795075",
+                "name": "Pulmonary branch B of right vagus nerve"
+            },
+            {
+                "id": "ILX:0795081",
+                "name": "Pulmonary branch C of left vagus nerve"
+            },
+            {
+                "id": "ILX:0795076",
+                "name": "Pulmonary branch C of right vagus nerve"
+            },
+            {
+                "id": "ILX:0795082",
+                "name": "Pulmonary branch D of left vagus nerve"
+            },
+            {
+                "id": "ILX:0795077",
+                "name": "Pulmonary branch D of right vagus nerve"
+            },
+            {
+                "id": "ILX:0795078",
+                "name": "Pulmonary branch E of right vagus nerve"
+            },
+            {
+                "id": "ILX:0796777",
+                "name": "Pyloric branch of greater posterior gastric nerve"
+            },
+            {
+                "id": "ILX:0795199",
+                "name": "Right C1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794593",
+                "name": "Right C1 spinal nerve"
+            },
+            {
+                "id": "ILX:0794579",
+                "name": "Right C1 spinal nerve branch to right ansa cervicalis"
+            },
+            {
+                "id": "ILX:0795201",
+                "name": "Right C2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794596",
+                "name": "Right C2 spinal nerve"
+            },
+            {
+                "id": "ILX:0794581",
+                "name": "Right C2 spinal nerve branch to right ansa cervicalis"
+            },
+            {
+                "id": "ILX:0796793",
+                "name": "Right C2 spinal nerve branch to right great auricular nerve"
+            },
+            {
+                "id": "ILX:0786093",
+                "name": "Right C2 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0790361",
+                "name": "Right C2 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795203",
+                "name": "Right C3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794599",
+                "name": "Right C3 spinal nerve"
+            },
+            {
+                "id": "ILX:0796795",
+                "name": "Right C3 spinal nerve branch to right great auricular nerve"
+            },
+            {
+                "id": "ILX:0796797",
+                "name": "Right C3 spinal nerve branch to right supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0787174",
+                "name": "Right C3 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0785584",
+                "name": "Right C3 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795205",
+                "name": "Right C4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794602",
+                "name": "Right C4 spinal nerve"
+            },
+            {
+                "id": "ILX:0788082",
+                "name": "Right C4 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788319",
+                "name": "Right C4 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795207",
+                "name": "Right C5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794605",
+                "name": "Right C5 spinal nerve"
+            },
+            {
+                "id": "ILX:0784857",
+                "name": "Right C5 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0784496",
+                "name": "Right C5 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795209",
+                "name": "Right C6 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794608",
+                "name": "Right C6 spinal nerve"
+            },
+            {
+                "id": "ILX:0789777",
+                "name": "Right C6 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791228",
+                "name": "Right C6 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0795211",
+                "name": "Right C7 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794611",
+                "name": "Right C7 spinal nerve"
+            },
+            {
+                "id": "ILX:0795213",
+                "name": "Right C8 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0794614",
+                "name": "Right C8 spinal nerve"
+            },
+            {
+                "id": "ILX:0796955",
+                "name": "Right L1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0790855",
+                "name": "Right L1 spinal nerve"
+            },
+            {
+                "id": "ILX:0796957",
+                "name": "Right L1 spinal nerve branch to right genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0792634",
+                "name": "Right L1 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791337",
+                "name": "Right L1 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0791910",
+                "name": "Right L1 white ramus communicans"
+            },
+            {
+                "id": "ILX:0796959",
+                "name": "Right L2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787929",
+                "name": "Right L2 spinal nerve"
+            },
+            {
+                "id": "ILX:0795372",
+                "name": "Right L2 spinal nerve branch to right femoral nerve"
+            },
+            {
+                "id": "ILX:0796961",
+                "name": "Right L2 spinal nerve branch to right genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0795374",
+                "name": "Right L2 spinal nerve branch to right lateral femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0796963",
+                "name": "Right L2 spinal nerve branch to right obturator nerve"
+            },
+            {
+                "id": "ILX:0791645",
+                "name": "Right L2 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788137",
+                "name": "Right L2 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0790534",
+                "name": "Right L2 white ramus communicans"
+            },
+            {
+                "id": "ILX:0796965",
+                "name": "Right L3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0791242",
+                "name": "Right L3 spinal nerve"
+            },
+            {
+                "id": "ILX:0786521",
+                "name": "Right L3 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0786789",
+                "name": "Right L3 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0795364",
+                "name": "Right L4 branch to right common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795354",
+                "name": "Right L4 branch to right tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0796967",
+                "name": "Right L4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0789630",
+                "name": "Right L4 spinal nerve"
+            },
+            {
+                "id": "ILX:0795366",
+                "name": "Right L5 branch to right common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795356",
+                "name": "Right L5 branch to right tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0796969",
+                "name": "Right L5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0788087",
+                "name": "Right L5 spinal nerve"
+            },
+            {
+                "id": "ILX:0795368",
+                "name": "Right S1 branch to right common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795358",
+                "name": "Right S1 branch to right tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0797025",
+                "name": "Right S1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0795176",
+                "name": "Right S1 sacral splanchnic nerve"
+            },
+            {
+                "id": "ILX:0784617",
+                "name": "Right S1 spinal nerve"
+            },
+            {
+                "id": "ILX:0795370",
+                "name": "Right S2 branch to right common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0795360",
+                "name": "Right S2 branch to right tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0797027",
+                "name": "Right S2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0795179",
+                "name": "Right S2 sacral splanchnic nerve"
+            },
+            {
+                "id": "ILX:0790323",
+                "name": "Right S2 spinal nerve"
+            },
+            {
+                "id": "ILX:0797029",
+                "name": "Right S2 spinal nerve branch to right pudendal nerve"
+            },
+            {
+                "id": "ILX:0795362",
+                "name": "Right S3 branch to right tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0797031",
+                "name": "Right S3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787077",
+                "name": "Right S3 spinal nerve"
+            },
+            {
+                "id": "ILX:0797033",
+                "name": "Right S3 spinal nerve branch to right pudendal nerve"
+            },
+            {
+                "id": "ILX:0797035",
+                "name": "Right S4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0786250",
+                "name": "Right S4 spinal nerve"
+            },
+            {
+                "id": "ILX:0797037",
+                "name": "Right S4 spinal nerve branch to right pudendal nerve"
+            },
+            {
+                "id": "ILX:0797039",
+                "name": "Right S5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787717",
+                "name": "Right S5 spinal nerve"
+            },
+            {
+                "id": "ILX:0791865",
+                "name": "Right T1 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0788282",
+                "name": "Right T1 spinal nerve"
+            },
+            {
+                "id": "ILX:0787179",
+                "name": "Right T1 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788601",
+                "name": "Right T1 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0789706",
+                "name": "Right T1 white ramus communicans"
+            },
+            {
+                "id": "ILX:0791007",
+                "name": "Right T10 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787515",
+                "name": "Right T10 spinal nerve"
+            },
+            {
+                "id": "ILX:0792349",
+                "name": "Right T10 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788019",
+                "name": "Right T10 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0784598",
+                "name": "Right T10 white ramus communicans"
+            },
+            {
+                "id": "ILX:0784673",
+                "name": "Right T11 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0791664",
+                "name": "Right T11 spinal nerve"
+            },
+            {
+                "id": "ILX:0793013",
+                "name": "Right T11 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788168",
+                "name": "Right T11 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0790247",
+                "name": "Right T11 white ramus communicans"
+            },
+            {
+                "id": "ILX:0796937",
+                "name": "Right T12 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0790330",
+                "name": "Right T12 spinal nerve"
+            },
+            {
+                "id": "ILX:0791997",
+                "name": "Right T12 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0788051",
+                "name": "Right T12 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0796939",
+                "name": "Right T12 white ramus communicans"
+            },
+            {
+                "id": "ILX:0792452",
+                "name": "Right T2 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0786267",
+                "name": "Right T2 spinal nerve"
+            },
+            {
+                "id": "ILX:0786344",
+                "name": "Right T2 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791529",
+                "name": "Right T2 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0784453",
+                "name": "Right T2 white ramus communicans"
+            },
+            {
+                "id": "ILX:0788842",
+                "name": "Right T3 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0787393",
+                "name": "Right T3 spinal nerve"
+            },
+            {
+                "id": "ILX:0785359",
+                "name": "Right T3 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0791747",
+                "name": "Right T3 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0786631",
+                "name": "Right T3 white ramus communicans"
+            },
+            {
+                "id": "ILX:0785311",
+                "name": "Right T4 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0785052",
+                "name": "Right T4 spinal nerve"
+            },
+            {
+                "id": "ILX:0789918",
+                "name": "Right T4 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0790881",
+                "name": "Right T4 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0784621",
+                "name": "Right T4 white ramus communicans"
+            },
+            {
+                "id": "ILX:0787369",
+                "name": "Right T5 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0784405",
+                "name": "Right T5 spinal nerve"
+            },
+            {
+                "id": "ILX:0787767",
+                "name": "Right T5 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0792309",
+                "name": "Right T5 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0791498",
+                "name": "Right T5 white ramus communicans"
+            },
+            {
+                "id": "ILX:0792099",
+                "name": "Right T6 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0792459",
+                "name": "Right T6 spinal nerve"
+            },
+            {
+                "id": "ILX:0785887",
+                "name": "Right T6 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0790554",
+                "name": "Right T6 spinal nerve posterior ramus medial branch"
+            },
+            {
+                "id": "ILX:0792201",
+                "name": "Right T6 white ramus communicans"
+            },
+            {
+                "id": "ILX:0792878",
+                "name": "Right T7 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0791174",
+                "name": "Right T7 spinal nerve"
+            },
+            {
+                "id": "ILX:0785737",
+                "name": "Right T7 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0787184",
+                "name": "Right T7 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0786071",
+                "name": "Right T7 white ramus communicans"
+            },
+            {
+                "id": "ILX:0785921",
+                "name": "Right T8 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0786564",
+                "name": "Right T8 spinal nerve"
+            },
+            {
+                "id": "ILX:0788685",
+                "name": "Right T8 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0787068",
+                "name": "Right T8 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0792831",
+                "name": "Right T8 white ramus communicans"
+            },
+            {
+                "id": "ILX:0787012",
+                "name": "Right T9 grey ramus communicans"
+            },
+            {
+                "id": "ILX:0789063",
+                "name": "Right T9 spinal nerve"
+            },
+            {
+                "id": "ILX:0792136",
+                "name": "Right T9 spinal nerve posterior ramus"
+            },
+            {
+                "id": "ILX:0787447",
+                "name": "Right T9 spinal nerve posterior ramus lateral branch"
+            },
+            {
+                "id": "ILX:0786061",
+                "name": "Right T9 white ramus communicans"
+            },
+            {
+                "id": "ILX:0785210",
+                "name": "Right accessory nerve"
+            },
+            {
+                "id": "ILX:0796803",
+                "name": "Right accessory phrenic nerve"
+            },
+            {
+                "id": "ILX:0794577",
+                "name": "Right ansa cervicalis"
+            },
+            {
+                "id": "ILX:0796754",
+                "name": "Right anterior division of mandibular nerve"
+            },
+            {
+                "id": "ILX:0796714",
+                "name": "Right anterior ethmoidal nerve"
+            },
+            {
+                "id": "ILX:0796991",
+                "name": "Right anterior femoral cutaneous branch A"
+            },
+            {
+                "id": "ILX:0796897",
+                "name": "Right anterior interosseous nerve"
+            },
+            {
+                "id": "ILX:0795159",
+                "name": "Right anterior scrotal nerve"
+            },
+            {
+                "id": "ILX:0796748",
+                "name": "Right anterior superior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796787",
+                "name": "Right anterior supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796770",
+                "name": "Right auriculotemporal nerve"
+            },
+            {
+                "id": "ILX:0796857",
+                "name": "Right axillary nerve"
+            },
+            {
+                "id": "ILX:0796861",
+                "name": "Right axillary nerve anterior branch"
+            },
+            {
+                "id": "ILX:0796863",
+                "name": "Right axillary nerve posterior branch"
+            },
+            {
+                "id": "ILX:0796768",
+                "name": "Right buccal nerve"
+            },
+            {
+                "id": "ILX:0796778",
+                "name": "Right caroticotympanic nerve"
+            },
+            {
+                "id": "ILX:0786650",
+                "name": "Right carotid sinus nerve"
+            },
+            {
+                "id": "ILX:0795353",
+                "name": "Right coccygeal grey ramus communicans"
+            },
+            {
+                "id": "ILX:0784847",
+                "name": "Right coccygeal spinal nerve"
+            },
+            {
+                "id": "ILX:0790324",
+                "name": "Right cochlear nerve"
+            },
+            {
+                "id": "ILX:0791510",
+                "name": "Right common fibular nerve"
+            },
+            {
+                "id": "ILX:0795182",
+                "name": "Right common fibular part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0796849",
+                "name": "Right common palmar digital nerve A"
+            },
+            {
+                "id": "ILX:0795138",
+                "name": "Right common palmar digital nerve B"
+            },
+            {
+                "id": "ILX:0795141",
+                "name": "Right common palmar digital nerve C"
+            },
+            {
+                "id": "ILX:0795194",
+                "name": "Right common plantar digital nerve B"
+            },
+            {
+                "id": "ILX:0795191",
+                "name": "Right common plantar digital nerve C"
+            },
+            {
+                "id": "ILX:0795188",
+                "name": "Right common plantar digital nerve D"
+            },
+            {
+                "id": "ILX:0797067",
+                "name": "Right common plantar digital nerve E"
+            },
+            {
+                "id": "ILX:0797069",
+                "name": "Right common plantar digital nerve F"
+            },
+            {
+                "id": "ILX:0796706",
+                "name": "Right communicating branch of nasociliary nerve with ciliary ganglion"
+            },
+            {
+                "id": "ILX:0797089",
+                "name": "Right deep fibular nerve"
+            },
+            {
+                "id": "ILX:0796772",
+                "name": "Right deep petrosal nerve"
+            },
+            {
+                "id": "ILX:0797021",
+                "name": "Right dorsal nerve of penis"
+            },
+            {
+                "id": "ILX:0791272",
+                "name": "Right eighth intercostal nerve"
+            },
+            {
+                "id": "ILX:0788489",
+                "name": "Right eleventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0792879",
+                "name": "Right external laryngeal nerve"
+            },
+            {
+                "id": "ILX:0790936",
+                "name": "Right external laryngeal nerve branch to inferior pharyngeal constrictor"
+            },
+            {
+                "id": "ILX:0787745",
+                "name": "Right external laryngeal nerve branch to pharyngeal plexus"
+            },
+            {
+                "id": "ILX:0791475",
+                "name": "Right facial nerve"
+            },
+            {
+                "id": "ILX:0796995",
+                "name": "Right femoral branch of genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0796989",
+                "name": "Right femoral nerve"
+            },
+            {
+                "id": "ILX:0795162",
+                "name": "Right femoral nerve posterior division"
+            },
+            {
+                "id": "ILX:0787824",
+                "name": "Right fifth intercostal nerve"
+            },
+            {
+                "id": "ILX:0790464",
+                "name": "Right first intercostal nerve"
+            },
+            {
+                "id": "ILX:0796973",
+                "name": "Right first lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0791393",
+                "name": "Right fourth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796979",
+                "name": "Right fourth lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0796698",
+                "name": "Right frontal nerve"
+            },
+            {
+                "id": "ILX:0796997",
+                "name": "Right genital branch of genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0796993",
+                "name": "Right genitofemoral nerve"
+            },
+            {
+                "id": "ILX:0791729",
+                "name": "Right glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0794583",
+                "name": "Right great auricular nerve"
+            },
+            {
+                "id": "ILX:0796783",
+                "name": "Right great auricular nerve anterior branch"
+            },
+            {
+                "id": "ILX:0796785",
+                "name": "Right great auricular nerve posterior branch"
+            },
+            {
+                "id": "ILX:0790361",
+                "name": "Right greater occipital nerve"
+            },
+            {
+                "id": "ILX:0796738",
+                "name": "Right greater palatine nerve"
+            },
+            {
+                "id": "ILX:0788496",
+                "name": "Right greater petrosal nerve"
+            },
+            {
+                "id": "ILX:0796949",
+                "name": "Right greater splanchnic nerve"
+            },
+            {
+                "id": "ILX:0796983",
+                "name": "Right hypogastric nerve"
+            },
+            {
+                "id": "ILX:0796981",
+                "name": "Right iliohypogastric nerve"
+            },
+            {
+                "id": "ILX:0796987",
+                "name": "Right ilioinguinal nerve"
+            },
+            {
+                "id": "ILX:0796762",
+                "name": "Right incisive branch of inferior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796760",
+                "name": "Right inferior alveolar nerve"
+            },
+            {
+                "id": "UBERON:0011767",
+                "name": "Right inferior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796867",
+                "name": "Right inferior lateral cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0796750",
+                "name": "Right inferior palpebral branch of infraorbital nerve"
+            },
+            {
+                "id": "ILX:0797017",
+                "name": "Right inferior rectal nerve"
+            },
+            {
+                "id": "ILX:0796742",
+                "name": "Right infraorbital nerve"
+            },
+            {
+                "id": "ILX:0796708",
+                "name": "Right infratrochlear nerve"
+            },
+            {
+                "id": "ILX:0796831",
+                "name": "Right intercostobrachial nerve"
+            },
+            {
+                "id": "ILX:0797083",
+                "name": "Right intermediate dorsal cutaneous nerve"
+            },
+            {
+                "id": "ILX:0795107",
+                "name": "Right internal carotid nerve"
+            },
+            {
+                "id": "ILX:0788164",
+                "name": "Right internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796696",
+                "name": "Right lacrimal nerve"
+            },
+            {
+                "id": "ILX:0796780",
+                "name": "Right laryngopharyngeal branch of superior cervical ganglion"
+            },
+            {
+                "id": "ILX:0797075",
+                "name": "Right lateral calcaneal branch A of right sural nerve"
+            },
+            {
+                "id": "ILX:0796829",
+                "name": "Right lateral cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0795117",
+                "name": "Right lateral cutaneous nerve of forearm anterior branch"
+            },
+            {
+                "id": "ILX:0795120",
+                "name": "Right lateral cutaneous nerve of forearm posterior branch"
+            },
+            {
+                "id": "ILX:0797077",
+                "name": "Right lateral dorsal cutaneous nerve"
+            },
+            {
+                "id": "ILX:0797085",
+                "name": "Right lateral dorsal digital nerve of the third toe"
+            },
+            {
+                "id": "ILX:0796999",
+                "name": "Right lateral femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0797045",
+                "name": "Right lateral plantar nerve"
+            },
+            {
+                "id": "ILX:0797091",
+                "name": "Right lateral sural cutaneous nerve"
+            },
+            {
+                "id": "ILX:0796953",
+                "name": "Right least splanchnic nerve"
+            },
+            {
+                "id": "ILX:0788591",
+                "name": "Right lesser occipital nerve"
+            },
+            {
+                "id": "ILX:0796740",
+                "name": "Right lesser palatine nerve"
+            },
+            {
+                "id": "ILX:0784458",
+                "name": "Right lesser petrosal nerve"
+            },
+            {
+                "id": "ILX:0796951",
+                "name": "Right lesser splanchnic nerve"
+            },
+            {
+                "id": "ILX:0796774",
+                "name": "Right lingual branch of glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0796766",
+                "name": "Right lingual nerve"
+            },
+            {
+                "id": "ILX:0796710",
+                "name": "Right long ciliary nerve A"
+            },
+            {
+                "id": "ILX:0796712",
+                "name": "Right long ciliary nerve B"
+            },
+            {
+                "id": "ILX:0796825",
+                "name": "Right long thoracic nerve"
+            },
+            {
+                "id": "ILX:0796971",
+                "name": "Right lumbosacral trunk"
+            },
+            {
+                "id": "ILX:0793008",
+                "name": "Right mandibular nerve"
+            },
+            {
+                "id": "ILX:0791027",
+                "name": "Right maxillary nerve"
+            },
+            {
+                "id": "ILX:0796833",
+                "name": "Right medial cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0796835",
+                "name": "Right medial cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0797081",
+                "name": "Right medial dorsal cutaneous nerve"
+            },
+            {
+                "id": "ILX:0797087",
+                "name": "Right medial dorsal digital nerve of the fourth toe"
+            },
+            {
+                "id": "ILX:0797043",
+                "name": "Right medial plantar nerve"
+            },
+            {
+                "id": "ILX:0796724",
+                "name": "Right medial posterior superior nasal nerve"
+            },
+            {
+                "id": "ILX:0797073",
+                "name": "Right medial sural cutaneous nerve"
+            },
+            {
+                "id": "ILX:0795153",
+                "name": "Right medial visceral branch of right T10 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795155",
+                "name": "Right medial visceral branch of right T11 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795157",
+                "name": "Right medial visceral branch of right T12 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795143",
+                "name": "Right medial visceral branch of right T5 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795145",
+                "name": "Right medial visceral branch of right T6 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795147",
+                "name": "Right medial visceral branch of right T7 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795149",
+                "name": "Right medial visceral branch of right T8 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0795151",
+                "name": "Right medial visceral branch of right T9 sympathetic ganglion"
+            },
+            {
+                "id": "ILX:0796877",
+                "name": "Right median nerve"
+            },
+            {
+                "id": "ILX:0795092",
+                "name": "Right meningeal branch of anterior ethmoidal nerve"
+            },
+            {
+                "id": "ILX:0796758",
+                "name": "Right meningeal branch of mandibular nerve"
+            },
+            {
+                "id": "ILX:0796764",
+                "name": "Right mental nerve"
+            },
+            {
+                "id": "ILX:0796718",
+                "name": "Right middle meningeal nerve"
+            },
+            {
+                "id": "ILX:0796746",
+                "name": "Right middle superior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796789",
+                "name": "Right middle supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796827",
+                "name": "Right musculocutaneous nerve"
+            },
+            {
+                "id": "ILX:0796704",
+                "name": "Right nasociliary nerve"
+            },
+            {
+                "id": "ILX:0796736",
+                "name": "Right nasopalatine nerve"
+            },
+            {
+                "id": "ILX:0795101",
+                "name": "Right nerve of the pterygoid canal"
+            },
+            {
+                "id": "ILX:0795103",
+                "name": "Right nervus intermedius"
+            },
+            {
+                "id": "ILX:0788417",
+                "name": "Right ninth intercostal nerve"
+            },
+            {
+                "id": "ILX:0797005",
+                "name": "Right obturator nerve"
+            },
+            {
+                "id": "ILX:0786853",
+                "name": "Right oculomotor nerve"
+            },
+            {
+                "id": "ILX:0796690",
+                "name": "Right olfactory nerve"
+            },
+            {
+                "id": "ILX:0789469",
+                "name": "Right ophthalmic nerve"
+            },
+            {
+                "id": "ILX:0796692",
+                "name": "Right optic nerve"
+            },
+            {
+                "id": "ILX:0795095",
+                "name": "Right orbital branch of maxillary nerve"
+            },
+            {
+                "id": "ILX:0795099",
+                "name": "Right palpebral branch of infraorbital nerve"
+            },
+            {
+                "id": "ILX:0795089",
+                "name": "Right palpebral branch of lacrimal nerve"
+            },
+            {
+                "id": "ILX:0797019",
+                "name": "Right perineal nerve"
+            },
+            {
+                "id": "ILX:0795097",
+                "name": "Right pharyngeal nerve"
+            },
+            {
+                "id": "ILX:0796799",
+                "name": "Right phrenic nerve"
+            },
+            {
+                "id": "ILX:0793009",
+                "name": "Right posterior auricular nerve"
+            },
+            {
+                "id": "ILX:0796869",
+                "name": "Right posterior cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0796871",
+                "name": "Right posterior cutaneous nerve of forearm"
+            },
+            {
+                "id": "ILX:0796756",
+                "name": "Right posterior division of mandibular nerve"
+            },
+            {
+                "id": "ILX:0796716",
+                "name": "Right posterior ethmoidal nerve"
+            },
+            {
+                "id": "ILX:0797013",
+                "name": "Right posterior femoral cutaneous nerve"
+            },
+            {
+                "id": "ILX:0796873",
+                "name": "Right posterior interosseous nerve"
+            },
+            {
+                "id": "ILX:0797023",
+                "name": "Right posterior scrotal nerve"
+            },
+            {
+                "id": "ILX:0796744",
+                "name": "Right posterior superior alveolar nerve"
+            },
+            {
+                "id": "ILX:0796722",
+                "name": "Right posterior superior lateral nasal branch of maxillary nerve"
+            },
+            {
+                "id": "ILX:0796791",
+                "name": "Right posterior supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796851",
+                "name": "Right proper palmar digital nerve A"
+            },
+            {
+                "id": "ILX:0796853",
+                "name": "Right proper palmar digital nerve B"
+            },
+            {
+                "id": "ILX:0796855",
+                "name": "Right proper palmar digital nerve C"
+            },
+            {
+                "id": "ILX:0796889",
+                "name": "Right proper palmar digital nerve D"
+            },
+            {
+                "id": "ILX:0796891",
+                "name": "Right proper palmar digital nerve E"
+            },
+            {
+                "id": "ILX:0796893",
+                "name": "Right proper palmar digital nerve F"
+            },
+            {
+                "id": "ILX:0796895",
+                "name": "Right proper palmar digital nerve G"
+            },
+            {
+                "id": "ILX:0796883",
+                "name": "Right proper palmar digital nerve H"
+            },
+            {
+                "id": "ILX:0796885",
+                "name": "Right proper palmar digital nerve I"
+            },
+            {
+                "id": "ILX:0796887",
+                "name": "Right proper palmar digital nerve J"
+            },
+            {
+                "id": "ILX:0797047",
+                "name": "Right proper plantar digital nerve A"
+            },
+            {
+                "id": "ILX:0797049",
+                "name": "Right proper plantar digital nerve B"
+            },
+            {
+                "id": "ILX:0797051",
+                "name": "Right proper plantar digital nerve C"
+            },
+            {
+                "id": "ILX:0797053",
+                "name": "Right proper plantar digital nerve D"
+            },
+            {
+                "id": "ILX:0797055",
+                "name": "Right proper plantar digital nerve E"
+            },
+            {
+                "id": "ILX:0797057",
+                "name": "Right proper plantar digital nerve F"
+            },
+            {
+                "id": "ILX:0797059",
+                "name": "Right proper plantar digital nerve G"
+            },
+            {
+                "id": "ILX:0797061",
+                "name": "Right proper plantar digital nerve H"
+            },
+            {
+                "id": "ILX:0797063",
+                "name": "Right proper plantar digital nerve I"
+            },
+            {
+                "id": "ILX:0797065",
+                "name": "Right proper plantar digital nerve J"
+            },
+            {
+                "id": "ILX:0784920",
+                "name": "Right pudendal nerve"
+            },
+            {
+                "id": "ILX:0796865",
+                "name": "Right radial nerve"
+            },
+            {
+                "id": "UBERON:0011767",
+                "name": "Right recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0797001",
+                "name": "Right saphenous nerve"
+            },
+            {
+                "id": "ILX:0785820",
+                "name": "Right sciatic nerve"
+            },
+            {
+                "id": "ILX:0789993",
+                "name": "Right second intercostal nerve"
+            },
+            {
+                "id": "ILX:0796975",
+                "name": "Right second lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0790586",
+                "name": "Right seventh intercostal nerve"
+            },
+            {
+                "id": "ILX:0791724",
+                "name": "Right sixth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796823",
+                "name": "Right subclavian nerve"
+            },
+            {
+                "id": "ILX:0792128",
+                "name": "Right subcostal nerve"
+            },
+            {
+                "id": "ILX:0796875",
+                "name": "Right superficial branch of radial nerve"
+            },
+            {
+                "id": "ILX:0795129",
+                "name": "Right superficial branch of radial nerve lateral branch"
+            },
+            {
+                "id": "ILX:0795126",
+                "name": "Right superficial branch of radial nerve medial branch"
+            },
+            {
+                "id": "ILX:0797079",
+                "name": "Right superficial fibular nerve"
+            },
+            {
+                "id": "ILX:0786396",
+                "name": "Right superior cervical cardiac nerve"
+            },
+            {
+                "id": "ILX:0796752",
+                "name": "Right superior labial branch of infraorbital nerve"
+            },
+            {
+                "id": "ILX:0787738",
+                "name": "Right superior laryngeal nerve"
+            },
+            {
+                "id": "ILX:0796859",
+                "name": "Right superior lateral cutaneous nerve of arm"
+            },
+            {
+                "id": "ILX:0794901",
+                "name": "Right supraclavicular nerve"
+            },
+            {
+                "id": "ILX:0796702",
+                "name": "Right supraorbital nerve"
+            },
+            {
+                "id": "ILX:0796700",
+                "name": "Right supratrochlear nerve"
+            },
+            {
+                "id": "ILX:0795197",
+                "name": "Right sural communicating branch"
+            },
+            {
+                "id": "ILX:0797071",
+                "name": "Right sural nerve"
+            },
+            {
+                "id": "ILX:0786761",
+                "name": "Right sympathetic trunk"
+            },
+            {
+                "id": "ILX:0797098",
+                "name": "Right sympathetic trunk branch to internal carotid nerve plexus"
+            },
+            {
+                "id": "ILX:0788578",
+                "name": "Right tenth intercostal nerve"
+            },
+            {
+                "id": "ILX:0796694",
+                "name": "Right tentorial nerve"
+            },
+            {
+                "id": "ILX:0786349",
+                "name": "Right third intercostal nerve"
+            },
+            {
+                "id": "ILX:0796977",
+                "name": "Right third lumbar splanchnic nerve"
+            },
+            {
+                "id": "ILX:0792919",
+                "name": "Right third occipital nerve"
+            },
+            {
+                "id": "ILX:0791005",
+                "name": "Right tibial nerve"
+            },
+            {
+                "id": "ILX:0795185",
+                "name": "Right tibial part of sciatic nerve"
+            },
+            {
+                "id": "ILX:0794898",
+                "name": "Right transverse cervical nerve"
+            },
+            {
+                "id": "ILX:0792877",
+                "name": "Right trigeminal nerve"
+            },
+            {
+                "id": "ILX:0786889",
+                "name": "Right tympanic nerve"
+            },
+            {
+                "id": "ILX:0796841",
+                "name": "Right ulnar nerve"
+            },
+            {
+                "id": "UBERON:0035021",
+                "name": "Right vagus nerve"
+            },
+            {
+                "id": "ILX:0788963",
+                "name": "Right vestibular nerve"
+            },
+            {
+                "id": "ILX:0796730",
+                "name": "Right zygomatic nerve"
+            },
+            {
+                "id": "ILX:0796734",
+                "name": "Right zygomaticofacial nerve"
+            },
+            {
+                "id": "ILX:0796732",
+                "name": "Right zygomaticotemporal nerve"
+            },
+            {
+                "id": "ILX:0796848",
+                "name": "Superficial branch of left ulnar nerve"
+            },
+            {
+                "id": "ILX:0796847",
+                "name": "Superficial branch of right ulnar nerve"
+            },
+            {
+                "id": "ILX:0791998",
+                "name": "Superior cervical cardiac branch of left vagus nerve"
+            },
+            {
+                "id": "ILX:0786396",
+                "name": "Superior cervical cardiac branch of right vagus nerve"
+            },
+            {
+                "id": "ILX:0785786",
+                "name": "Superior ramus of left internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0784524",
+                "name": "Superior ramus of right internal laryngeal nerve"
+            },
+            {
+                "id": "ILX:0784519",
+                "name": "Temporal branch of left facial nerve"
+            },
+            {
+                "id": "ILX:0788053",
+                "name": "Temporal branch of right facial nerve"
+            },
+            {
+                "id": "ILX:0791489",
+                "name": "Thoracic cardiac branch of left vagus nerve"
+            },
+            {
+                "id": "ILX:0790057",
+                "name": "Thoracic cardiac branch of right vagus nerve"
+            },
+            {
+                "id": "ILX:0785969",
+                "name": "Tonsillar branch of left glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0790359",
+                "name": "Tonsillar branch of right glossopharyngeal nerve"
+            },
+            {
+                "id": "ILX:0785091",
+                "name": "Tracheal branch of left recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0792888",
+                "name": "Tracheal branch of right recurrent laryngeal nerve"
+            },
+            {
+                "id": "ILX:0791085",
+                "name": "Vagal branch to left carotid body"
+            },
+            {
+                "id": "ILX:0790433",
+                "name": "Vagal branch to right carotid body"
+            },
+            {
+                "id": "ILX:0792663",
+                "name": "Zygomatic branch of left facial nerve"
+            },
+            {
+                "id": "ILX:0789259",
+                "name": "Zygomatic branch of right facial nerve"
+            }
+        ]
+    },
+    "scaffold_settings": {
+        "deleteElementRanges": "",
+        "scaffoldPackage": {
+            "_ScaffoldPackage": true,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaffoldSettings": {
+                "Boolean option": true,
+                "Integer option": 1,
+                "Real option": 1.0
+            },
+            "scaffoldTypeName": "1D Nerve Path 1",
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "segmentation_data_settings": {},
+    "version": "1.0.0"
+}

@@ -1,0 +1,517 @@
+{
+    "id": "map-client-provenance-report-record",
+    "software_info": {
+        "id": "map-client-provenance-software-record",
+        "mapclient": {
+            "location": "https://github.com/MusculoskeletalAtlasProject/mapclient",
+            "version": "0.25.0"
+        },
+        "packages": {
+            "PyGithub": {
+                "location": "PyPI",
+                "version": "2.8.0"
+            },
+            "PyJWT": {
+                "location": "PyPI",
+                "version": "2.10.1"
+            },
+            "PyNaCl": {
+                "location": "PyPI",
+                "version": "1.5.0"
+            },
+            "PySide6": {
+                "location": "PyPI",
+                "version": "6.9.2"
+            },
+            "PySide6_Addons": {
+                "location": "PyPI",
+                "version": "6.9.2"
+            },
+            "PySide6_Essentials": {
+                "location": "PyPI",
+                "version": "6.9.2"
+            },
+            "altgraph": {
+                "location": "PyPI",
+                "version": "0.17.4"
+            },
+            "boto3": {
+                "location": "PyPI",
+                "version": "1.40.21"
+            },
+            "botocore": {
+                "location": "PyPI",
+                "version": "1.40.21"
+            },
+            "certifi": {
+                "location": "PyPI",
+                "version": "2025.8.3"
+            },
+            "cffi": {
+                "location": "PyPI",
+                "version": "1.17.1"
+            },
+            "charset-normalizer": {
+                "location": "PyPI",
+                "version": "3.4.3"
+            },
+            "choreographer": {
+                "location": "PyPI",
+                "version": "1.0.10"
+            },
+            "cmlibs.argon": {
+                "location": "PyPI",
+                "version": "0.4.3"
+            },
+            "cmlibs.exporter": {
+                "location": "PyPI",
+                "version": "0.9.0"
+            },
+            "cmlibs.importer": {
+                "location": "PyPI",
+                "version": "0.7.1"
+            },
+            "cmlibs.maths": {
+                "location": "PyPI",
+                "version": "0.7.3"
+            },
+            "cmlibs.merger": {
+                "location": "PyPI",
+                "version": "0.3.0"
+            },
+            "cmlibs.utils": {
+                "location": "PyPI",
+                "version": "0.13.0"
+            },
+            "cmlibs.widgets": {
+                "location": "PyPI",
+                "version": "0.9.3"
+            },
+            "cmlibs.zinc": {
+                "location": "PyPI",
+                "version": "4.2.1"
+            },
+            "colorama": {
+                "location": "PyPI",
+                "version": "0.4.6"
+            },
+            "cryptography": {
+                "location": "PyPI",
+                "version": "45.0.7"
+            },
+            "dataembedder": {
+                "location": "PyPI",
+                "version": "0.5.1"
+            },
+            "distlib": {
+                "location": "PyPI",
+                "version": "0.4.0"
+            },
+            "dulwich": {
+                "location": "PyPI",
+                "version": "0.24.1"
+            },
+            "et_xmlfile": {
+                "location": "PyPI",
+                "version": "2.0.0"
+            },
+            "exf2mbfxml": {
+                "location": "PyPI",
+                "version": "0.1.3"
+            },
+            "fieldfitter": {
+                "location": "PyPI",
+                "version": "0.6.0"
+            },
+            "filelock": {
+                "location": "PyPI",
+                "version": "3.19.1"
+            },
+            "grpcio": {
+                "location": "PyPI",
+                "version": "1.75.0rc1"
+            },
+            "grpcio-tools": {
+                "location": "PyPI",
+                "version": "1.63.0rc1"
+            },
+            "idna": {
+                "location": "PyPI",
+                "version": "3.10"
+            },
+            "importlib_metadata": {
+                "location": "PyPI",
+                "version": "8.7.0"
+            },
+            "isodate": {
+                "location": "PyPI",
+                "version": "0.7.2"
+            },
+            "jmespath": {
+                "location": "PyPI",
+                "version": "1.0.1"
+            },
+            "kaleido": {
+                "location": "PyPI",
+                "version": "1.1.0rc0"
+            },
+            "logistro": {
+                "location": "PyPI",
+                "version": "1.1.0"
+            },
+            "mapclientplugins.imagesourcestep": {
+                "location": "locally-acquired-v0.3.2",
+                "version": "0.3.2"
+            },
+            "mbfxml2ex": {
+                "location": "PyPI",
+                "version": "0.8.4"
+            },
+            "narwhals": {
+                "location": "PyPI",
+                "version": "2.3.0"
+            },
+            "numpy": {
+                "location": "PyPI",
+                "version": "2.0.2"
+            },
+            "oauthlib": {
+                "location": "PyPI",
+                "version": "3.3.1"
+            },
+            "openpyxl": {
+                "location": "PyPI",
+                "version": "3.1.5"
+            },
+            "orjson": {
+                "location": "PyPI",
+                "version": "3.11.3"
+            },
+            "osparc": {
+                "location": "PyPI",
+                "version": "0.5.0"
+            },
+            "packaging": {
+                "location": "PyPI",
+                "version": "25.0"
+            },
+            "pandas": {
+                "location": "PyPI",
+                "version": "2.3.2"
+            },
+            "pefile": {
+                "location": "PyPI",
+                "version": "2023.2.7"
+            },
+            "pennsieve2": {
+                "location": "PyPI",
+                "version": "0.1.2"
+            },
+            "pillow": {
+                "location": "PyPI",
+                "version": "11.3.0"
+            },
+            "pip": {
+                "location": "PyPI",
+                "version": "25.2"
+            },
+            "platformdirs": {
+                "location": "PyPI",
+                "version": "4.4.0"
+            },
+            "plotly": {
+                "location": "PyPI",
+                "version": "6.3.0"
+            },
+            "pmr2.client": {
+                "location": "PyPI",
+                "version": "0.2"
+            },
+            "pmr2.wfctrl": {
+                "location": "PyPI",
+                "version": "0.7.0"
+            },
+            "pointpare": {
+                "location": "PyPI",
+                "version": "0.1.0"
+            },
+            "protobuf": {
+                "location": "PyPI",
+                "version": "4.25.8"
+            },
+            "psutil": {
+                "location": "PyPI",
+                "version": "7.0.0"
+            },
+            "pycparser": {
+                "location": "PyPI",
+                "version": "2.22"
+            },
+            "pyinstaller": {
+                "location": "PyPI",
+                "version": "6.15.0"
+            },
+            "pyinstaller-hooks-contrib": {
+                "location": "PyPI",
+                "version": "2025.8"
+            },
+            "pyparsing": {
+                "location": "PyPI",
+                "version": "3.2.3"
+            },
+            "python-dateutil": {
+                "location": "PyPI",
+                "version": "2.9.0.post0"
+            },
+            "pytz": {
+                "location": "PyPI",
+                "version": "2025.2"
+            },
+            "pywin32-ctypes": {
+                "location": "PyPI",
+                "version": "0.2.3"
+            },
+            "rdflib": {
+                "location": "PyPI",
+                "version": "7.1.4"
+            },
+            "requests": {
+                "location": "PyPI",
+                "version": "2.32.5"
+            },
+            "requests-oauthlib": {
+                "location": "PyPI",
+                "version": "2.0.0"
+            },
+            "s3transfer": {
+                "location": "PyPI",
+                "version": "0.13.1"
+            },
+            "scaffoldfitter": {
+                "location": "PyPI",
+                "version": "0.11.2"
+            },
+            "scaffoldmaker": {
+                "location": "PyPI",
+                "version": "0.19.1"
+            },
+            "scipy": {
+                "location": "PyPI",
+                "version": "1.13.1"
+            },
+            "segmentationstitcher": {
+                "location": "PyPI",
+                "version": "0.1.1"
+            },
+            "setuptools": {
+                "location": "PyPI",
+                "version": "58.1.0"
+            },
+            "shiboken6": {
+                "location": "PyPI",
+                "version": "6.9.2"
+            },
+            "simplejson": {
+                "location": "PyPI",
+                "version": "3.20.1"
+            },
+            "six": {
+                "location": "PyPI",
+                "version": "1.17.0"
+            },
+            "sparc-curation-tools": {
+                "location": "PyPI",
+                "version": "0.7.9"
+            },
+            "sparc.client": {
+                "location": "PyPI",
+                "version": "0.4.1"
+            },
+            "svgpathtools-light": {
+                "location": "PyPI",
+                "version": "1.6.2"
+            },
+            "tabulate": {
+                "location": "PyPI",
+                "version": "0.9.0"
+            },
+            "tqdm": {
+                "location": "PyPI",
+                "version": "4.67.1"
+            },
+            "typing_extensions": {
+                "location": "PyPI",
+                "version": "4.15.0"
+            },
+            "tzdata": {
+                "location": "PyPI",
+                "version": "2025.2"
+            },
+            "urllib3": {
+                "location": "PyPI",
+                "version": "1.26.20"
+            },
+            "virtualenv": {
+                "location": "PyPI",
+                "version": "20.34.0"
+            },
+            "zipp": {
+                "location": "PyPI",
+                "version": "3.23.0"
+            }
+        },
+        "plugins": {
+            "mapclientplugins.applyfittedcoordinatesstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.applyfittedcoordinatesstep",
+                "version": "0.1.1"
+            },
+            "mapclientplugins.argonsceneexporterstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.argonsceneexporterstep",
+                "version": "0.7.3"
+            },
+            "mapclientplugins.argonviewerstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.argonviewerstep",
+                "version": "0.4.8"
+            },
+            "mapclientplugins.autosegmentationstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.autosegmentationstep",
+                "version": "0.4.1"
+            },
+            "mapclientplugins.configurationcapturestep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.configurationcapturestep",
+                "version": "0.1.2"
+            },
+            "mapclientplugins.convertcoordinatefieldstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.convertcoordinatefieldstep",
+                "version": "0.2.0"
+            },
+            "mapclientplugins.convertdatatozincstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.convertdatatozincstep",
+                "version": "0.2.2"
+            },
+            "mapclientplugins.dataembedderstep": {
+                "location": "https://github.com/ABI-Software/mapclientplugins.dataembedderstep",
+                "version": "0.5.0"
+            },
+            "mapclientplugins.dictserializerstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.dictserializerstep",
+                "version": "0.2.0"
+            },
+            "mapclientplugins.directorychooserstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.directorychooserstep",
+                "version": "0.2.2"
+            },
+            "mapclientplugins.fieldfitterstep": {
+                "location": "https://github.com/ABI-Software/mapclientplugins.fieldfitterstep",
+                "version": "0.5.0"
+            },
+            "mapclientplugins.filechooserstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.filechooserstep",
+                "version": "0.3.0"
+            },
+            "mapclientplugins.filelocationsinkstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.filelocationsinkstep",
+                "version": "0.5.0"
+            },
+            "mapclientplugins.generateflatmapsourcesstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.generateflatmapsourcesstep",
+                "version": "0.1.1"
+            },
+            "mapclientplugins.generatesdsstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.generatesds",
+                "version": "0.3.1"
+            },
+            "mapclientplugins.geometryfitter": {
+                "location": "https://github.com/ABI-Software/mapclientplugins.geometryfitter",
+                "version": "0.10.1"
+            },
+            "mapclientplugins.mapclientprovenancerecordstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.mapclientprovenancerecordstep",
+                "version": "0.3.2"
+            },
+            "mapclientplugins.mbfxml2exconverterstep": {
+                "location": "https://github.com/ABI-Software/mapclientplugins.mbfxml2exconverterstep",
+                "version": "0.3.0"
+            },
+            "mapclientplugins.mergezincdatastep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.mergezincdatastep",
+                "version": "0.2.0"
+            },
+            "mapclientplugins.meshprojectionstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.meshprojectionstep",
+                "version": "0.2.0"
+            },
+            "mapclientplugins.meshrotationstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.meshrotationstep",
+                "version": "0.1.0"
+            },
+            "mapclientplugins.meshtopointcloudstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.meshtopointcloudstep",
+                "version": "0.1.0"
+            },
+            "mapclientplugins.multiplefilechooserstep": {
+                "location": "https://github.com/mapclient-plugins/multiplefilechooser",
+                "version": "0.2.1"
+            },
+            "mapclientplugins.muxerstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.muxerstep",
+                "version": "0.2.2"
+            },
+            "mapclientplugins.pointcloudpartitionerstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.pointcloudpartitionerstep",
+                "version": "0.4.2"
+            },
+            "mapclientplugins.propagatezincdatastep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.propagatezincdatastep",
+                "version": "0.2.1"
+            },
+            "mapclientplugins.retrieveportaldatastep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.retrieveportaldatastep",
+                "version": "0.1.5"
+            },
+            "mapclientplugins.saveargondocumentstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.saveargondocumentstep",
+                "version": "0.2.0"
+            },
+            "mapclientplugins.scaffoldcreator": {
+                "location": "https://github.com/ABI-Software/mapclientplugins.scaffoldcreator",
+                "version": "0.11.0"
+            },
+            "mapclientplugins.scaffoldgeneratorstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.scaffoldgenerator",
+                "version": "0.1.1"
+            },
+            "mapclientplugins.sdsprotocolstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.sdsprotocolstep",
+                "version": "0.1.2"
+            },
+            "mapclientplugins.segmentationstitcherstep": {
+                "location": "https://github.com/ABI-Software/mapclientplugins.segmentationstitcherstep",
+                "version": "0.1.1"
+            },
+            "mapclientplugins.sparccurationhelperstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.sparccurationhelperstep",
+                "version": "0.5.4"
+            },
+            "mapclientplugins.typeconverterstep": {
+                "location": "https://github.com/mapclient-plugins/mapclientplugins.typeconverterstep",
+                "version": "0.2.4"
+            }
+        },
+        "python": {
+            "platform": "win32",
+            "version": "3.9.13"
+        },
+        "version": "0.2.0"
+    },
+    "version": "0.2.0",
+    "workflow_info": {
+        "id": "map-client-provenance-workflow-record",
+        "version": "0.1.0",
+        "workflow": {
+            "location": "https://github.com/mapclient-workflows/provenance-report",
+            "title": "MAPClient - provenance-report",
+            "version": "v0.1.0"
+        }
+    }
+}
