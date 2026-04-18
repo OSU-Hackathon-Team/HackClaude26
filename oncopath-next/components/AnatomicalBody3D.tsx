@@ -30,11 +30,23 @@ function CameraController({ selectedStructure, groupRef }: { selectedStructure: 
       if (selectedStructure) {
         let hasVisible = false;
         groupRef.current.traverse((child: any) => {
-          if (child.isMesh && child.visible && !child.userData?.isMarker) {
-            const childBox = new THREE.Box3().setFromObject(child);
-            if (!childBox.isEmpty()) {
-               box.union(childBox);
-               hasVisible = true;
+          if (child.isMesh && !child.userData?.isMarker) {
+            let isGloballyVisible = true;
+            let curr = child;
+            while (curr) {
+               if (!curr.visible) {
+                  isGloballyVisible = false;
+                  break;
+               }
+               curr = curr.parent;
+            }
+
+            if (isGloballyVisible) {
+               const childBox = new THREE.Box3().setFromObject(child);
+               if (!childBox.isEmpty()) {
+                  box.union(childBox);
+                  hasVisible = true;
+               }
             }
           }
         });
@@ -79,8 +91,9 @@ function CameraController({ selectedStructure, groupRef }: { selectedStructure: 
           // Apply padding margin scalar so it breathes slightly from the viewport edges
           targetDistance.current = Math.max(dist * 0.95, 8.0); 
         } else {
-          targetCenter.current.set(0, -1.0, 0);
-          targetDistance.current = 15;
+          // Immediately set perfectly framed center coordinate upon exact load without needing mesh bounding calculate!
+          targetCenter.current.set(0, 2.5, 0);
+          targetDistance.current = 14;
         }
       }
     }, 50);
@@ -444,8 +457,8 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
         if (id === 'SYS_ARTERIES' && region.includes('Arteries')) isMatch = true;
         if (id === 'SYS_VEINS' && region.includes('Veins')) isMatch = true;
 
-        // Reproductive & Others (Map to Skin or Bladder to avoid a completely blank screen)
-        if (['DMETS_DX_BREAST', 'DMETS_DX_MALE_GENITAL', 'DMETS_DX_FEMALE_GENITAL', 'DMETS_DX_OVARY', 'DMETS_DX_DIST_LN', 'DMETS_DX_UNSPECIFIED'].includes(id)) {
+        // Reproductive are handled by procedural meshes
+        if (['DMETS_DX_DIST_LN', 'DMETS_DX_UNSPECIFIED'].includes(id)) {
             if (region.includes('Skin') || region.includes('Bladder')) isMatch = true;
         }
 
@@ -477,6 +490,100 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
     });
   }, [meshes, activeSystem, skinOpacity, selectedStructure]);
 
+/* ───────────────────────────────────────────────────────
+   Procedural Reproductive Models
+─────────────────────────────────────────────────────── */
+function ReproductiveOrgans({ selectedStructure, activeSystem }: { selectedStructure: SelectedStructure | null, activeSystem: string }) {
+  const color = '#f472b6'; // Base pink color for reproductive parts
+  const showAll = activeSystem === 'all';
+  
+  const isBreastVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_BREAST';
+  const isOvaryVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_OVARY';
+  const isFemaleGenitalVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL';
+  const isMaleGenitalVisible = (!selectedStructure && showAll) || selectedStructure?.id === 'DMETS_DX_MALE_GENITAL';
+
+  const matProps = {
+    color,
+    roughness: 0.4,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: true,
+    emissive: new THREE.Color(0x222222)
+  };
+
+  const highlightProps = {
+    ...matProps,
+    transparent: false,
+    opacity: 1.0,
+    emissive: new THREE.Color(0x552233)
+  };
+
+  return (
+    <group>
+      {/* Breasts */}
+      <group visible={isBreastVisible}>
+        <mesh position={[0.22, 2.35, 0.42]} scale={[1.2, 1, 1.1]}>
+          <sphereGeometry args={[0.08, 32, 32]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_BREAST' ? highlightProps : matProps)} />
+        </mesh>
+        <mesh position={[-0.22, 2.35, 0.42]} scale={[1.2, 1, 1.1]}>
+          <sphereGeometry args={[0.08, 32, 32]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_BREAST' ? highlightProps : matProps)} />
+        </mesh>
+      </group>
+
+      {/* Ovaries */}
+      <group visible={isOvaryVisible}>
+        <mesh position={[0.25, 0.75, 0.12]} scale={[1.5, 1, 1]}>
+          <sphereGeometry args={[0.04, 16, 16]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_OVARY' ? highlightProps : matProps)} />
+        </mesh>
+        <mesh position={[-0.25, 0.75, 0.12]} scale={[1.5, 1, 1]}>
+          <sphereGeometry args={[0.04, 16, 16]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_OVARY' ? highlightProps : matProps)} />
+        </mesh>
+      </group>
+
+      {/* Female Genitals (Uterus + Tubes) */}
+      <group visible={isFemaleGenitalVisible} position={[0, 0.5, 0.18]}>
+        <mesh>
+          <sphereGeometry args={[0.06, 32, 32]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+        </mesh>
+        <mesh position={[0, -0.08, 0]}>
+          <cylinderGeometry args={[0.02, 0.02, 0.08]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+        </mesh>
+        <mesh position={[0.08, 0.04, 0]} rotation={[0, 0, -Math.PI / 6]}>
+          <capsuleGeometry args={[0.012, 0.08]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+        </mesh>
+        <mesh position={[-0.08, 0.04, 0]} rotation={[0, 0, Math.PI / 6]}>
+          <capsuleGeometry args={[0.012, 0.08]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_FEMALE_GENITAL' ? highlightProps : matProps)} />
+        </mesh>
+      </group>
+
+      {/* Male Genitals (Prostate base + Testes) */}
+      <group visible={isMaleGenitalVisible} position={[0, 0.4, 0.25]}>
+        <mesh position={[0, 0.06, -0.05]}>
+          <sphereGeometry args={[0.04, 32, 32]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_MALE_GENITAL' ? highlightProps : matProps)} />
+        </mesh>
+        <mesh position={[0.03, 0, 0]} scale={[1, 1.3, 1]}>
+          <sphereGeometry args={[0.03, 16, 16]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_MALE_GENITAL' ? highlightProps : matProps)} />
+        </mesh>
+        <mesh position={[-0.03, 0, 0]} scale={[1, 1.3, 1]}>
+          <sphereGeometry args={[0.03, 16, 16]} />
+          <meshPhysicalMaterial {...(selectedStructure?.id === 'DMETS_DX_MALE_GENITAL' ? highlightProps : matProps)} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
   return (
     <>
       <group rotation={[-Math.PI / 2, 0, 0]} scale={0.9} position={[0, -2.5, 0]}>
@@ -493,6 +600,8 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
              }}
           />
         ))}
+
+        <ReproductiveOrgans selectedStructure={selectedStructure} activeSystem={activeSystem} />
 
         {/* Dynamic Inner Markers (Undergo same Orientation+Scale transformations) */}
         {visibleMarkers.map((marker) => (
@@ -667,7 +776,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
       <div className="relative w-[calc(100%-340px)] h-full flex-grow-0 flex-shrink-0">
         <Canvas 
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-          camera={{ position: [0, 0, 14], fov: 45 }} 
+          camera={{ position: [0, 2.5, 14], fov: 45 }} 
           gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
           onPointerMissed={() => setSelectedStructure(null)}
         >
@@ -692,7 +801,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
         </group>
         
         <Particles />
-        <OrbitControls makeDefault enablePan={true} enableZoom={true} enableRotate={false} minDistance={1} maxDistance={20} minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} enableDamping dampingFactor={0.05} autoRotate={false} />
+        <OrbitControls makeDefault enablePan={true} enableZoom={true} enableRotate={false} minDistance={1} maxDistance={20} minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} enableDamping dampingFactor={0.05} autoRotate={false} target={[0, 2.5, 0]} />
       </Canvas>
       </div>
 
@@ -714,36 +823,6 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
          </div>
       </div>
 
-      {/* Restored Top-left controls -> Now moved to Bottom Right */}
-      <div className="absolute z-20 space-y-3" style={{ bottom: '20px', right: '20px' }}>
-        <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
-           <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">Viewing Mode</div>
-           <div className="flex flex-col gap-2">
-             {[
-               { id: 'all', label: 'All Systems' },
-               { id: 'skin', label: 'Integumentary' },
-               { id: 'muscular', label: 'Muscular' },
-               { id: 'skeletal', label: 'Skeletal' },
-               { id: 'circulatory', label: 'Circulatory' },
-               { id: 'nervous', label: 'Nervous' }
-             ].map(sys => (
-               <button key={sys.id} onClick={() => setActiveSystem(sys.id)} className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-bold transition-all text-left ${activeSystem === sys.id ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20 w-full' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}>
-                 {sys.label}
-               </button>
-             ))}
-           </div>
-        </div>
-
-        {activeSystem === 'all' && !selectedStructure && (
-          <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Skin Layer</span>
-              <span className="text-[10px] text-blue-400 font-mono font-bold">{Math.round(skinOpacity * 100)}%</span>
-            </div>
-            <input type="range" min={0} max={0.8} step={0.05} value={skinOpacity} onChange={(e) => setSkinOpacity(parseFloat(e.target.value))} className="w-full" style={{ width: '120px' }} />
-          </div>
-        )}
-      </div>
 
       {/* Right Sidebar for Body Parts Selection */}
       <div className="absolute z-20 w-[300px] flex flex-col pointer-events-auto overflow-hidden bg-[#0f172a]/90 backdrop-blur-xl rounded-xl border border-slate-700/60 shadow-2xl" style={{ top: '80px', right: '20px', maxHeight: '70vh' }}>

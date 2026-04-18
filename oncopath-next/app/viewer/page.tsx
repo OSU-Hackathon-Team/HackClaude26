@@ -202,39 +202,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex gap-2 pointer-events-auto">
-            <button
-              onClick={() => setViewMode(viewMode === '3d' ? '2d' : '3d')}
-              className={`p-2.5 backdrop-blur-xl rounded-lg border transition-all shadow-lg flex items-center gap-2 ${
-                viewMode === '3d'
-                  ? 'bg-purple-500/15 border-purple-500/30 hover:bg-purple-500/25'
-                  : 'bg-[#0f172a]/60 border-slate-800/40 hover:bg-slate-800/60 hover:border-slate-700/60'
-              }`}
-              title={`Switch to ${viewMode === '3d' ? '2D' : '3D'} view`}
-            >
-              {viewMode === '3d' ? (
-                <>
-                  <Box size={14} className="text-purple-400" />
-                  <span className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider">
-                    3D
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Layout size={14} className="text-slate-400" />
-                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                    2D
-                  </span>
-                </>
-              )}
-            </button>
-            <button className="p-2.5 bg-[#0f172a]/60 backdrop-blur-xl rounded-lg border border-slate-800/40 hover:bg-slate-800/60 transition-all hover:border-slate-700/60 shadow-lg">
-              <Terminal size={14} className="text-slate-400" />
-            </button>
-            <button className="p-2.5 bg-[#0f172a]/60 backdrop-blur-xl rounded-lg border border-slate-800/40 hover:bg-slate-800/60 transition-all hover:border-slate-700/60 shadow-lg">
-              <HelpCircle size={14} className="text-slate-400" />
-            </button>
-          </div>
+
         </div>
 
         <div className="flex-1 relative">
