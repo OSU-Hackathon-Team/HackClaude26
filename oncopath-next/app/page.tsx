@@ -1,10 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { GenomicLab } from '@/components/GenomicLab';
-import { MetastaticHeatmap } from '@/components/MetastaticHeatmap';
 import { PatientProfile, simulateRisk } from '@/lib/api';
-import { AlertCircle, Terminal, HelpCircle } from 'lucide-react';
+import { AlertCircle, Terminal, HelpCircle, Box, Layout } from 'lucide-react';
+
+const AnatomicalBody3D = lazy(() =>
+  import('@/components/AnatomicalBody3D').then(mod => ({ default: mod.AnatomicalBody3D }))
+);
+
+const MetastaticHeatmap = lazy(() =>
+  import('@/components/MetastaticHeatmap').then(mod => ({ default: mod.MetastaticHeatmap }))
+);
 
 const INITIAL_PROFILE: PatientProfile = {
   age: 65,
@@ -19,6 +26,7 @@ export default function Home() {
   const [risks, setRisks] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
 
   useEffect(() => {
     async function runSimulation() {
@@ -54,6 +62,11 @@ export default function Home() {
               <span className="text-[9px] bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded-md border border-blue-500/20 uppercase font-semibold tracking-wider">
                 v5.0
               </span>
+              {viewMode === '3d' && (
+                <span className="text-[9px] bg-purple-500/15 text-purple-400 px-2 py-0.5 rounded-md border border-purple-500/20 uppercase font-semibold tracking-wider">
+                  3D
+                </span>
+              )}
             </h1>
             <p className="text-[11px] text-slate-400">
               Simulating{' '}
@@ -64,6 +77,28 @@ export default function Home() {
           </div>
 
           <div className="flex gap-2 pointer-events-auto">
+            {/* View Mode Toggle */}
+            <button
+              onClick={() => setViewMode(viewMode === '3d' ? '2d' : '3d')}
+              className={`p-2.5 backdrop-blur-xl rounded-lg border transition-all shadow-lg flex items-center gap-2 ${
+                viewMode === '3d'
+                  ? 'bg-purple-500/15 border-purple-500/30 hover:bg-purple-500/25'
+                  : 'bg-[#0f172a]/60 border-slate-800/40 hover:bg-slate-800/60 hover:border-slate-700/60'
+              }`}
+              title={`Switch to ${viewMode === '3d' ? '2D' : '3D'} view`}
+            >
+              {viewMode === '3d' ? (
+                <>
+                  <Box size={14} className="text-purple-400" />
+                  <span className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider">3D</span>
+                </>
+              ) : (
+                <>
+                  <Layout size={14} className="text-slate-400" />
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">2D</span>
+                </>
+              )}
+            </button>
             <button className="p-2.5 bg-[#0f172a]/60 backdrop-blur-xl rounded-lg border border-slate-800/40 hover:bg-slate-800/60 transition-all hover:border-slate-700/60 shadow-lg">
               <Terminal size={14} className="text-slate-400" />
             </button>
@@ -75,7 +110,25 @@ export default function Home() {
 
         {/* Visualization */}
         <div className="flex-1 relative">
-          <MetastaticHeatmap risks={risks} />
+          <Suspense fallback={
+            <div className="w-full h-full bg-[#030712] flex items-center justify-center">
+              <div className="flex flex-col items-center gap-3">
+                <div className="relative">
+                  <div className="w-10 h-10 border-[3px] border-blue-500/15 rounded-full" />
+                  <div className="absolute inset-0 w-10 h-10 border-[3px] border-transparent border-t-blue-500 rounded-full animate-spin" />
+                </div>
+                <span className="text-[10px] font-mono text-blue-400/80 animate-pulse tracking-wider uppercase">
+                  Loading {viewMode === '3d' ? '3D renderer' : 'visualization'}...
+                </span>
+              </div>
+            </div>
+          }>
+            {viewMode === '3d' ? (
+              <AnatomicalBody3D risks={risks} />
+            ) : (
+              <MetastaticHeatmap risks={risks} />
+            )}
+          </Suspense>
 
           {loading && (
             <div className="absolute inset-0 bg-[#030712]/40 backdrop-blur-[2px] z-30 flex items-center justify-center">
