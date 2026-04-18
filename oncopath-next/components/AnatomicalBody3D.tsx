@@ -20,11 +20,133 @@ interface OrganMarkerData {
   color: THREE.Color;
 }
 
+interface AnatomyMetadataEntry {
+  URL?: string;
+  Index?: number;
+  RegionPath?: string;
+}
+
+interface AnatomyMeshEntry {
+  vertices?: number[];
+  faces?: number[];
+  normals?: number[];
+}
+
 function getRiskColor3D(prob: number): THREE.Color {
   const risk = prob * 100;
   if (risk > 70) return new THREE.Color('#ef4444');
   if (risk > 40) return new THREE.Color('#f59e0b');
   return new THREE.Color('#10b981');
+}
+
+function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: string): THREE.Mesh | null {
+  if (!meshData) return null;
+
+  const vs = meshData.vertices || [];
+  const fs = meshData.faces || [];
+  const ns = meshData.normals || [];
+
+  if (vs.length === 0 || fs.length === 0) return null;
+
+  const positions: number[] = [];
+  const normals: number[] = [];
+
+  let idx = 0;
+  while (idx < fs.length) {
+    const type = fs[idx];
+
+    if (type === 40) {
+      const v1 = fs[idx + 1];
+      const v2 = fs[idx + 2];
+      const v3 = fs[idx + 3];
+
+      positions.push(vs[v1 * 3] * 0.01, vs[v1 * 3 + 1] * 0.01, vs[v1 * 3 + 2] * 0.01);
+      positions.push(vs[v2 * 3] * 0.01, vs[v2 * 3 + 1] * 0.01, vs[v2 * 3 + 2] * 0.01);
+      positions.push(vs[v3 * 3] * 0.01, vs[v3 * 3 + 1] * 0.01, vs[v3 * 3 + 2] * 0.01);
+
+      const n1 = fs[idx + 7];
+      const n2 = fs[idx + 8];
+      const n3 = fs[idx + 9];
+      normals.push(ns[n1 * 3], ns[n1 * 3 + 1], ns[n1 * 3 + 2]);
+      normals.push(ns[n2 * 3], ns[n2 * 3 + 1], ns[n2 * 3 + 2]);
+      normals.push(ns[n3 * 3], ns[n3 * 3 + 1], ns[n3 * 3 + 2]);
+      idx += 10;
+      continue;
+    }
+
+    if (type === 32) {
+      const v1 = fs[idx + 1];
+      const v2 = fs[idx + 2];
+      const v3 = fs[idx + 3];
+
+      positions.push(vs[v1 * 3] * 0.01, vs[v1 * 3 + 1] * 0.01, vs[v1 * 3 + 2] * 0.01);
+      positions.push(vs[v2 * 3] * 0.01, vs[v2 * 3 + 1] * 0.01, vs[v2 * 3 + 2] * 0.01);
+      positions.push(vs[v3 * 3] * 0.01, vs[v3 * 3 + 1] * 0.01, vs[v3 * 3 + 2] * 0.01);
+
+      const n1 = fs[idx + 4];
+      const n2 = fs[idx + 5];
+      const n3 = fs[idx + 6];
+      normals.push(ns[n1 * 3], ns[n1 * 3 + 1], ns[n1 * 3 + 2]);
+      normals.push(ns[n2 * 3], ns[n2 * 3 + 1], ns[n2 * 3 + 2]);
+      normals.push(ns[n3 * 3], ns[n3 * 3 + 1], ns[n3 * 3 + 2]);
+      idx += 7;
+      continue;
+    }
+
+    if (type === 0) {
+      const v1 = fs[idx + 1];
+      const v2 = fs[idx + 2];
+      const v3 = fs[idx + 3];
+      positions.push(vs[v1 * 3] * 0.01, vs[v1 * 3 + 1] * 0.01, vs[v1 * 3 + 2] * 0.01);
+      positions.push(vs[v2 * 3] * 0.01, vs[v2 * 3 + 1] * 0.01, vs[v2 * 3 + 2] * 0.01);
+      positions.push(vs[v3 * 3] * 0.01, vs[v3 * 3 + 1] * 0.01, vs[v3 * 3 + 2] * 0.01);
+      idx += 4;
+      continue;
+    }
+
+    if (type === 41 || type === 42 || type === 43) {
+      idx += 11;
+      continue;
+    }
+
+    if (type === 2) {
+      idx += 5;
+      continue;
+    }
+
+    break;
+  }
+
+  if (positions.length === 0) return null;
+
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  if (normals.length > 0) {
+    geom.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  } else {
+    geom.computeVertexNormals();
+  }
+
+  const color = region.includes('Arteries') ? '#ef4444' :
+    region.includes('Veins') ? '#3b82f6' :
+      region.includes('Nerves') ? '#fbbf24' :
+        region.includes('Bones') ? '#e5decd' :
+          region.includes('Muscles') ? '#a33327' :
+            region.includes('Skin') ? '#d4a574' : '#f87171';
+
+  const mat = new THREE.MeshPhysicalMaterial({
+    color: color,
+    roughness: region.includes('Skin') ? 0.3 : 0.6,
+    metalness: 0.1,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 1.0,
+    depthWrite: true,
+  });
+
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.name = region;
+  return mesh;
 }
 
 /* ───────────────────────────────────────────────────────
@@ -36,124 +158,110 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity }: { activeSystem: stri
   
   useEffect(() => {
     let mounted = true;
+    const controller = new AbortController();
     
     const loadParts = async () => {
       try {
-        const metaRes = await fetch('/derivative/human_body_metadata.json');
-        const metadata = await metaRes.json();
-        
-        let loaded = 0;
-        const total = metadata.length;
-        
-        for (const item of metadata) {
-           if (!mounted) return;
-           
-           const url = item.URL; 
-           if (!url) {
-               loaded++;
-               continue;
-           }
-           
-           try {
-             const res = await fetch('/derivative/' + url);
-             const dataList = await res.json();
-             
-             for (const meshData of (Array.isArray(dataList) ? dataList : [dataList])) {
-                const vs = meshData.vertices || [];
-                const fs = meshData.faces || [];
-                const ns = meshData.normals || [];
-                
-                if (vs.length === 0 || fs.length === 0) continue;
-                
-                const positions = [];
-                const normals = [];
-                
-                let idx = 0;
-                while (idx < fs.length) {
-                   const type = fs[idx];
-                   if (type === 40) {
-                      const v1 = fs[idx+1], v2 = fs[idx+2], v3 = fs[idx+3];
-                      positions.push(vs[v1*3]*0.01, vs[v1*3+1]*0.01, vs[v1*3+2]*0.01);
-                      positions.push(vs[v2*3]*0.01, vs[v2*3+1]*0.01, vs[v2*3+2]*0.01);
-                      positions.push(vs[v3*3]*0.01, vs[v3*3+1]*0.01, vs[v3*3+2]*0.01);
-                      
-                      const n1 = fs[idx+7], n2 = fs[idx+8], n3 = fs[idx+9];
-                      normals.push(ns[n1*3], ns[n1*3+1], ns[n1*3+2]);
-                      normals.push(ns[n2*3], ns[n2*3+1], ns[n2*3+2]);
-                      normals.push(ns[n3*3], ns[n3*3+1], ns[n3*3+2]);
-                      idx += 10;
-                   } else if (type === 32) {
-                      const v1 = fs[idx+1], v2 = fs[idx+2], v3 = fs[idx+3];
-                      positions.push(vs[v1*3]*0.01, vs[v1*3+1]*0.01, vs[v1*3+2]*0.01);
-                      positions.push(vs[v2*3]*0.01, vs[v2*3+1]*0.01, vs[v2*3+2]*0.01);
-                      positions.push(vs[v3*3]*0.01, vs[v3*3+1]*0.01, vs[v3*3+2]*0.01);
-                      
-                      const n1 = fs[idx+4], n2 = fs[idx+5], n3 = fs[idx+6];
-                      normals.push(ns[n1*3], ns[n1*3+1], ns[n1*3+2]);
-                      normals.push(ns[n2*3], ns[n2*3+1], ns[n2*3+2]);
-                      normals.push(ns[n3*3], ns[n3*3+1], ns[n3*3+2]);
-                      idx += 7;
-                   } else if (type === 0) {
-                      const v1 = fs[idx+1], v2 = fs[idx+2], v3 = fs[idx+3];
-                      positions.push(vs[v1*3]*0.01, vs[v1*3+1]*0.01, vs[v1*3+2]*0.01);
-                      positions.push(vs[v2*3]*0.01, vs[v2*3+1]*0.01, vs[v2*3+2]*0.01);
-                      positions.push(vs[v3*3]*0.01, vs[v3*3+1]*0.01, vs[v3*3+2]*0.01);
-                      idx += 4;
-                   } else if (type === 41 || type === 42 || type === 43) {
-                      idx += 11;
-                   } else if (type === 2) {
-                      idx += 5;
-                   } else {
-                      break;
-                   }
-                }
-                
-                if (positions.length > 0) {
-                   const geom = new THREE.BufferGeometry();
-                   geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-                   if (normals.length > 0) {
-                      geom.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-                   } else {
-                      geom.computeVertexNormals();
-                   }
-                   
-                   const region = item.RegionPath || '';
-                   const color = region.includes('Arteries') ? '#ef4444' :
-                                 region.includes('Veins') ? '#3b82f6' :
-                                 region.includes('Nerves') ? '#fbbf24' :
-                                 region.includes('Bones') ? '#e5decd' :
-                                 region.includes('Muscles') ? '#a33327' :
-                                 region.includes('Skin') ? '#d4a574' : '#f87171';
-                                 
-                   const mat = new THREE.MeshPhysicalMaterial({
-                      color: color,
-                      roughness: region.includes('Skin') ? 0.3 : 0.6,
-                      metalness: 0.1,
-                      surfaceTint: new THREE.Color(color),
-                      side: THREE.DoubleSide,
-                      transparent: true, // We allow transparency adjustments later
-                      opacity: 1.0,
-                      depthWrite: true
-                   });
-                   
-                   const m = new THREE.Mesh(geom, mat);
-                   m.name = region;
-                   setMeshes(prev => [...prev, m]);
-                }
-             }
-           } catch(e) { }
-           
-           loaded++;
-           setProgress(Math.round((loaded/total)*100));
+        const metaRes = await fetch('/derivative/human_body_metadata.json', { signal: controller.signal });
+        if (!metaRes.ok) {
+          throw new Error(`Failed to load anatomy metadata: ${metaRes.status} ${metaRes.statusText}`);
         }
-      } catch (e) {
-        console.error("Failed to load metadata", e);
+
+        const metadata = await metaRes.json() as AnatomyMetadataEntry[];
+        if (!Array.isArray(metadata)) {
+          throw new Error('Anatomy metadata payload is not an array');
+        }
+
+        const byUrl = new Map<string, AnatomyMetadataEntry[]>();
+        for (const item of metadata) {
+          const url = item.URL;
+          if (!url) continue;
+
+          const list = byUrl.get(url);
+          if (list) {
+            list.push(item);
+          } else {
+            byUrl.set(url, [item]);
+          }
+        }
+
+        const urls = Array.from(byUrl.keys());
+        if (urls.length === 0) {
+          if (mounted) {
+            setMeshes([]);
+            setProgress(100);
+          }
+          return;
+        }
+
+        let loaded = 0;
+        const total = urls.length;
+        const payloadByUrl = new Map<string, AnatomyMeshEntry | AnatomyMeshEntry[]>();
+
+        await Promise.all(urls.map(async (url) => {
+          const res = await fetch(`/derivative/${url}`, { signal: controller.signal });
+          if (!res.ok) {
+            throw new Error(`Failed to load anatomy part "${url}": ${res.status} ${res.statusText}`);
+          }
+
+          const payload = await res.json() as AnatomyMeshEntry | AnatomyMeshEntry[];
+          payloadByUrl.set(url, payload);
+
+          loaded += 1;
+          if (mounted) {
+            setProgress(Math.round((loaded / total) * 100));
+          }
+        }));
+
+        if (!mounted) return;
+
+        const nextMeshes: THREE.Mesh[] = [];
+        for (const item of metadata) {
+          const url = item.URL;
+          if (!url) continue;
+
+          const payload = payloadByUrl.get(url);
+          if (!payload) continue;
+
+          const meshData = Array.isArray(payload)
+            ? (typeof item.Index === 'number' ? payload[item.Index] : payload[0])
+            : payload;
+
+          const mesh = createMeshFromEntry(meshData, item.RegionPath || '');
+          if (mesh) nextMeshes.push(mesh);
+        }
+
+        if (mounted) {
+          setMeshes(nextMeshes);
+          setProgress(100);
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error('Failed to load anatomy data', error);
+        }
       }
     };
     
     loadParts();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
   }, []);
+
+  useEffect(() => {
+    return () => {
+      meshes.forEach((mesh) => {
+        mesh.geometry.dispose();
+        const material = mesh.material;
+        if (Array.isArray(material)) {
+          material.forEach((m) => m.dispose());
+        } else {
+          material.dispose();
+        }
+      });
+    };
+  }, [meshes]);
 
   // Sync visibility & opacity to Active System
   useEffect(() => {
