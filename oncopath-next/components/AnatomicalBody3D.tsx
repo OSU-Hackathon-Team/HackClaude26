@@ -2,7 +2,7 @@
 
 import React, { useRef, useMemo, useState, Suspense, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Html, Center } from '@react-three/drei';
+import { OrbitControls, Html, Center, Bounds, useBounds } from '@react-three/drei';
 import * as THREE from 'three';
 import { ANATOMY_MAPPING_3D, type OrganPosition3D } from '@/lib/anatomy3d';
 
@@ -14,18 +14,69 @@ export interface SelectedStructure {
   position: THREE.Vector3;
 }
 
-function CameraController({ selectedStructure }: { selectedStructure: SelectedStructure | null }) {
-  const { controls } = useThree() as any;
+function CameraController({ selectedStructure, groupRef }: { selectedStructure: SelectedStructure | null, groupRef: React.RefObject<THREE.Group> }) {
+  const { camera, controls, size } = useThree() as any;
+  const targetCenter = useRef(new THREE.Vector3(0, 0, 0));
+  const targetDistance = useRef(11);
+
+  useEffect(() => {
+    if (!groupRef.current) return;
+    
+    setTimeout(() => {
+      if (!groupRef.current) return;
+      const box = new THREE.Box3();
+      groupRef.current.updateMatrixWorld(true);
+
+      if (selectedStructure) {
+        let hasVisible = false;
+        groupRef.current.traverse((child: any) => {
+          if (child.isMesh && child.visible && !child.userData?.isMarker) {
+            const childBox = new THREE.Box3().setFromObject(child);
+            if (!childBox.isEmpty()) {
+               box.union(childBox);
+               hasVisible = true;
+            }
+          }
+        });
+
+        if (hasVisible) {
+          box.getCenter(targetCenter.current);
+          const boxSize = box.getSize(new THREE.Vector3());
+          const maxDim = Math.max(boxSize.x, boxSize.y, boxSize.z);
+          const fov = camera.fov * (Math.PI / 180);
+          
+          let dist = Math.abs(maxDim / Math.sin(fov / 2));
+          const effectiveAspect = (size.width * 0.66) / size.height;
+          const hFov = 2 * Math.atan(Math.tan(fov / 2) * effectiveAspect);
+          const horizontalDist = Math.abs(maxDim / Math.sin(hFov / 2));
+          
+          dist = Math.max(dist, horizontalDist);
+          // Tight framing padding so the organ is IMMENSE and takes up the entire 3D window
+          targetDistance.current = Math.max(dist * 1.15, 2.0); 
+        }
+      } else {
+        // FULL BODY - Fall back to mathematically perfect hardcoded coordinates 
+        // to bypass hidden floating matrices in the parent GLTF file breaking the scale!
+        targetCenter.current.set(0, -3.0, 0);
+        targetDistance.current = 10.5;
+      }
+    }, 50);
+  }, [selectedStructure, camera.fov, size, groupRef]);
+
   useFrame(() => {
     if (controls) {
-      if (selectedStructure && selectedStructure.position) {
-        controls.target.lerp(selectedStructure.position, 0.05);
-      } else {
-        controls.target.lerp(new THREE.Vector3(0, 0, 0), 0.05);
+      controls.target.lerp(targetCenter.current, 0.05);
+      
+      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+      if (offset.lengthSq() > 0.001) {
+        offset.normalize().multiplyScalar(targetDistance.current);
+        const idealPos = new THREE.Vector3().copy(controls.target).add(offset);
+        camera.position.lerp(idealPos, 0.05);
       }
       controls.update();
     }
   });
+
   return null;
 }
 
@@ -206,7 +257,7 @@ function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: str
 /* ───────────────────────────────────────────────────────
    Procedural ZygoteBody JSON Loader
 ─────────────────────────────────────────────────────── */
-function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure }: { activeSystem: string, skinOpacity: number, selectedStructure: SelectedStructure | null }) {
+function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, visibleMarkers = [], hoveredOrgan = null, setHoveredOrgan = () => {} }: { activeSystem: string, skinOpacity: number, selectedStructure: SelectedStructure | null, visibleMarkers?: any[], hoveredOrgan?: string | null, setHoveredOrgan?: (id: string | null) => void }) {
   const [meshes, setMeshes] = useState<THREE.Mesh[]>([]);
   const [progress, setProgress] = useState(0);
   
@@ -404,8 +455,8 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure }: {
   }, [meshes, activeSystem, skinOpacity, selectedStructure]);
 
   return (
-    <Center>
-      <group rotation={[0, -Math.PI / 2, 0]} scale={0.7} position={[0, -0.6, 0]}>
+    <>
+      <group rotation={[-Math.PI / 2, 0, 0]} scale={0.9} position={[0, -2.5, 0]}>
         {meshes.map((m, i) => (
           <primitive 
              key={i} 
@@ -417,6 +468,18 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure }: {
              onPointerOut={(e: any) => {
                document.body.style.cursor = 'auto';
              }}
+          />
+        ))}
+
+        {/* Dynamic Inner Markers (Undergo same Orientation+Scale transformations) */}
+        {visibleMarkers.map((marker) => (
+          <OrganMarker 
+            key={marker.id} 
+            data={marker} 
+            isHovered={hoveredOrgan === marker.id} 
+            isSelected={selectedStructure?.id === marker.id} 
+            onHover={() => setHoveredOrgan(marker.id)} 
+            onUnhover={() => setHoveredOrgan(null)} 
           />
         ))}
       </group>
@@ -432,7 +495,7 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure }: {
            </div>
          </Html>
       )}
-    </Center>
+    </>
   );
 }
 
@@ -464,11 +527,11 @@ function OrganMarker({ data, isHovered, isSelected, onHover, onUnhover }: { data
 
   return (
     <group position={data.meta.position}>
-      <mesh ref={ringRef}>
+      <mesh ref={ringRef} userData={{ isMarker: true }}>
         <ringGeometry args={[data.meta.size * 0.8, data.meta.size * 1.0, 32]} />
         <meshBasicMaterial color={data.color} transparent opacity={0.3} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
-      <mesh ref={glowRef}>
+      <mesh ref={glowRef} userData={{ isMarker: true }}>
         <sphereGeometry args={[data.meta.size * 1.5, 16, 16]} />
         <meshBasicMaterial color={data.color} transparent opacity={0.15} depthWrite={false} />
       </mesh>
@@ -476,16 +539,11 @@ function OrganMarker({ data, isHovered, isSelected, onHover, onUnhover }: { data
         ref={meshRef} 
         onPointerOver={(e) => { e.stopPropagation(); onHover(); }} 
         onPointerOut={onUnhover}
-        userData={{
-            isOrganMarker: true,
-            id: data.id,
-            name: data.meta.label,
-            system: data.meta.system,
-            position: new THREE.Vector3(...data.meta.position)
-        }}
+        onClick={() => console.log('Marker clicked')}
+        userData={{ isMarker: true }}
       >
-        <sphereGeometry args={[data.meta.size, 16, 16]} />
-        <meshPhysicalMaterial color={data.color} emissive={data.color} emissiveIntensity={isHovered || isSelected ? 2 : 0.8} roughness={0.2} metalness={0.1} transparent opacity={0.9} clearcoat={1} clearcoatRoughness={0.1} />
+        <sphereGeometry args={[data.meta.size, 32, 32]} />
+        <meshStandardMaterial color={data.color} emissive={data.color} emissiveIntensity={isHovered || isSelected ? 2 : 0.8} />
       </mesh>
       {markerTextVisible && (
         <Html position={[0, data.meta.size * 2.5, 0]} center distanceFactor={8} style={{ pointerEvents: 'none' }}>
@@ -579,37 +637,45 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
   }, [allOrganMarkers]);
 
   return (
-    <div className="w-full h-full bg-[#030712] relative overflow-hidden flex">
-      <Canvas 
-         camera={{ position: [0, 1.5, 7], fov: 45, near: 0.1, far: 100 }} 
-         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
-         onPointerMissed={() => setSelectedStructure(null)}
-      >
-        <CameraController selectedStructure={selectedStructure} />
+    <div className="w-full h-full bg-[#030712] relative overflow-hidden flex justify-start items-stretch">
+      
+      {/* Viewport dynamically constrained to strictly the left workspace, protecting the sidebar. Flex and height explicit. */}
+      <div className="relative w-[calc(100%-340px)] h-full flex-grow-0 flex-shrink-0">
+        <Canvas 
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+          camera={{ position: [0, 0, 14], fov: 45 }} 
+          gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
+          onPointerMissed={() => setSelectedStructure(null)}
+        >
+        <CameraController selectedStructure={selectedStructure} groupRef={groupRef} />
+        
         <ambientLight intensity={0.8} color="#ffffff" />
         <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" castShadow />
-        <directionalLight position={[-5, 4, -5]} intensity={0.5} />
-        <pointLight position={[0, 2, 6]} intensity={1} color="#e2e8f0" distance={15} />
+        <directionalLight position={[-5, 4, -5]} intensity={0.5} color="#93c5fd" />
+        <pointLight position={[0, 2, 6]} intensity={1.2} color="#e2e8f0" distance={15} />
 
         <group ref={groupRef} position={[0, -1, 0]}>
           <Suspense fallback={null}>
-            <AnatomyModelRawJSON activeSystem={activeSystem} skinOpacity={skinOpacity} selectedStructure={selectedStructure} />
+              <AnatomyModelRawJSON 
+                 activeSystem={activeSystem} 
+                 skinOpacity={skinOpacity} 
+                 selectedStructure={selectedStructure} 
+                 visibleMarkers={visibleMarkers}
+                 hoveredOrgan={hoveredOrgan}
+                 setHoveredOrgan={setHoveredOrgan}
+              />
           </Suspense>
-
-          {/* Restored Risk markers */}
-          {visibleMarkers.map((marker) => (
-            <OrganMarker key={marker.id} data={marker} isHovered={hoveredOrgan === marker.id} isSelected={selectedStructure?.id === marker.id} onHover={() => setHoveredOrgan(marker.id)} onUnhover={() => setHoveredOrgan(null)} />
-          ))}
         </group>
         
         <Particles />
-        <OrbitControls enablePan={true} minDistance={1} maxDistance={20} minPolarAngle={Math.PI * 0.1} maxPolarAngle={Math.PI * 0.9} enableDamping dampingFactor={0.05} autoRotate={false} />
+        <OrbitControls makeDefault enablePan={true} minDistance={1} maxDistance={20} minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} enableDamping dampingFactor={0.05} autoRotate={false} />
       </Canvas>
+      </div>
 
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, #030712 90%)' }} />
 
-      {/* Restored Top-left controls */}
-      <div className="absolute top-5 left-5 z-20 space-y-3">
+      {/* Restored Top-left controls -> Now moved to Bottom Right */}
+      <div className="absolute z-20 space-y-3" style={{ bottom: '20px', right: '20px' }}>
         <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">Viewing Mode</div>
            <div className="flex flex-col gap-2">
@@ -640,7 +706,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
       </div>
 
       {/* Right Sidebar for Body Parts Selection */}
-      <div className="absolute top-5 right-5 bottom-5 z-20 w-[300px] bg-[#0f172a]/90 backdrop-blur-xl rounded-xl border border-slate-700/60 shadow-2xl flex flex-col pointer-events-auto overflow-hidden">
+      <div className="absolute z-20 w-[300px] flex flex-col pointer-events-auto overflow-hidden bg-[#0f172a]/90 backdrop-blur-xl rounded-xl border border-slate-700/60 shadow-2xl" style={{ top: '80px', right: '20px', maxHeight: '70vh' }}>
          <div className="p-4 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
             <h3 className="text-[12px] text-blue-400 uppercase tracking-widest font-bold">Anatomical Map</h3>
             {selectedStructure && (
@@ -697,7 +763,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
       </div>
 
       {/* Restored Bottom HUD */}
-      <div className="absolute bottom-5 left-5 z-20">
+      <div className="absolute z-20" style={{ bottom: '20px', left: '20px' }}>
         <div className="bg-[#0f172a]/70 backdrop-blur-xl rounded-xl border border-slate-800/40 p-3 shadow-xl">
           <div className="text-[9px] text-slate-500 uppercase tracking-[0.15em] font-semibold mb-2">Active Risk Sites</div>
           <div className="flex gap-4">
