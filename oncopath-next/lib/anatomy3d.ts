@@ -183,6 +183,46 @@ export const ANATOMY_MAPPING_3D: Record<string, OrganPosition3D> = {
     size: 0.08,
     description: "Metastatic site not otherwise specified"
   },
+  "SYS_HEART": {
+    label: "Heart",
+    region: "Chest",
+    system: "Circulatory",
+    position: [0.1, 2.7, 0.3],
+    size: 0.15,
+    description: "Cardiovascular pump"
+  },
+  "SYS_MUSCLES": {
+    label: "Muscles",
+    region: "Skeletal",
+    system: "Musculoskeletal",
+    position: [-0.5, 1.0, 0.3],
+    size: 0.15,
+    description: "Striated muscular system"
+  },
+  "SYS_ARTERIES": {
+    label: "Arteries",
+    region: "Systemic",
+    system: "Circulatory",
+    position: [0.2, 1.5, 0.1],
+    size: 0.15,
+    description: "Oxygenated blood vessels"
+  },
+  "SYS_VEINS": {
+    label: "Veins",
+    region: "Systemic",
+    system: "Circulatory",
+    position: [-0.2, 1.5, 0.1],
+    size: 0.15,
+    description: "Deoxygenated blood vessels"
+  },
+  "SYS_SPINAL_NERVES": {
+    label: "Spinal Nerves",
+    region: "Nervous System",
+    system: "Nervous",
+    position: [0, 1.8, -0.2],
+    size: 0.15,
+    description: "Nerve roots exiting the spinal cord"
+  }
 };
 
 /**
