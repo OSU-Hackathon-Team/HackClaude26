@@ -326,15 +326,16 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity }: { activeSystem: stri
 /* ───────────────────────────────────────────────────────
    Pulsing Organ Risk Marker
 ─────────────────────────────────────────────────────── */
-function OrganMarker({ data, isHovered, onHover, onUnhover }: { data: OrganMarkerData; isHovered: boolean; onHover: () => void; onUnhover: () => void; }) {
+function OrganMarker({ data, isHovered, isSelected, onHover, onUnhover }: { data: OrganMarkerData; isHovered: boolean; isSelected: boolean; onHover: () => void; onUnhover: () => void; }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
+  const markerTextVisible = data.prob > 0;
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     const pulse = Math.sin(t * 2 + data.prob * 10) * 0.15 + 1;
-    const scale = isHovered ? 1.8 : pulse;
+    const scale = isSelected ? 2.5 : isHovered ? 1.8 : pulse;
 
     if (meshRef.current) meshRef.current.scale.setScalar(scale);
     if (glowRef.current) {
@@ -360,14 +361,16 @@ function OrganMarker({ data, isHovered, onHover, onUnhover }: { data: OrganMarke
       </mesh>
       <mesh ref={meshRef} onPointerOver={(e) => { e.stopPropagation(); onHover(); }} onPointerOut={onUnhover}>
         <sphereGeometry args={[data.meta.size, 16, 16]} />
-        <meshPhysicalMaterial color={data.color} emissive={data.color} emissiveIntensity={isHovered ? 2 : 0.8} roughness={0.2} metalness={0.1} transparent opacity={0.9} clearcoat={1} clearcoatRoughness={0.1} />
+        <meshPhysicalMaterial color={data.color} emissive={data.color} emissiveIntensity={isHovered || isSelected ? 2 : 0.8} roughness={0.2} metalness={0.1} transparent opacity={0.9} clearcoat={1} clearcoatRoughness={0.1} />
       </mesh>
-      <Html position={[0, data.meta.size * 2.5, 0]} center distanceFactor={8} style={{ pointerEvents: 'none' }}>
-        <div style={{ fontSize: '10px', fontFamily: "'Inter', monospace", fontWeight: 700, color: `#${data.color.getHexString()}`, textShadow: `0 0 8px #${data.color.getHexString()}`, whiteSpace: 'nowrap', opacity: data.prob * 100 > 15 ? 0.9 : 0.5 }}>
-          {Math.round(data.prob * 100)}%
-        </div>
-      </Html>
-      {isHovered && (
+      {markerTextVisible && (
+        <Html position={[0, data.meta.size * 2.5, 0]} center distanceFactor={8} style={{ pointerEvents: 'none' }}>
+          <div style={{ fontSize: '10px', fontFamily: "'Inter', monospace", fontWeight: 700, color: `#${data.color.getHexString()}`, textShadow: `0 0 8px #${data.color.getHexString()}`, whiteSpace: 'nowrap', opacity: data.prob * 100 > 15 ? 0.9 : 0.5 }}>
+            {Math.round(data.prob * 100)}%
+          </div>
+        </Html>
+      )}
+      {isHovered && !isSelected && (
         <Html position={[0, data.meta.size * 4.5, 0]} center distanceFactor={6} style={{ pointerEvents: 'none' }}>
           <div style={{ background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)', border: '1px solid rgba(100, 116, 139, 0.3)', borderRadius: '12px', padding: '12px 16px', minWidth: '200px', maxWidth: '260px', boxShadow: `0 0 30px rgba(0,0,0,0.5), 0 0 15px #${data.color.getHexString()}40` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -467,7 +470,7 @@ export function AnatomicalBody3D({ risks }: AnatomicalBody3DProps) {
         </group>
         
         <Particles />
-        <OrbitControls enablePan={true} minDistance={1} maxDistance={20} minPolarAngle={Math.PI * 0.1} maxPolarAngle={Math.PI * 0.9} enableDamping dampingFactor={0.05} autoRotate={true} autoRotateSpeed={0.5} />
+        <OrbitControls enablePan={true} minDistance={1} maxDistance={20} minPolarAngle={Math.PI * 0.1} maxPolarAngle={Math.PI * 0.9} enableDamping dampingFactor={0.05} autoRotate={false} />
       </Canvas>
 
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, #030712 90%)' }} />
