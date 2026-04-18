@@ -35,6 +35,7 @@ const DEFAULT_TREATMENT: TreatmentPresetId = TIMELINE_TREATMENT_PRESETS[0].id;
 
 export function BodyDashboard() {
   const [profile, setProfile]           = useState<PatientProfile>(DEFAULT_PROFILE);
+  const [simulationProfile, setSimulationProfile] = useState<PatientProfile>(DEFAULT_PROFILE);
   const [risks, setRisks]               = useState<Record<string, number>>({});
   const [prediction, setPrediction]     = useState<PredictionSnapshot | null>(null);
   const [loading, setLoading]           = useState(false);
@@ -53,7 +54,7 @@ export function BodyDashboard() {
     (async () => {
       setLoading(true); setError(null);
       try {
-        const result = await simulateRisk(profile);
+        const result = await simulateRisk(simulationProfile);
         if (!cancelled) { setPrediction(result); setRisks(result.risk_scores); }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : 'API unreachable');
@@ -62,7 +63,7 @@ export function BodyDashboard() {
       }
     })();
     return () => { cancelled = true; ctrl.abort(); };
-  }, [profile]);
+  }, [simulationProfile]);
 
   // ── 12-month projection for hovered organ ─────────────────────────────── //
   useEffect(() => {
@@ -151,7 +152,7 @@ export function BodyDashboard() {
       <div className="absolute bottom-4 left-4 z-20 flex items-end pointer-events-none">
         {/* Parameters FAB */}
         <div className="pointer-events-auto">
-          <GenomicDrawer profile={profile} onChange={setProfile} />
+          <GenomicDrawer profile={profile} onChange={setProfile} onRunSimulation={() => setSimulationProfile(profile)} />
         </div>
       </div>
 

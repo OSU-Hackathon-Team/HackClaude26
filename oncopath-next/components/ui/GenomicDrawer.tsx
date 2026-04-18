@@ -7,9 +7,10 @@ import { PatientProfile } from '@/lib/api';
 interface GenomicDrawerProps {
   profile: PatientProfile;
   onChange: (p: PatientProfile) => void;
+  onRunSimulation: () => void;
 }
 
-export function GenomicDrawer({ profile, onChange }: GenomicDrawerProps) {
+export function GenomicDrawer({ profile, onChange, onRunSimulation }: GenomicDrawerProps) {
   const [open, setOpen] = useState(false);
   const mutationCount = Object.keys(profile.mutations).length;
 
@@ -53,6 +54,14 @@ export function GenomicDrawer({ profile, onChange }: GenomicDrawerProps) {
         </div>
         <div className="flex-1 overflow-hidden">
           <GenomicLab profile={profile} onChange={onChange} />
+        </div>
+        <div className="p-4 border-t border-zinc-800 bg-zinc-900/80">
+          <button 
+            onClick={() => { onRunSimulation(); setOpen(false); }} 
+            className="w-full py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold tracking-wide transition-all shadow-[0_0_15px_rgba(234,88,12,0.4)]"
+          >
+            Run Simulation
+          </button>
         </div>
       </div>
     </>
