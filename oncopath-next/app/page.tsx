@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { SignInButton, SignUpButton, Show } from "@clerk/nextjs";
 import { Activity, ShieldCheck, Database, Zap } from 'lucide-react';
@@ -57,12 +59,12 @@ export default function LandingPage() {
           <Show when="signed-out">
              <div className="flex items-center gap-4">
                <SignInButton forceRedirectUrl="/viewer" mode="modal"><button className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white text-lg font-semibold rounded-xl border border-slate-700 transition-all">
-                     Log In to Dashboard
-                  </button></SignInButton>
+                      Log In to Dashboard
+                   </button></SignInButton>
                <SignUpButton forceRedirectUrl="/viewer" mode="modal"><button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-lg font-bold rounded-xl shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] transition-all relative overflow-hidden group">
-                     Create Free Account
-                     <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                  </button></SignUpButton>
+                      Create Free Account
+                      <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                   </button></SignUpButton>
              </div>
           </Show>
 

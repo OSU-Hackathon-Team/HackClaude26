@@ -3,13 +3,26 @@
 import React, { useMemo, useState } from 'react';
 import { ANATOMY_MAPPING_2D } from '@/lib/anatomy';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSmoothedRisks } from '@/lib/useSmoothedRisks';
 
 interface MetastaticHeatmapProps {
     risks: { [key: string]: number };
 }
 
+interface OrganMarker {
+    id: string;
+    label: string;
+    region: string;
+    system: string;
+    x: number;
+    y: number;
+    prob: number;
+    color: string;
+}
+
 export function MetastaticHeatmap({ risks }: MetastaticHeatmapProps) {
     const [hoveredOrgan, setHoveredOrgan] = useState<string | null>(null);
+    const displayRisks = useSmoothedRisks(risks);
 
     const getRiskColor = (prob: number) => {
         const risk = prob * 100;
@@ -18,13 +31,13 @@ export function MetastaticHeatmap({ risks }: MetastaticHeatmapProps) {
         return '#10b981';
     };
 
-    const organMarkers = useMemo(() => {
-        return Object.entries(risks).map(([site, prob]) => {
+    const organMarkers = useMemo<OrganMarker[]>(() => {
+        return Object.entries(displayRisks).map(([site, prob]) => {
             const meta = ANATOMY_MAPPING_2D[site];
             if (!meta || (prob * 100) < 5) return null;
             return { id: site, ...meta, prob: prob * 100, color: getRiskColor(prob) };
-        }).filter(Boolean);
-    }, [risks]);
+        }).filter((marker): marker is OrganMarker => marker !== null);
+    }, [displayRisks]);
 
     return (
         <div className="w-full h-full bg-[#030712] flex items-center justify-center relative overflow-hidden">
@@ -102,7 +115,7 @@ export function MetastaticHeatmap({ risks }: MetastaticHeatmapProps) {
                 {/* Organ markers overlay — positioned to cover the SVG exactly */}
                 <div className="absolute top-0 left-0 w-full h-full" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
                     <AnimatePresence>
-                        {organMarkers.map((marker: any) => (
+                        {organMarkers.map((marker) => (
                             <motion.div
                                 key={marker.id}
                                 initial={{ scale: 0, opacity: 0 }}

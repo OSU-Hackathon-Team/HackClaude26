@@ -16,9 +16,9 @@ export interface PatientProfile {
   mutations: { [key: string]: number };
 }
 
-type RiskScores = Record<string, number>;
+export type RiskScores = Record<string, number>;
 
-export type PredictionSource = "/predict" | "/simulate";
+export type PredictionSource = "/predict" | "/simulate" | "/simulate/temporal" | "/predict/timeline";
 
 export interface PredictionSnapshot {
   source: PredictionSource;
@@ -29,37 +29,51 @@ export interface PredictionSnapshot {
   shap_values?: Record<string, number>;
 }
 
-interface SimulateRequestPayload {
-  profile: PatientProfile;
-  image?: string;
+export interface SimulationResult {
+  simulated_risks: { [key: string]: number };
+  visual_lift: number;
+  has_visual_data: boolean;
 }
 
-interface PredictRequestPayload {
-  age_at_sequencing: number;
-  sex: string;
-  primary_site: string;
-  oncotree_code: string;
-  genomic_markers: Record<string, number>;
+export interface TemporalSimulationPoint {
+  month: number;
+  risks: { [key: string]: number };
+  max_risk: number;
+  mean_risk: number;
 }
 
-interface PredictTimelineRequestPayload {
-  profile: PatientProfile;
-  risks: Record<string, number>;
-  baseline_risk?: number;
-  treatment: string;
+export type TemporalMode = "untreated" | "treatment_adjusted";
+export type TreatmentType = "CHEMOTHERAPY" | "IMMUNOTHERAPY" | "ORAL_DRUG";
+
+export interface TemporalSimulationResult {
+  mode: TemporalMode;
+  treatment: TreatmentType | null;
   months: number;
-  organ?: string;
+  baseline_risks: { [key: string]: number };
+  timeline: TemporalSimulationPoint[];
+  visual_lift: number;
+  has_visual_data: boolean;
 }
 
 export interface SystemicSimulationResult {
   status: string;
   trajectories: Record<string, TimelinePoint[]>;
   summary: string;
+  treatment?: string;
+  prediction_id?: string;
+  confidence_metrics?: Record<string, number>;
 }
 
 export interface PredictionRequestOptions {
   image?: string;
   preferPredict?: boolean;
+}
+
+export interface TemporalSimulationParams {
+  mode: TemporalMode;
+  months: number;
+  treatment?: TreatmentType;
+  image?: string;
 }
 
 const FALLBACK_STATUSES = new Set([404, 405, 501]);
@@ -101,18 +115,12 @@ function objectFromUnknown(value: unknown): Record<string, unknown> | null {
 
 function parseNumericMap(value: unknown): Record<string, number> | undefined {
   const obj = objectFromUnknown(value);
-  if (!obj) {
-    return undefined;
-  }
-
+  if (!obj) return undefined;
   const out: Record<string, number> = {};
   for (const [key, rawValue] of Object.entries(obj)) {
     const parsed = typeof rawValue === "number" ? rawValue : Number(rawValue);
-    if (Number.isFinite(parsed)) {
-      out[key] = parsed;
-    }
+    if (Number.isFinite(parsed)) out[key] = parsed;
   }
-
   return Object.keys(out).length ? out : undefined;
 }
 
@@ -120,179 +128,77 @@ export function normalizeOrganKey(rawKey: string): string {
   if (rawKey.startsWith("DMETS_DX_") || rawKey.startsWith("SYS_") || rawKey.startsWith("PRIMARY_")) {
     return rawKey;
   }
-
   const normalized = rawKey.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_");
   return ORGAN_KEY_ALIASES[normalized] ?? rawKey;
 }
 
 function normalizeRiskScores(value: unknown): RiskScores | null {
   const obj = objectFromUnknown(value);
-  if (!obj) {
-    return null;
-  }
-
+  if (!obj) return null;
   const normalized: RiskScores = {};
   for (const [rawKey, rawValue] of Object.entries(obj)) {
     const parsed = typeof rawValue === "number" ? rawValue : Number(rawValue);
-    if (!Number.isFinite(parsed)) {
-      continue;
-    }
+    if (!Number.isFinite(parsed)) continue;
     normalized[normalizeOrganKey(rawKey)] = parsed;
   }
-
   return Object.keys(normalized).length ? normalized : null;
 }
 
 export function normalizeSystemicTimelineResponse(value: unknown): SystemicSimulationResult | null {
   const obj = objectFromUnknown(value);
   if (!obj) return null;
-
   const rawTrajectories = objectFromUnknown(obj.trajectories);
   if (!rawTrajectories) return null;
-
   const trajectories: Record<string, TimelinePoint[]> = {};
   for (const [site, rawPoints] of Object.entries(rawTrajectories)) {
     if (!Array.isArray(rawPoints)) continue;
-    
     const points: TimelinePoint[] = [];
     for (const item of rawPoints) {
       const p = objectFromUnknown(item);
       if (!p) continue;
-      
       const month = Number(p.month);
       const risk = Number(p.risk);
-      if (Number.isFinite(month) && Number.isFinite(risk)) {
-        points.push({ month, risk });
-      }
+      if (Number.isFinite(month) && Number.isFinite(risk)) points.push({ month, risk });
     }
     trajectories[site] = points;
   }
-
   return {
     status: String(obj.status || "unknown"),
     trajectories,
-    summary: String(obj.summary || "Biological simulation complete.")
+    summary: String(obj.summary || "Biological simulation complete."),
+    treatment: String(obj.treatment || ""),
+    prediction_id: String(obj.prediction_id || ""),
+    confidence_metrics: parseNumericMap(obj.confidence_metrics)
   };
 }
 
-function normalizePredictResponse(value: unknown): PredictionSnapshot | null {
-  const obj = objectFromUnknown(value);
-  if (!obj) {
-    return null;
-  }
-
-  const risk_scores = normalizeRiskScores(obj.risk_scores);
-  if (!risk_scores) {
-    return null;
-  }
-
-  return {
-    source: "/predict",
-    risk_scores,
-    prediction_id: typeof obj.prediction_id === "string" ? obj.prediction_id : undefined,
-    status: typeof obj.status === "string" ? obj.status : undefined,
-    confidence_metrics: parseNumericMap(obj.confidence_metrics),
-    shap_values: parseNumericMap(obj.shap_values),
-  };
-}
-
-function normalizeSimulationResponse(value: unknown): PredictionSnapshot {
-  const obj = objectFromUnknown(value);
-  if (!obj) {
-    throw new Error("Schema mismatch from /simulate: expected response object");
-  }
-
-  const risk_scores = normalizeRiskScores(obj.simulated_risks);
-  if (!risk_scores) {
-    throw new Error("Schema mismatch from /simulate: missing simulated_risks map");
-  }
-
-  return {
-    source: "/simulate",
-    risk_scores,
-    shap_values: parseNumericMap(obj.shap_values),
-    confidence_metrics: parseNumericMap(obj.confidence_metrics),
-  };
-}
-
-function toSimulatePayload(profile: PatientProfile, image?: string): SimulateRequestPayload {
-  return image ? { profile, image } : { profile };
-}
-
-function toPredictPayload(profile: PatientProfile): PredictRequestPayload {
-  return {
-    age_at_sequencing: profile.age,
-    sex: profile.sex,
-    primary_site: profile.primary_site,
-    oncotree_code: profile.oncotree_code,
-    genomic_markers: profile.mutations,
-  };
-}
-
-function isPredictPreferred(preferPredict?: boolean): boolean {
-  if (typeof preferPredict === "boolean") {
-    return preferPredict;
-  }
-
-  const envFlag =
-    process.env.NEXT_PUBLIC_ENABLE_PREDICT_ENDPOINT ??
-    process.env.NEXT_PUBLIC_PREDICT_FIRST ??
-    process.env.NEXT_PUBLIC_PREDICT_ENABLED;
-
-  if (!envFlag) {
-    return false;
-  }
-
-  return ["1", "true", "yes", "on"].includes(envFlag.toLowerCase());
-}
-
-async function postJson(endpoint: PredictionSource, body: unknown): Promise<Response> {
+async function postJson(endpoint: string, body: unknown): Promise<Response> {
   return fetch(`${API_URL}${endpoint}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 }
 
-function buildApiError(endpoint: PredictionSource, response: Response): Error {
-  return new Error(`API Error (${endpoint}): ${response.status} ${response.statusText || "Unknown error"}`);
+export async function simulateRisk(profile: PatientProfile, image?: string): Promise<SimulationResult> {
+  const response = await postJson("/simulate", { profile, image });
+  if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+  return response.json();
 }
 
-async function requestSimulation(profile: PatientProfile, image?: string): Promise<PredictionSnapshot> {
-  const response = await postJson("/simulate", toSimulatePayload(profile, image));
-  if (!response.ok) {
-    throw buildApiError("/simulate", response);
-  }
-
-  const data: unknown = await response.json();
-  return normalizeSimulationResponse(data);
-}
-
-export async function simulateRisk(
+export async function simulateTemporalRisk(
   profile: PatientProfile,
-  options: PredictionRequestOptions = {}
-): Promise<PredictionSnapshot> {
-  if (!isPredictPreferred(options.preferPredict)) {
-    return requestSimulation(profile, options.image);
-  }
-
-  const predictResponse = await postJson("/predict", toPredictPayload(profile));
-  if (!predictResponse.ok) {
-    if (FALLBACK_STATUSES.has(predictResponse.status)) {
-      return requestSimulation(profile, options.image);
-    }
-    throw buildApiError("/predict", predictResponse);
-  }
-
-  const predictData: unknown = await predictResponse.json();
-  const normalizedPrediction = normalizePredictResponse(predictData);
-  if (normalizedPrediction) {
-    return normalizedPrediction;
-  }
-
-  return requestSimulation(profile, options.image);
+  params: TemporalSimulationParams
+): Promise<TemporalSimulationResult> {
+  const response = await postJson("/simulate/temporal", {
+    profile,
+    image: params.image,
+    months: params.months,
+    mode: params.mode,
+    treatment: params.mode === "treatment_adjusted" ? params.treatment : null,
+  });
+  if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+  return response.json();
 }
 
 export async function requestPredictTimeline(
@@ -303,34 +209,22 @@ export async function requestPredictTimeline(
   organ?: string,
   signal?: AbortSignal
 ): Promise<SystemicSimulationResult> {
-  const payload: PredictTimelineRequestPayload = {
-    profile,
-    risks: risksSnapshot,
-    treatment,
-    months: Math.max(1, Math.floor(months)),
-    organ,
-  };
-
   const response = await fetch(`${API_URL}/predict/timeline`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      profile,
+      risks: risksSnapshot,
+      treatment,
+      months: Math.max(1, Math.floor(months)),
+      organ,
+    }),
     signal,
   });
 
-  if (!response.ok) {
-    throw new Error(
-      `API Error (/predict/timeline): ${response.status} ${response.statusText || "Unknown error"}`
-    );
-  }
-
-  const data: unknown = await response.json();
-  const result = normalizeSystemicTimelineResponse(data);
-  if (!result) {
-    throw new Error("Schema mismatch from /predict/timeline: missing trajectories");
-  }
-
-  return result;
+  if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+  const data = await response.json();
+  const normalized = normalizeSystemicTimelineResponse(data);
+  if (!normalized) throw new Error("Schema mismatch from /predict/timeline");
+  return normalized;
 }
