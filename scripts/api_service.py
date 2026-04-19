@@ -7,6 +7,14 @@ import os
 from typing import Dict, Optional
 from uuid import uuid4
 from scripts.extract_embeddings import VisionEncoder
+from scripts.copilot_timeline_service import (
+    CopilotServiceConfigurationError,
+    CopilotServiceInvocationError,
+    CopilotServiceResponseError,
+    CopilotTimelineService,
+    TimelineExplainRequest,
+    TimelineExplainResponse,
+)
 
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
@@ -37,6 +45,7 @@ models = {}
 vision_encoder = None
 vision_detector = None # Level 2 Ensemble Signal (The "Eyes")
 supabase: Optional[Client] = None
+timeline_assistant_service = CopilotTimelineService()
 
 @app.on_event("startup")
 def startup_event():
@@ -465,6 +474,18 @@ def predict_timeline(request: PredictTimelineRequest):
         "treatment": treatment_key,
         "timeline": timeline
     }
+
+
+@app.post("/assistant/timeline-explain", response_model=TimelineExplainResponse)
+async def explain_timeline(request: TimelineExplainRequest):
+    try:
+        return await timeline_assistant_service.explain_timeline(request)
+    except CopilotServiceConfigurationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except CopilotServiceInvocationError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    except CopilotServiceResponseError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 if __name__ == "__main__":
     import uvicorn

@@ -6,6 +6,7 @@ import { Select, SelectItem, Slider, ToggleSwitch } from '@/components/ui';
 import type { PredictionSnapshot } from '@/lib/api';
 import {
   DEFAULT_TIMELINE_MONTHS,
+  generateLocalTimelineProjection,
   getTimelinePointAtMonth,
   TIMELINE_TREATMENT_PRESETS,
   type TimelinePoint,
@@ -24,11 +25,17 @@ interface TimelinePanelProps {
   selectedMonth: number;
   timeline: TimelinePoint[];
   timelineSource: 'local' | 'backend';
+  isTimelinePending: boolean;
+  timelineErrorMessage: string | null;
   baselineRisk: number | null;
   prediction: PredictionSnapshot | null;
+  isTimelinePlaying: boolean;
   onOrganChange: (organ: string) => void;
   onTreatmentChange: (treatment: TreatmentPresetId) => void;
   onMonthChange: (month: number) => void;
+  onPlaybackPlay: () => void;
+  onPlaybackPause: () => void;
+  onPlaybackReplay: () => void;
 }
 
 const CHART_WIDTH = 640;
@@ -36,6 +43,54 @@ const CHART_HEIGHT = 220;
 const CHART_PADDING_X = 44;
 const CHART_PADDING_Y = 24;
 const TREATMENT_IDS = new Set<string>(TIMELINE_TREATMENT_PRESETS.map((preset) => preset.id));
+
+interface ChartGeometry {
+  linePoints: string;
+  areaPath: string;
+  marker: { x: number; y: number } | null;
+  toX: (month: number) => number;
+  toY: (risk: number) => number;
+}
+
+function buildChartGeometry({
+  points,
+  maxMonth,
+  activePoint,
+}: {
+  points: TimelinePoint[];
+  maxMonth: number;
+  activePoint: TimelinePoint | null;
+}): ChartGeometry | null {
+  if (!points.length) {
+    return null;
+  }
+
+  const toX = (month: number) =>
+    CHART_PADDING_X + (month / Math.max(maxMonth, 1)) * (CHART_WIDTH - CHART_PADDING_X * 2);
+  const toY = (risk: number) =>
+    CHART_HEIGHT - CHART_PADDING_Y - risk * (CHART_HEIGHT - CHART_PADDING_Y * 2);
+
+  const linePoints = points.map((point) => `${toX(point.month)},${toY(point.risk)}`).join(' ');
+  const firstPoint = points[0];
+  const lastPoint = points[points.length - 1];
+  const areaPath = [
+    `M ${toX(firstPoint.month)} ${toY(0)}`,
+    `L ${toX(firstPoint.month)} ${toY(firstPoint.risk)}`,
+    ...points.map((point) => `L ${toX(point.month)} ${toY(point.risk)}`),
+    `L ${toX(lastPoint.month)} ${toY(0)}`,
+    'Z',
+  ].join(' ');
+
+  const marker =
+    activePoint === null
+      ? null
+      : {
+          x: toX(activePoint.month),
+          y: toY(activePoint.risk),
+        };
+
+  return { linePoints, areaPath, marker, toX, toY };
+}
 
 function asPercent(risk: number): string {
   return `${Math.round(risk * 100)}%`;
@@ -102,14 +157,24 @@ export function TimelinePanel({
   selectedMonth,
   timeline,
   timelineSource,
+  isTimelinePending,
+  timelineErrorMessage,
   baselineRisk,
   prediction,
+  isTimelinePlaying,
   onOrganChange,
   onTreatmentChange,
   onMonthChange,
+  onPlaybackPlay,
+  onPlaybackPause,
+  onPlaybackReplay,
 }: TimelinePanelProps) {
   const [patientFriendlyMode, setPatientFriendlyMode] = useState(true);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
+  const [comparisonTreatment, setComparisonTreatment] = useState<TreatmentPresetId>(
+    TIMELINE_TREATMENT_PRESETS.find((preset) => preset.id !== selectedTreatment)?.id ?? selectedTreatment
+  );
 
   const selectedOrganLabel = useMemo(
     () => organOptions.find((option) => option.key === selectedOrgan)?.label ?? selectedOrgan,
@@ -137,37 +202,61 @@ export function TimelinePanel({
     [activePoint, baselineRisk, selectedTreatmentLabel]
   );
 
-  const chart = useMemo(() => {
-    if (!timeline.length) {
-      return null;
+  const effectiveComparisonTreatment = useMemo(
+    () =>
+      comparisonTreatment === selectedTreatment
+        ? (TIMELINE_TREATMENT_PRESETS.find((preset) => preset.id !== selectedTreatment)?.id ?? comparisonTreatment)
+        : comparisonTreatment,
+    [comparisonTreatment, selectedTreatment]
+  );
+
+  const chart = useMemo(
+    () =>
+      buildChartGeometry({
+        points: timeline,
+        maxMonth,
+        activePoint,
+      }),
+    [activePoint, maxMonth, timeline]
+  );
+
+  const comparisonTimeline = useMemo(() => {
+    if (!compareMode || !selectedOrgan || baselineRisk === null) {
+      return [];
     }
 
-    const toX = (month: number) =>
-      CHART_PADDING_X + (month / Math.max(maxMonth, 1)) * (CHART_WIDTH - CHART_PADDING_X * 2);
-    const toY = (risk: number) =>
-      CHART_HEIGHT - CHART_PADDING_Y - risk * (CHART_HEIGHT - CHART_PADDING_Y * 2);
-
-    const linePoints = timeline.map((point) => `${toX(point.month)},${toY(point.risk)}`).join(' ');
-    const firstPoint = timeline[0];
-    const lastPoint = timeline[timeline.length - 1];
-    const areaPath = [
-      `M ${toX(firstPoint.month)} ${toY(0)}`,
-      `L ${toX(firstPoint.month)} ${toY(firstPoint.risk)}`,
-      ...timeline.map((point) => `L ${toX(point.month)} ${toY(point.risk)}`),
-      `L ${toX(lastPoint.month)} ${toY(0)}`,
-      'Z',
-    ].join(' ');
-
-    const marker =
-      activePoint === null
-        ? null
-        : {
-            x: toX(activePoint.month),
-            y: toY(activePoint.risk),
-          };
-
-    return { linePoints, areaPath, marker, toX, toY };
-  }, [activePoint, maxMonth, timeline]);
+    return generateLocalTimelineProjection({
+      organKey: selectedOrgan,
+      baselineRisk,
+      treatment: effectiveComparisonTreatment,
+      months: Math.max(maxMonth, DEFAULT_TIMELINE_MONTHS),
+    });
+  }, [baselineRisk, compareMode, effectiveComparisonTreatment, maxMonth, selectedOrgan]);
+  const comparisonTreatmentLabel = useMemo(
+    () =>
+      TIMELINE_TREATMENT_PRESETS.find((preset) => preset.id === effectiveComparisonTreatment)?.label ??
+      effectiveComparisonTreatment,
+    [effectiveComparisonTreatment]
+  );
+  const comparisonActivePoint = useMemo(
+    () => getTimelinePointAtMonth(comparisonTimeline, clampedMonth),
+    [clampedMonth, comparisonTimeline]
+  );
+  const comparisonChart = useMemo(
+    () =>
+      buildChartGeometry({
+        points: comparisonTimeline,
+        maxMonth,
+        activePoint: comparisonActivePoint,
+      }),
+    [comparisonActivePoint, comparisonTimeline, maxMonth]
+  );
+  const comparisonDeltaPercent = useMemo(() => {
+    if (!activePoint || !comparisonActivePoint) {
+      return null;
+    }
+    return Math.round((activePoint.risk - comparisonActivePoint.risk) * 100);
+  }, [activePoint, comparisonActivePoint]);
 
   const monthTicks = useMemo(() => {
     const ticks = [0, Math.round(maxMonth * 0.25), Math.round(maxMonth * 0.5), Math.round(maxMonth * 0.75), maxMonth];
@@ -196,8 +285,11 @@ export function TimelinePanel({
   );
 
   const hasOrganOptions = organOptions.length > 0;
-  const sourceLabel =
-    timelineSource === 'backend' ? 'Live projection (backend)' : 'Instant estimate (local)';
+  const sourceLabel = isTimelinePending
+    ? 'Fetching live projection…'
+    : timelineSource === 'backend'
+      ? 'Live projection (backend)'
+      : 'Instant estimate (local)';
 
   return (
     <section className="border-t border-slate-800/40 bg-[#060d1a]/90 backdrop-blur-sm px-6 py-4 z-20">
@@ -211,6 +303,7 @@ export function TimelinePanel({
           <div className="space-y-1.5">
             <label className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Organ</label>
             <Select
+              data-testid="timeline-organ-select"
               value={selectedOrgan}
               onValueChange={(value) => {
                 onOrganChange(value);
@@ -228,6 +321,7 @@ export function TimelinePanel({
           <div className="space-y-1.5">
             <label className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Treatment</label>
             <Select
+              data-testid="timeline-treatment-select"
               value={selectedTreatment}
               onValueChange={(value) => {
                 if (TREATMENT_IDS.has(value)) {
@@ -247,9 +341,13 @@ export function TimelinePanel({
           <div className="space-y-2">
             <div className="flex justify-between text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
               <span>Month</span>
-              <span className="text-blue-400 font-mono">{clampedMonth}</span>
+              <span data-testid="timeline-current-month" className="text-blue-400 font-mono">
+                {clampedMonth}
+              </span>
             </div>
             <Slider
+              data-testid="timeline-month-slider"
+              aria-label="Timeline month slider"
               value={[clampedMonth]}
               min={0}
               max={Math.max(maxMonth, 1)}
@@ -257,6 +355,86 @@ export function TimelinePanel({
               onValueChange={([value]) => onMonthChange(value)}
               className={!hasOrganOptions ? 'opacity-40 pointer-events-none' : ''}
             />
+          </div>
+
+          <div className="space-y-2 rounded-lg border border-slate-700/60 bg-slate-900/40 p-3">
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Playhead</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                data-testid="timeline-play-button"
+                onClick={onPlaybackPlay}
+                disabled={isTimelinePlaying}
+                className={`px-2.5 py-1 text-[10px] rounded-md border transition-colors ${
+                  isTimelinePlaying
+                    ? 'opacity-40 cursor-not-allowed border-slate-700 text-slate-500'
+                    : 'border-emerald-500/40 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20'
+                }`}
+              >
+                Play
+              </button>
+              <button
+                type="button"
+                data-testid="timeline-pause-button"
+                onClick={onPlaybackPause}
+                disabled={!isTimelinePlaying}
+                className={`px-2.5 py-1 text-[10px] rounded-md border transition-colors ${
+                  !isTimelinePlaying
+                    ? 'opacity-40 cursor-not-allowed border-slate-700 text-slate-500'
+                    : 'border-amber-500/40 text-amber-100 bg-amber-500/10 hover:bg-amber-500/20'
+                }`}
+              >
+                Pause
+              </button>
+              <button
+                type="button"
+                data-testid="timeline-replay-button"
+                onClick={onPlaybackReplay}
+                className="px-2.5 py-1 text-[10px] rounded-md border border-blue-500/40 text-blue-200 bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
+              >
+                Replay
+              </button>
+            </div>
+            <p className="text-[10px] text-slate-500">
+              {isTimelinePlaying ? 'Autoplay is running across months.' : 'Autoplay paused.'}
+            </p>
+          </div>
+
+          <div className="space-y-2 rounded-lg border border-slate-700/60 bg-slate-900/40 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <label
+                htmlFor="compare-treatment-mode"
+                className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold"
+              >
+                Compare treatments
+              </label>
+              <ToggleSwitch
+                id="compare-treatment-mode"
+                checked={compareMode}
+                onChange={setCompareMode}
+              />
+            </div>
+            {compareMode && (
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                  Compare against
+                </label>
+                <Select
+                  value={effectiveComparisonTreatment}
+                  onValueChange={(value) => {
+                    if (TREATMENT_IDS.has(value) && value !== selectedTreatment) {
+                      setComparisonTreatment(value as TreatmentPresetId);
+                    }
+                  }}
+                >
+                  {TIMELINE_TREATMENT_PRESETS.filter((preset) => preset.id !== selectedTreatment).map((preset) => (
+                    <SelectItem key={preset.id} value={preset.id}>
+                      {preset.label}
+                    </SelectItem>
+                  ))}
+                </Select>
+              </div>
+            )}
           </div>
 
           {activePoint && baselineRisk !== null ? (
@@ -294,15 +472,16 @@ export function TimelinePanel({
         <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div>
-              <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
-                <ActivitySquare size={14} className="text-blue-400" />
-                {selectedOrganLabel || 'Projection Curve'}
-              </h3>
+                <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                  <ActivitySquare size={14} className="text-blue-400" />
+                  <span data-testid="timeline-chart-organ-label">{selectedOrganLabel || 'Projection Curve'}</span>
+                </h3>
               <p className="text-[10px] text-slate-500 mt-1">
                 Month marker drives active anatomical risk value.
               </p>
             </div>
             <span
+              data-testid="timeline-source-label"
               className={`text-[10px] uppercase tracking-wider font-semibold rounded-md px-2 py-1 border ${
                 timelineSource === 'backend'
                   ? 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10'
@@ -312,6 +491,23 @@ export function TimelinePanel({
               {sourceLabel}
             </span>
           </div>
+
+          {timelineErrorMessage && (
+            <div
+              data-testid="timeline-guardrail-message"
+              className="mb-3 rounded-lg border border-amber-500/35 bg-amber-950/30 px-3 py-2 text-[11px] text-amber-100"
+            >
+              {timelineErrorMessage}
+            </div>
+          )}
+          {isTimelinePending && (
+            <div
+              data-testid="timeline-loading-message"
+              className="mb-3 rounded-lg border border-blue-500/25 bg-blue-950/20 px-3 py-2 text-[11px] text-blue-100"
+            >
+              Building backend projection in the background. Local estimate stays visible meanwhile.
+            </div>
+          )}
 
           {!hasOrganOptions ? (
             <div className="h-[220px] rounded-lg border border-slate-700/50 bg-slate-950/50 flex items-center justify-center px-6 text-center">
@@ -326,6 +522,99 @@ export function TimelinePanel({
                 Selected organ has no baseline risk. Choose another organ with a valid risk score.
               </p>
             </div>
+          ) : compareMode ? (
+            chart && comparisonChart ? (
+              <div data-testid="timeline-compare-split" className="grid grid-cols-2 gap-2">
+                {[
+                  {
+                    key: 'primary',
+                    chartData: chart,
+                    treatmentLabel: selectedTreatmentLabel,
+                    sourceText: timelineSource === 'backend' ? 'Live projection' : 'Local projection',
+                    stroke: 'rgb(96,165,250)',
+                    area: 'rgba(59,130,246,0.14)',
+                    markerFill: 'rgb(191,219,254)',
+                    markerHalo: 'rgba(59,130,246,0.25)',
+                  },
+                  {
+                    key: 'comparison',
+                    chartData: comparisonChart,
+                    treatmentLabel: comparisonTreatmentLabel,
+                    sourceText: 'Compare projection (local)',
+                    stroke: 'rgb(167,139,250)',
+                    area: 'rgba(139,92,246,0.14)',
+                    markerFill: 'rgb(221,214,254)',
+                    markerHalo: 'rgba(139,92,246,0.28)',
+                  },
+                ].map((item) => (
+                  <div key={item.key} className="rounded-lg border border-slate-700/50 bg-slate-950/40 p-2">
+                    <p className="text-[10px] font-semibold text-slate-100 truncate">{item.treatmentLabel}</p>
+                    <p className="text-[9px] text-slate-500">{item.sourceText}</p>
+                    <svg
+                      viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+                      className="w-full h-[170px]"
+                      role="img"
+                      aria-label={`${item.treatmentLabel} risk projection`}
+                    >
+                      {[0, 0.25, 0.5, 0.75, 1].map((level) => (
+                        <line
+                          key={`${item.key}-grid-${level}`}
+                          x1={CHART_PADDING_X}
+                          y1={item.chartData.toY(level)}
+                          x2={CHART_WIDTH - CHART_PADDING_X}
+                          y2={item.chartData.toY(level)}
+                          stroke="rgba(100,116,139,0.22)"
+                          strokeWidth={1}
+                        />
+                      ))}
+                      {monthTicks.map((tick) => (
+                        <line
+                          key={`${item.key}-tick-${tick}`}
+                          x1={item.chartData.toX(tick)}
+                          y1={CHART_HEIGHT - CHART_PADDING_Y}
+                          x2={item.chartData.toX(tick)}
+                          y2={CHART_PADDING_Y}
+                          stroke="rgba(100,116,139,0.2)"
+                          strokeWidth={1}
+                        />
+                      ))}
+                      <path d={item.chartData.areaPath} fill={item.area} />
+                      <polyline
+                        fill="none"
+                        stroke={item.stroke}
+                        strokeWidth={3}
+                        points={item.chartData.linePoints}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      {item.chartData.marker && (
+                        <>
+                          <line
+                            x1={item.chartData.marker.x}
+                            y1={CHART_HEIGHT - CHART_PADDING_Y}
+                            x2={item.chartData.marker.x}
+                            y2={CHART_PADDING_Y}
+                            stroke="rgba(147,197,253,0.7)"
+                            strokeWidth={1.5}
+                            strokeDasharray="4 4"
+                          />
+                          <circle cx={item.chartData.marker.x} cy={item.chartData.marker.y} r={5} fill={item.markerFill} />
+                          <circle cx={item.chartData.marker.x} cy={item.chartData.marker.y} r={9} fill={item.markerHalo} />
+                        </>
+                      )}
+                    </svg>
+                    <div className="mt-1 flex items-center justify-between text-[9px] text-slate-500 px-1">
+                      <span>M0</span>
+                      <span>M{maxMonth}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="h-[220px] rounded-lg border border-slate-700/50 bg-slate-950/50 flex items-center justify-center">
+                <p className="text-xs text-slate-400">Comparison curves are loading.</p>
+              </div>
+            )
           ) : !chart ? (
             <div className="h-[220px] rounded-lg border border-slate-700/50 bg-slate-950/50 flex items-center justify-center">
               <p className="text-xs text-slate-400">Projection curve not available.</p>
@@ -392,6 +681,21 @@ export function TimelinePanel({
             </div>
           )}
 
+          {compareMode && activePoint && comparisonActivePoint && (
+            <div className="mt-3 rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">
+                Side-by-side readout
+              </p>
+              <p className="text-xs text-slate-200 leading-relaxed">
+                At month {clampedMonth}, {selectedTreatmentLabel} projects {asPercent(activePoint.risk)} while{' '}
+                {comparisonTreatmentLabel} projects {asPercent(comparisonActivePoint.risk)}.
+                {comparisonDeltaPercent !== null && (
+                  <> Difference: {comparisonDeltaPercent > 0 ? '+' : ''}{comparisonDeltaPercent}%.</>
+                )}
+              </p>
+            </div>
+          )}
+
           <div className="mt-3 rounded-lg border border-slate-700/60 bg-slate-900/50 p-3 space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h4 className="text-[11px] font-semibold text-slate-100">What is happening now?</h4>
@@ -403,7 +707,9 @@ export function TimelinePanel({
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-200 leading-relaxed">{projectionSentence}</p>
+            <p data-testid="timeline-projection-sentence" className="text-xs text-slate-200 leading-relaxed">
+              {projectionSentence}
+            </p>
           </div>
         </div>
 

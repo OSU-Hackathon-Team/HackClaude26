@@ -11,6 +11,18 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const disableClerkForE2E = process.env.NEXT_PUBLIC_E2E_DISABLE_CLERK === '1';
+
+  if (disableClerkForE2E) {
+    return (
+      <html lang="en" className="h-full">
+        <body className={`${inter.variable} h-full overflow-hidden bg-zinc-950 antialiased`}>
+          {children}
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.variable} h-full overflow-hidden bg-zinc-950 antialiased`}>

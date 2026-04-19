@@ -9,12 +9,37 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /* ─── Slider ─── */
-export function Slider({ value, min, max, step, onValueChange, className }: {
-    value: number[], min: number, max: number, step: number,
-    onValueChange: (val: number[]) => void, className?: string
-}) {
+type SliderProps = {
+    value: number[];
+    min: number;
+    max: number;
+    step: number;
+    onValueChange: (val: number[]) => void;
+    className?: string;
+    id?: string;
+    name?: string;
+    "data-testid"?: string;
+    "aria-label"?: string;
+};
+
+export function Slider({
+    value,
+    min,
+    max,
+    step,
+    onValueChange,
+    className,
+    id,
+    name,
+    "data-testid": dataTestId,
+    "aria-label": ariaLabel
+}: SliderProps) {
     return (
         <input
+            id={id}
+            name={name}
+            data-testid={dataTestId}
+            aria-label={ariaLabel}
             type="range" min={min} max={max} step={step} value={value[0]}
             onChange={(e) => onValueChange([parseInt(e.target.value)])}
             className={cn("w-full", className)}
@@ -48,11 +73,37 @@ export function Checkbox({ id, checked, onCheckedChange, className }: {
 }
 
 /* ─── Select ─── */
-export function Select({ value, onValueChange, children }: { value: string, onValueChange: (v: string) => void, children: React.ReactNode }) {
+type SelectProps = {
+    value: string;
+    onValueChange: (v: string) => void;
+    children: React.ReactNode;
+    className?: string;
+    id?: string;
+    name?: string;
+    "data-testid"?: string;
+};
+
+export function Select({
+    value,
+    onValueChange,
+    children,
+    className,
+    id,
+    name,
+    "data-testid": dataTestId
+}: SelectProps) {
     return (
         <div className="relative">
-            <select value={value} onChange={(e) => onValueChange(e.target.value)}
-                className="w-full bg-[#0f172a] border border-slate-700/60 text-slate-100 text-sm rounded-lg focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 block p-2.5 pr-8 appearance-none transition-colors hover:border-slate-600"
+            <select
+                id={id}
+                name={name}
+                data-testid={dataTestId}
+                value={value}
+                onChange={(e) => onValueChange(e.target.value)}
+                className={cn(
+                    "w-full bg-[#0f172a] border border-slate-700/60 text-slate-100 text-sm rounded-lg focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 block p-2.5 pr-8 appearance-none transition-colors hover:border-slate-600",
+                    className
+                )}
             >
                 {children}
             </select>
