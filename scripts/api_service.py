@@ -228,17 +228,64 @@ def _run_risk_inference(
         "vision_confidence": round(vision_confidence, 4)
     }
 
-def _build_confidence_metrics(risk_scores: Dict[str, float]) -> Dict[str, float]:
-    if not risk_scores:
-        raise HTTPException(status_code=500, detail="No risk scores produced by inference.")
+def _build_clinical_confidence_metrics(
+    risks: Dict[str, float],
+    mutations: Dict[str, int],
+    shap_values: Dict[str, float],
+    primary_site: str = "",
+    oncotree_code: str = "",
+) -> Dict[str, float]:
+    """
+    Three end-user-facing confidence signals for medical professionals and patients.
 
-    scores = np.array(list(risk_scores.values()), dtype=float)
-    standard_deviation = float(np.std(scores))
-    calibration_score = float(np.clip(1.0 - standard_deviation, 0.0, 1.0))
+    1. Genetic Driver Score  – are the patient’s specific mutations driving this, or just demographics?
+    2. Target Clarity        – does the model have a focused target, or is risk diffuse everywhere?
+    3. Data Confidence       – how well-studied is this cancer profile in the MSK-MET training data?
+    """
+    CLINICAL_PREFIXES = ('age_', 'sex_', 'primary_site_', 'oncotree_')
+
+    # ─ 1. Genetic Driver Score ──────────────────────────────────────
+    # seed_signal alone overstates confidence when mutations aren't in the training set.
+    # Weighting by coverage gives an honest combined score.
+    active_muts = [m for m, v in mutations.items() if v > 0]
+    known_muts  = [m for m in active_muts if genomic_features and m in genomic_features]
+    coverage    = len(known_muts) / max(len(active_muts), 1)
+
+    total_shap   = sum(abs(v) for v in shap_values.values())
+    genomic_shap = sum(abs(v) for k, v in shap_values.items()
+                       if not any(k.startswith(p) for p in CLINICAL_PREFIXES))
+    seed_signal  = genomic_shap / max(total_shap, 1e-9)
+
+    genetic_driver_score = seed_signal * (0.5 + 0.5 * coverage)
+
+    # ─ 2. Target Clarity ─────────────────────────────────────────────
+    # Fraction of total risk mass held by the top-3 sites (Gini-like concentration).
+    # High = focused targets (targeted screening). Low = diffuse (full-body imaging).
+    sorted_vals = sorted(risks.values(), reverse=True)
+    total_risk  = sum(sorted_vals)
+    top3_risk   = sum(sorted_vals[:3])
+    target_clarity = top3_risk / max(total_risk, 1e-9) if sorted_vals else 0.0
+
+    # ─ 3. Data Confidence ────────────────────────────────────────────
+    # Weighted composite of site prevalence in MSK-MET, oncotree recognition,
+    # and mutation panel depth. Penalises rare subtypes and sparse panels.
+    WELL_STUDIED_SITES = {
+        'breast', 'lung', 'colorectal', 'colon', 'prostate', 'ovary',
+        'pancreas', 'liver', 'melanoma', 'bladder', 'kidney'
+    }
+    WELL_STUDIED_CODES = {
+        'BRCA', 'IDC', 'ILC', 'LUAD', 'LUSC', 'NSCLC', 'COAD', 'READ',
+        'COADREAD', 'PAAD', 'PRAD', 'OV', 'MEL', 'HCC', 'BLCA', 'KIRC'
+    }
+    site_conf     = 0.88 if primary_site.lower() in WELL_STUDIED_SITES else 0.52
+    code_conf     = 0.92 if oncotree_code.upper() in WELL_STUDIED_CODES else 0.58
+    mutation_conf = min(len(active_muts) / 5.0, 1.0) * 0.80 + 0.20
+    data_confidence = (site_conf + code_conf + mutation_conf) / 3.0
 
     return {
-        "standard_deviation": round(standard_deviation, 4),
-        "calibration_score": round(calibration_score, 4)
+        "Genetic Driver Score": round(genetic_driver_score, 3),
+        "Target Clarity":       round(target_clarity,       3),
+        "Data Confidence":      round(data_confidence,      3),
     }
 
 def _build_demo_shap_values(request: PredictRequest) -> Dict[str, float]:
@@ -452,10 +499,18 @@ def simulate_risk(request: MultimodalRequest):
             oncotree_code=profile.oncotree_code,
             mutations=profile.mutations,
         )
+        confidence_metrics = _build_clinical_confidence_metrics(
+            risks=risks,
+            mutations=profile.mutations,
+            shap_values=shap_values,
+            primary_site=profile.primary_site,
+            oncotree_code=profile.oncotree_code,
+        )
 
         return {
             "simulated_risks": risks,
             "shap_values": shap_values,
+            "confidence_metrics": confidence_metrics,
             "visual_lift": round(total_lift / len(models), 4) if has_image else 0.0,
             "has_visual_data": has_image,
             "vision_confidence": round(vision_confidence, 4),
@@ -480,12 +535,19 @@ def predict_risk(request: PredictRequest):
     primary_key = f"PRIMARY_{request.profile.primary_site.upper()}"
     inference["risk_scores"][primary_key] = 1.0 # Primary site is 100% established
     
+    shap_for_predict = _build_demo_shap_values(request)
     return {
         "prediction_id": str(uuid4()),
         "status": "success",
         "risk_scores": inference["risk_scores"],
-        "confidence_metrics": _build_confidence_metrics(risk_scores),
-        "shap_values": _build_demo_shap_values(request)
+        "confidence_metrics": _build_clinical_confidence_metrics(
+            risks=inference["risk_scores"],
+            mutations={k: int(v) for k, v in request.genomic_markers.items()},
+            shap_values=shap_for_predict,
+            primary_site=request.primary_site,
+            oncotree_code=request.oncotree_code,
+        ),
+        "shap_values": shap_for_predict
     }
 
 @app.post("/predict/timeline")
@@ -504,6 +566,13 @@ async def predict_timeline(request: PredictTimelineRequest):
     
     from uuid import uuid4
     
+    timeline_shap = _build_simulate_shap_values(
+        age=request.profile.age,
+        sex=request.profile.sex,
+        primary_site=request.profile.primary_site,
+        oncotree_code=request.profile.oncotree_code,
+        mutations=request.profile.mutations,
+    )
     return {
         "prediction_id": f"sim_{str(uuid4())[:8]}",
         "status": result.status,
@@ -513,11 +582,13 @@ async def predict_timeline(request: PredictTimelineRequest):
             for site, pts in result.trajectories.items()
         },
         "summary": result.summary,
-        "confidence_metrics": {
-            "Genomic Match": 0.942,
-            "Real-world Evidence": 0.885,
-            "Heuristic Alignment": 0.912
-        }
+        "confidence_metrics": _build_clinical_confidence_metrics(
+            risks=request.risks,
+            mutations=request.profile.mutations,
+            shap_values=timeline_shap,
+            primary_site=request.profile.primary_site,
+            oncotree_code=request.profile.oncotree_code,
+        )
     }
 
 if __name__ == "__main__":
