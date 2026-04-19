@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { AlertCircle, ActivitySquare, X } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { AlertCircle, ActivitySquare, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Select, SelectItem, Slider } from '@/components/ui';
 import type { PredictionSnapshot } from '@/lib/api';
 import {
@@ -55,9 +56,10 @@ export function TimelinePanel({
   simulationSummary,
   isProjectionLoading = false,
   confidenceMetrics,
-  baselineRisk,
-  prediction,
-  onOrganChange,
+  onMonthChange,
+  onClose,
+}: TimelinePanelProps) {
+  const [isMinimized, setIsMinimized] = useState(false);
   onTreatmentChange,
   onMonthChange,
   onClose,
@@ -130,7 +132,24 @@ export function TimelinePanel({
   const sourceLabel = timelineSource === 'backend' ? 'Backend Projection' : 'Simulated Projection';
 
   return (
-    <section className="relative border-t border-slate-800/40 bg-[#060d1a]/90 backdrop-blur-sm px-6 py-4 z-20">
+    <motion.section 
+      initial={false}
+      animate={{ height: isMinimized ? '44px' : 'auto' }}
+      className="relative border-t border-slate-800/40 bg-[#060d1a]/95 backdrop-blur-md px-6 z-20 overflow-hidden shadow-[0_-10px_30px_rgba(0,0,0,0.5)] transition-colors duration-500"
+    >
+      {/* Draggable Handle */}
+      <div 
+        onClick={() => setIsMinimized(!isMinimized)}
+        className="w-full h-11 flex flex-col items-center justify-center cursor-pointer group hover:bg-slate-800/30 transition-colors"
+      >
+        <div className="w-12 h-1 bg-slate-700/50 rounded-full group-hover:bg-blue-500/50 transition-colors mb-1" />
+        <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-slate-500 group-hover:text-slate-300">
+           {isMinimized ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+           {isMinimized ? 'Expand Clinical Timeline' : 'Drag or Click to Minimize'}
+        </div>
+      </div>
+
+      <div className={`pb-4 ${isMinimized ? 'opacity-0' : 'opacity-100 transition-opacity duration-300 delay-100'}`}>
       {onClose && (
         <button 
           onClick={onClose}
@@ -657,6 +676,6 @@ export function TimelinePanel({
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

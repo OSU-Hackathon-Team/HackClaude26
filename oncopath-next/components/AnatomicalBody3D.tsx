@@ -245,10 +245,10 @@ function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: str
 }
 
 function AnatomyModelRawJSON({ 
-  activeSystem, skinOpacity, selectedStructure, risks = {}, isSimulatingSpread 
+  activeSystem, skinOpacity, selectedStructure, risks = {}, rotationZ = 0 
 }: { 
   activeSystem: string, skinOpacity: number, selectedStructure: SelectedStructure | null, 
-  risks?: Record<string, number>, isSimulatingSpread?: boolean
+  risks?: Record<string, number>, rotationZ?: number
 }) {
   const [meshes, setMeshes] = useState<THREE.Mesh[]>([]);
   const [progress, setProgress] = useState(0);
@@ -325,13 +325,10 @@ function AnatomyModelRawJSON({
   }, [meshes, activeSystem, skinOpacity, selectedStructure, risks]);
 
   return (
-    <group rotation={[-Math.PI / 2, 0, 0]} scale={0.9} position={[0, -2.5, 0]}>
-      {meshes.map((m, i) => {
-        if (isSimulatingSpread && selectedStructure && m.visible) {
-          return <SpreadableMesh key={i} baseMesh={m as any} isSimulating={true} />;
-        }
-        return <primitive key={i} object={m} />;
-      })}
+    <group rotation={[-Math.PI / 2, 0, rotationZ]} scale={0.9} position={[0, -2.5, 0]}>
+      {meshes.map((m, i) => (
+        <primitive key={i} object={m} />
+      ))}
       {progress < 100 && (
          <Html position={[0, 2, 0]} center>
            <div className="bg-slate-900/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-700 shadow-xl text-white font-mono text-sm">
@@ -366,7 +363,7 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
   const [activeSystem, setActiveSystem] = useState('all');
   const [skinOpacity, setSkinOpacity] = useState(0.4);
   const [selectedStructure, setSelectedStructure] = useState<SelectedStructure | null>(null);
-  const [isSimulatingSpread, setIsSimulatingSpread] = useState(false);
+  const [rotationZ, setRotationZ] = useState(0);
 
   return (
     <div className="w-full h-full bg-zinc-950 relative overflow-hidden">
@@ -381,12 +378,12 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
               skinOpacity={skinOpacity} 
               selectedStructure={selectedStructure} 
               risks={risks}
-              isSimulatingSpread={isSimulatingSpread}
+              rotationZ={rotationZ}
             />
           </Suspense>
         </group>
         <Particles />
-        <OrbitControls enableRotate={!selectedStructure} />
+        <OrbitControls enableRotate={true} />
       </Canvas>
 
       <div className="absolute top-20 left-5 z-20 space-y-3">
@@ -399,6 +396,24 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
               </button>
             ))}
           </div>
+
+          <div className="pt-4 mt-4 border-t border-zinc-800">
+             <div className="text-[10px] text-zinc-500 uppercase font-bold mb-2">Orientation</div>
+             <input 
+                type="range"
+                min={-Math.PI}
+                max={Math.PI}
+                step={0.01}
+                value={rotationZ}
+                onChange={(e) => setRotationZ(parseFloat(e.target.value))}
+                className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-orange-500"
+             />
+             <div className="flex justify-between mt-1 text-[8px] text-zinc-600 font-mono">
+                <span>-180°</span>
+                <span>0°</span>
+                <span>+180°</span>
+             </div>
+          </div>
         </div>
       </div>
 
@@ -407,10 +422,7 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
             <h3 className="text-[12px] text-zinc-100 uppercase font-bold">Anatomical Map</h3>
             {selectedStructure && (
               <div className="flex gap-2">
-                <button onClick={() => setIsSimulatingSpread(!isSimulatingSpread)} className={`text-[10px] px-3 py-1.5 rounded-md font-bold uppercase ${isSimulatingSpread ? 'bg-red-600 text-white' : 'bg-purple-600 text-white'}`}>
-                  {isSimulatingSpread ? 'Stop' : 'Spread'}
-                </button>
-                <button onClick={() => { setSelectedStructure(null); setIsSimulatingSpread(false); }} className="text-[10px] px-3 py-1.5 rounded-md bg-zinc-700 text-white font-bold uppercase">Reset</button>
+                <button onClick={() => { setSelectedStructure(null); }} className="text-[10px] px-3 py-1.5 rounded-md bg-zinc-700 text-white font-bold uppercase">Reset</button>
               </div>
             )}
          </div>

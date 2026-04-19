@@ -326,15 +326,14 @@ export function BodyDashboard() {
               onClose={() => setIsTimelineOpen(false)}
             />
             
-            {/* OncoBot Integration */}
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
-               <Suspense fallback={null}>
-                  <OncoBot />
-               </Suspense>
-            </div>
-          </div>
-        </div>
       )}
+
+      {/* ── OncoBot (Always Visible) ─────────────────────────────────────── */}
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-auto">
+        <Suspense fallback={null}>
+          <OncoBot selectedOrgan={activeOrganId || popover?.organId || null} />
+        </Suspense>
+      </div>
 
       {/* ── Error toast ─────────────────────────────────────────────────── */}
       {error && (
