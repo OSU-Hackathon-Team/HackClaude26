@@ -6,6 +6,8 @@ import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { ANATOMY_MAPPING_3D, type OrganPosition3D } from '@/lib/anatomy3d';
 import type { PatientProfile } from '@/lib/api';
+import { InSceneTumor } from '@/components/InSceneTumor';
+import type { TreatmentPresetId } from '@/lib/timeline';
 
 export interface SelectedStructure {
   id: string;
@@ -105,6 +107,10 @@ export interface AnatomicalBody3DProps {
   profile?: PatientProfile;
   /** Called when the user clicks an organ marker or sidebar button */
   onOrganSelect?: (organId: string, name: string, clientX: number, clientY: number) => void;
+  selectedMonth?: number;
+  selectedTreatment?: string; // Using string to avoid union type conflicts if any
+  baselineRisk?: number | null;
+  primaryOrganId?: string;
 }
 
 interface OrganMarkerData {
@@ -372,12 +378,27 @@ function Particles() {
   );
 }
 
-export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBody3DProps) {
+export function AnatomicalBody3D({ 
+  risks, 
+  profile, 
+  onOrganSelect,
+  selectedMonth = 0,
+  selectedTreatment = 'OBSERVATION',
+  baselineRisk = null,
+  primaryOrganId,
+}: AnatomicalBody3DProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [activeSystem, setActiveSystem] = useState('all');
   const [skinOpacity, setSkinOpacity] = useState(0.4);
   const [selectedStructure, setSelectedStructure] = useState<SelectedStructure | null>(null);
   const [rotationZ, setRotationZ] = useState(0);
+
+  // Auto-dim skin when tumor is visible so it shows through the body wall
+  useEffect(() => {
+    if (primaryOrganId && risks[primaryOrganId] && risks[primaryOrganId] > 0.05) {
+      setSkinOpacity((prev) => Math.min(prev, 0.22));
+    }
+  }, [primaryOrganId, risks]);
 
   return (
     <div className="w-full h-full bg-zinc-950 relative overflow-hidden">
@@ -395,6 +416,19 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
               rotationZ={rotationZ}
             />
           </Suspense>
+
+          {/* ── In-Scene Tumor: rendered at the organ's actual 3D position ── */}
+          {primaryOrganId && ANATOMY_MAPPING_3D[primaryOrganId] && (
+            <Suspense fallback={null}>
+              <InSceneTumor
+                risk={risks[primaryOrganId] || 0}
+                baselineRisk={baselineRisk ?? 0}
+                treatment={selectedTreatment as TreatmentPresetId}
+                month={selectedMonth}
+                position={ANATOMY_MAPPING_3D[primaryOrganId].position}
+              />
+            </Suspense>
+          )}
         </group>
         <Particles />
         <OrbitControls enableRotate={true} />

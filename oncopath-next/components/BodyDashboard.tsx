@@ -228,7 +228,11 @@ export function BodyDashboard() {
           <AnatomicalBody3D 
             risks={temporalRisks} 
             profile={simulationProfile} 
-            onOrganSelect={handleOrganSelect} 
+            onOrganSelect={handleOrganSelect}
+            selectedMonth={selectedMonth}
+            selectedTreatment={selectedTreatment}
+            baselineRisk={activeOrganId ? (risks[activeOrganId] ?? null) : null}
+            primaryOrganId={activeOrganId || Object.keys(risks).find(k => k.startsWith('PRIMARY_'))}
           />
         </Suspense>
 
