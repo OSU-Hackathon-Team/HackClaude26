@@ -6,7 +6,6 @@ import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { ANATOMY_MAPPING_3D, type OrganPosition3D } from '@/lib/anatomy3d';
 import type { PatientProfile } from '@/lib/api';
-import { SpreadableMesh } from '@/components/SpreadableMesh';
 
 export interface SelectedStructure {
   id: string;

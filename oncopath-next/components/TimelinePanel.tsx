@@ -673,6 +673,8 @@ export function TimelinePanel({
               {simulationSummary || "Analyzing potential genomic-treatment synergy..."}
             </p>
           </div>
+          </div>
+          </div>
         </div>
       </div>
     </motion.section>
