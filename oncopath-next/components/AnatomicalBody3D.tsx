@@ -160,7 +160,7 @@ function getRiskColor3D(prob: number): THREE.Color {
   return new THREE.Color('#10b981');
 }
 
-function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: string): THREE.Mesh | null {
+function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: string, skinOpacity: number): THREE.Mesh | null {
   if (!meshData) return null;
 
   const vs = meshData.vertices || [];
@@ -294,7 +294,7 @@ function AnatomyModelRawJSON({
           const payload = payloadByUrl.get(item.URL!);
           if (!payload) continue;
           const meshData = Array.isArray(payload) ? (typeof item.Index === 'number' ? payload[item.Index] : payload[0]) : payload;
-          const mesh = createMeshFromEntry(meshData, item.RegionPath || '');
+          const mesh = createMeshFromEntry(meshData, item.RegionPath || '', skinOpacity);
           if (mesh) nextMeshes.push(mesh);
         }
 
