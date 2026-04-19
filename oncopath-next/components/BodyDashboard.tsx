@@ -325,7 +325,8 @@ export function BodyDashboard() {
               onMonthChange={setSelectedMonth}
               onClose={() => setIsTimelineOpen(false)}
             />
-            
+          </div>
+        </div>
       )}
 
       {/* ── OncoBot (Always Visible) ─────────────────────────────────────── */}
