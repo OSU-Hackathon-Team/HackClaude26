@@ -1,6 +1,6 @@
 # OncoPath: Multimodal Cancer Metastasis Risk Prediction
 
-![OncoPath Hero Banner](oncopath_hero.png)
+![OncoPath Hero Banner](data/slides/oncopath_hero.png)
 
 <p align="center">
   <strong>Transforming Genomic Complexity into Clinical Insight with 3D Anatomical Visualizations and Multimodal AI.</strong>
@@ -150,7 +150,3 @@ Our models are audited for **"Genomic Lift"**—measuring the performance improv
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
----
-<p align="center">
-  Built for the <strong>OncoPath Multimodal Risk Simulation Hackathon</strong>
-</p>
