@@ -16,12 +16,12 @@ export interface OrganPosition3D {
 
 export const ANATOMY_MAPPING_3D: Record<string, OrganPosition3D> = {
   "DMETS_DX_CNS_BRAIN": {
-    label: "Brain Stem",
+    label: "Brain",
     region: "Head",
     system: "Nervous",
     position: [0, 4.6, 0.05],
     size: 0.18,
-    description: "Central nervous system — cerebral cortex, cerebellum, brainstem"
+    description: "Central nervous system — cerebral cortex, cerebellum, brain"
   },
   "DMETS_DX_HEAD_NECK": {
     label: "Head & Neck",

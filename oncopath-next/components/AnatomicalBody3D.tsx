@@ -7,6 +7,206 @@ import * as THREE from 'three';
 import { ANATOMY_MAPPING_3D, type OrganPosition3D } from '@/lib/anatomy3d';
 import { SeedSoilAnalysis } from '@/components/analysis/SeedSoilAnalysis';
 import type { PatientProfile } from '@/lib/api';
+import { useLoader } from '@react-three/fiber';
+
+const PROCEDURAL_ORGANS: Record<string, { size: number, pos: [number,number,number] }> = {
+  'DMETS_DX_LIVER': { size: 0.15, pos: [-0.15, 1.6, 0.2] },
+  'DMETS_DX_KIDNEY': { size: 0.12, pos: [0, 1.7, -0.15] },
+  'DMETS_DX_MALE_GENITAL': { size: 0.15, pos: [0, 0.3, 0.1] },
+  'DMETS_DX_OVARY': { size: 0.15, pos: [0, 0.5, 0.1] },
+  'DMETS_DX_FEMALE_GENITAL': { size: 0.15, pos: [0, 0.5, 0.1] },
+  'DMETS_DX_CNS_BRAIN': { size: 0.14, pos: [0, 4.4, 0.05] },
+  'DMETS_DX_BREAST': { size: 0.16, pos: [0, 2.35, 0.45] }
+};
+
+const ORGAN_GEOMETRIES = {
+  liver: (() => {
+    const geo = new THREE.SphereGeometry(1, 128, 128);
+    const pos = geo.attributes.position;
+    for(let i=0; i<pos.count; i++){
+       let x = pos.getX(i); let y = pos.getY(i); let z = pos.getZ(i);
+       if (x > 0) { x *= 1.8; y *= 1.3; } 
+       else { y *= (1.0 + x*0.6); z *= (1.0 + x*0.5); }
+       if (y < 0) { y *= 0.6; z += (y * 0.4); }
+       if (z < 0) { z *= 0.6; }
+       pos.setXYZ(i, x, y, z);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  })(),
+
+  kidney: (() => {
+    const geo = new THREE.SphereGeometry(1, 64, 64);
+    const pos = geo.attributes.position;
+    for(let i=0; i<pos.count; i++){
+       let x = pos.getX(i); let y = pos.getY(i); let z = pos.getZ(i);
+       y *= 1.7; z *= 0.6; x *= 0.9;
+       if (x < 0) { const pinch = Math.exp(-(y*y)*2); x += pinch * 0.9; }
+       pos.setXYZ(i, x, y, z);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  })(),
+
+  brain: (() => {
+    const geo = new THREE.SphereGeometry(1, 200, 200);
+    const pos = geo.attributes.position;
+    for(let i=0; i<pos.count; i++){
+       let x = pos.getX(i); let y = pos.getY(i); let z = pos.getZ(i);
+       y *= 0.85; z *= 1.15;
+       const d = Math.sqrt(x*x + y*y + z*z);
+       if(d > 0.01) {
+           const theta = Math.asin(y/d);
+           const phi = Math.atan2(z, x);
+           let noise = Math.sin(phi * 25 + Math.sin(theta * 25)) * Math.cos(theta * 25 + Math.cos(phi * 25));
+           noise += Math.sin(theta * 10) * Math.cos(phi * 10) * 0.5;
+           const displacement = 1 + noise * 0.035;
+           pos.setXYZ(i, x*displacement, y*displacement, z*displacement);
+       }
+    }
+    geo.computeVertexNormals();
+    return geo;
+  })(),
+
+  uterus: (() => {
+    const geo = new THREE.SphereGeometry(1, 64, 64);
+    const pos = geo.attributes.position;
+    for(let i=0; i<pos.count; i++){
+       let x = pos.getX(i); let y = pos.getY(i); let z = pos.getZ(i);
+       z *= 0.5; x *= 0.9;
+       if (y < 0) { x *= (1.0 + y*0.6); z *= (1.0 + y*0.6); } 
+       else { x *= (1.0 + (y*y)*0.5); }
+       pos.setXYZ(i, x, y, z);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  })(),
+
+  breast: (() => {
+    const geo = new THREE.SphereGeometry(1, 64, 64);
+    const pos = geo.attributes.position;
+    for(let i=0; i<pos.count; i++){
+       let x = pos.getX(i); let y = pos.getY(i); let z = pos.getZ(i);
+       if (y > 0) { z *= (1.0 - y*0.6); } 
+       else { z *= (1.0 + (-y)*0.3); } 
+       x *= 0.95; 
+       if (z < -0.2) z = -0.2; 
+       pos.setXYZ(i, x, y, z);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  })()
+};
+
+function ProceduralOrgan({ id }: { id: string }) {
+  const config = PROCEDURAL_ORGANS[id];
+  if (!config) return null;
+
+  return (
+    <group position={new THREE.Vector3(...config.pos)} scale={new THREE.Vector3(config.size, config.size, config.size)}>
+      {id === 'DMETS_DX_LIVER' && (
+        <mesh position={[0.2, -0.2, 0]} rotation={[0.2, 0.2, 0.1]} geometry={ORGAN_GEOMETRIES.liver}>
+          <meshPhysicalMaterial color="#5c2018" roughness={0.3} clearcoat={0.6} sheenColor="#ff7b63" sheen={1} />
+        </mesh>
+      )}
+
+      {id === 'DMETS_DX_KIDNEY' && (
+        <group>
+          <mesh position={[-0.8, 0, 0]} rotation={[0.1, -0.3, 0.2]} scale={[0.5, 0.5, 0.5]} geometry={ORGAN_GEOMETRIES.kidney}>
+            <meshPhysicalMaterial color="#4a1a13" roughness={0.4} clearcoat={0.2} sheenColor="#a33427" sheen={0.8} />
+          </mesh>
+          <mesh position={[0.8, -0.2, 0]} rotation={[0.1, 0.3, -0.2]} scale={[-0.5, 0.5, 0.5]} geometry={ORGAN_GEOMETRIES.kidney}>
+            <meshPhysicalMaterial color="#4a1a13" roughness={0.4} clearcoat={0.2} sheenColor="#a33427" sheen={0.8} />
+          </mesh>
+        </group>
+      )}
+
+      {id === 'DMETS_DX_CNS_BRAIN' && (
+        <group>
+          <mesh position={[-0.45, 0, 0]} geometry={ORGAN_GEOMETRIES.brain}>
+            <meshPhysicalMaterial color="#baa1a4" roughness={0.6} clearcoat={0.3} transmission={0.1} thickness={0.5} />
+          </mesh>
+          <mesh position={[0.45, 0, 0]} scale={[-1, 1, 1]} geometry={ORGAN_GEOMETRIES.brain}>
+            <meshPhysicalMaterial color="#baa1a4" roughness={0.6} clearcoat={0.3} transmission={0.1} thickness={0.5} />
+          </mesh>
+          <mesh position={[0, -0.9, -0.6]} scale={[0.7, 0.5, 0.6]}>
+            <sphereGeometry args={[1, 64, 64]} />
+            <meshPhysicalMaterial color="#8a7376" roughness={0.8} />
+          </mesh>
+        </group>
+      )}
+
+      {(id === 'DMETS_DX_OVARY' || id === 'DMETS_DX_FEMALE_GENITAL') && (
+        <group>
+          <mesh position={[0, 0, 0]} scale={[0.6, 0.9, 0.5]} geometry={ORGAN_GEOMETRIES.uterus}>
+            <meshPhysicalMaterial color="#b35a65" roughness={0.4} clearcoat={0.3} />
+          </mesh>
+          <mesh position={[-0.8, 0.5, 0]} rotation={[0, 0, 1.2]}>
+             <cylinderGeometry args={[0.08, 0.08, 1.0, 32]} />
+             <meshPhysicalMaterial color="#a6545e" roughness={0.5} clearcoat={0.2} />
+          </mesh>
+          <mesh position={[0.8, 0.5, 0]} rotation={[0, 0, -1.2]}>
+             <cylinderGeometry args={[0.08, 0.08, 1.0, 32]} />
+             <meshPhysicalMaterial color="#a6545e" roughness={0.5} clearcoat={0.2} />
+          </mesh>
+          <mesh position={[-1.3, 0.3, 0]} scale={[0.3, 0.2, 0.2]}>
+             <sphereGeometry args={[1, 32, 32]} />
+             <meshPhysicalMaterial color="#e8caced" roughness={0.3} clearcoat={0.7} />
+          </mesh>
+          <mesh position={[1.3, 0.3, 0]} scale={[0.3, 0.2, 0.2]}>
+             <sphereGeometry args={[1, 32, 32]} />
+             <meshPhysicalMaterial color="#e8cbcd" roughness={0.3} clearcoat={0.7} />
+          </mesh>
+        </group>
+      )}
+
+      {id === 'DMETS_DX_MALE_GENITAL' && (
+        <group>
+          <mesh position={[0, 0, 0]} scale={[0.4, 0.4, 0.4]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshPhysicalMaterial color="#8a5e57" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, -0.9, 0.4]} rotation={[0.4, 0, 0]}>
+            <cylinderGeometry args={[0.22, 0.22, 1.4, 32]} />
+            <meshPhysicalMaterial color="#ab7b73" roughness={0.4} clearcoat={0.2} />
+          </mesh>
+          <mesh position={[0, -1.6, 0.7]} rotation={[0.4, 0, 0]} scale={[0.25, 0.2, 0.25]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshPhysicalMaterial color="#b3645b" roughness={0.3} clearcoat={0.5} />
+          </mesh>
+          <mesh position={[-0.3, -1.1, 0.2]} scale={[0.3, 0.4, 0.3]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshPhysicalMaterial color="#bda39f" roughness={0.6} clearcoat={0.1} />
+          </mesh>
+          <mesh position={[0.3, -1.1, 0.2]} scale={[0.3, 0.4, 0.3]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshPhysicalMaterial color="#bda39f" roughness={0.6} clearcoat={0.1} />
+          </mesh>
+        </group>
+      )}
+
+      {id === 'DMETS_DX_BREAST' && (
+        <group>
+          <mesh position={[-0.8, 0, 0]} scale={[0.8, 0.8, 0.7]} rotation={[0.1, -0.1, 0]} geometry={ORGAN_GEOMETRIES.breast}>
+            <meshPhysicalMaterial color="#e8c0b3" roughness={0.5} clearcoat={0.2} sheenColor="#ffcebd" sheen={1} />
+          </mesh>
+          <mesh position={[-0.88, -0.2, 0.65]} scale={[0.15, 0.15, 0.05]} rotation={[-0.1, -0.2, 0]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshPhysicalMaterial color="#d48c79" roughness={0.7} />
+          </mesh>
+          <mesh position={[0.8, 0, 0]} scale={[0.8, 0.8, 0.7]} rotation={[0.1, 0.1, 0]} geometry={ORGAN_GEOMETRIES.breast}>
+            <meshPhysicalMaterial color="#e8c0b3" roughness={0.5} clearcoat={0.2} sheenColor="#ffcebd" sheen={1} />
+          </mesh>
+          <mesh position={[0.88, -0.2, 0.65]} scale={[0.15, 0.15, 0.05]} rotation={[-0.1, 0.2, 0]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshPhysicalMaterial color="#d48c79" roughness={0.7} />
+          </mesh>
+        </group>
+      )}
+    </group>
+  );
+}
+
 
 export interface SelectedStructure {
   id: string;
@@ -497,11 +697,15 @@ function AnatomyModelRawJSON({
         }
 
         if (isMatch) {
-           m.visible = true;
-           mat.opacity = 1.0;
-           mat.depthWrite = true;
-           mat.transparent = false;
-           mat.emissive.setHex(0x222222); // subtle glow
+           if (id in PROCEDURAL_ORGANS) {
+              m.visible = false;
+           } else {
+              m.visible = true;
+              mat.opacity = 1.0;
+              mat.depthWrite = true;
+              mat.transparent = false;
+              mat.emissive.setHex(0x222222); // subtle glow
+           }
         } else {
            m.visible = false; // Hide completely as requested
         }
@@ -727,6 +931,9 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
                  setHoveredOrgan={setHoveredOrgan}
                  onOrganSelect={onOrganSelect}
               />
+              {selectedStructure && PROCEDURAL_ORGANS[selectedStructure.id] && (
+                 <ProceduralOrgan id={selectedStructure.id} />
+              )}
           </Suspense>
         </group>
         
