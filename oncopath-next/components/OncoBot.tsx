@@ -13,7 +13,7 @@ export function OncoBot({ selectedOrgan, onClose }: OncoBotProps) {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant', content: string }>>([
     {
       role: 'assistant',
-      content: `Hello. I am OncoBot, clinical assistant for OncoPath. I am currently locked to analyzing: ${selectedOrgan || "General Anatomy"}. How can I assist you with this structure today?`
+      content: `I am OncoBot, your clinical assistant. I am currently focused on: ${selectedOrgan || "General Anatomy"}. How can I assist you today?`
     }
   ]);
   const [input, setInput] = useState('');
@@ -25,16 +25,6 @@ export function OncoBot({ selectedOrgan, onClose }: OncoBotProps) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
      }
   }, [messages, isTyping, isOpen]);
-
-  // If the target organ changes context, alert the bot state!
-  useEffect(() => {
-     if (selectedOrgan) {
-        setMessages(prev => [
-            ...prev,
-            { role: 'assistant', content: `[SYSTEM ALERT] Diagnosis context shifted. I am now strictly analyzing the ${selectedOrgan}. Please provide relevant queries.` }
-        ]);
-     }
-  }, [selectedOrgan]);
 
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
@@ -51,7 +41,7 @@ export function OncoBot({ selectedOrgan, onClose }: OncoBotProps) {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify({
-            messages: newContext.filter(m => !m.content.startsWith('[SYSTEM ALERT]')), // filter out artificial system alerts from true prompt history
+            messages: newContext,
             selectedOrgan: selectedOrgan
          })
       });
@@ -87,19 +77,13 @@ export function OncoBot({ selectedOrgan, onClose }: OncoBotProps) {
         <div className="bg-zinc-800/80 border-b border-zinc-700 p-4 flex justify-between items-center shrink-0">
            <div className="flex items-center gap-2 text-blue-400">
                <Bot size={18} />
-               <h3 className="font-bold text-sm tracking-widest uppercase">OncoBot AI</h3>
+               <h3 className="font-bold text-sm tracking-widest uppercase">Clinical Assistant</h3>
            </div>
            <button onClick={() => setIsOpen(false)} className="text-zinc-400 hover:text-white transition-colors">
               <X size={16} />
            </button>
         </div>
         
-        {/* Context Strip */}
-        <div className="bg-blue-900/20 px-4 py-2 border-b border-zinc-700/50 flex items-center gap-2 text-xs text-blue-300 font-medium shrink-0">
-           <ShieldAlert size={14} className="text-blue-400" />
-           Protection Active: Restricted to {selectedOrgan || 'General Anatomy'}
-        </div>
-
         {/* Chat Log */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 custom-scrollbar">
             {messages.map((m, i) => (
@@ -111,9 +95,7 @@ export function OncoBot({ selectedOrgan, onClose }: OncoBotProps) {
                     <div className={`text-sm px-3 py-2 rounded-xl max-w-[90%] shadow-lg ${
                             m.role === 'user' 
                             ? 'bg-blue-600/80 text-white rounded-br-sm' 
-                            : m.content.startsWith('[SYSTEM') 
-                                ? 'bg-amber-500/20 text-amber-200 border border-amber-500/30 font-medium text-xs' 
-                                : 'bg-zinc-800/90 text-zinc-200 border border-zinc-700/50 rounded-bl-sm'
+                            : 'bg-zinc-800/90 text-zinc-200 border border-zinc-700/50 rounded-bl-sm'
                         }`}>
                         {m.content}
                     </div>
