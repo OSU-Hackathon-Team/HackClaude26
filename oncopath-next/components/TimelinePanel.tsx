@@ -53,17 +53,16 @@ export function TimelinePanel({
   selectedMonth,
   timeline,
   timelineSource,
-  simulationSummary,
   isProjectionLoading = false,
   confidenceMetrics,
-  onMonthChange,
-  onClose,
-}: TimelinePanelProps) {
-  const [isMinimized, setIsMinimized] = useState(false);
+  baselineRisk,
+  prediction,
+  onOrganChange,
   onTreatmentChange,
   onMonthChange,
   onClose,
 }: TimelinePanelProps) {
+  const [isMinimized, setIsMinimized] = useState(false);
   const selectedOrganLabel = useMemo(
     () => organOptions.find((option) => option.key === selectedOrgan)?.label ?? selectedOrgan,
     [organOptions, selectedOrgan]
