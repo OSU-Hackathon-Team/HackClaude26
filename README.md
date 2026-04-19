@@ -1,57 +1,109 @@
 # OncoPath: Multimodal Cancer Metastasis Risk Prediction
 
-OncoPath is a state-of-the-art AI-driven platform designed to predict organ-specific metastatic risks for cancer patients. By integrating longitudinal clinical data with genomic mutation profiles from the MSK-MET dataset, OncoPath provides clinicians and researchers with real-time "What-If" simulations to understand how specific genetic mutations influence cancer progression across 21 different anatomical sites.
+![OncoPath Hero Banner](oncopath_hero.png)
 
-## 🚀 Key Features
+<p align="center">
+  <strong>Transforming Genomic Complexity into Clinical Insight with 3D Anatomical Visualizations and Multimodal AI.</strong>
+</p>
 
-- **Real-Time Simulation:** Interactive "What-If" engine to observe risk changes based on genomic alterations (e.g., TP53, KRAS mutations).
-- **Multimodal Integration:** Fuses clinical data, 101-gene mutation profiles, and high-fidelity pathology imaging signals.
-- **Decision Engine Layer 2 (Vision):** Late-fusion ensemble that uses a specialized Vision Detector to provide conclusive "Risk Lift" or "Risk Drain."
-- **Site-Specific Intelligence:** 21 individual XGBoost models optimized for specific metastatic targets, validated against clinical literature.
-- **Model Interpretability:** Uses SHAP and exact probability reporting for transparent clinico-genomic reasoning.
-- **Anatomical Visualization:** Interactive 2D/3D heatmaps for intuitive risk assessment across the entire body.
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Three.js-black?style=for-the-badge&logo=three.js" alt="Three.js" />
+  <img src="https://img.shields.io/badge/Anthropic-Claude--3.5-7253ed?style=for-the-badge" alt="Anthropic" />
+</p>
+
+---
+
+## 🔬 Overview
+
+OncoPath is a state-of-the-art AI-driven platform designed to predict organ-specific metastatic risks for cancer patients. By integrating longitudinal clinical data with genomic mutation profiles from the **MSK-MET dataset**, OncoPath provides clinicians and researchers with real-time **"What-If" simulations** to understand how specific genetic mutations (e.g., *TP53*, *KRAS*) influence cancer progression across 21 different anatomical sites.
+
+### 🌟 Key Highlights
+
+- **3D Metastatic HUD (Heads-Up Display):** A high-fidelity, interactive 3D anatomical viewer that visualizes risk intensity as a dynamic heatmap across the human body.
+- **Multimodal Fusion Engine:** Integrates clinical tabular data, 101-gene mutation profiles, and high-fidelity pathology imaging signals using specialized Vision Encoders (Phikon).
+- **OncoBot Clinical Assistant:** A specialized RAG-based clinical AI assistant restricted to oncological reasoning, providing interpreted insights directly within the dashboard.
+- **Genomic Prototyping:** Real-time mutation toggling with a <50ms latency response from the FastAPI-backed XGBoost inference engine.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph "Frontend (Next.js)"
+        A[3D Anatomical Viewer] --- B[Dashboard UI]
+        B --- C[OncoBot AI Chat]
+    end
+
+    subgraph "Backend (FastAPI)"
+        D[Inference Engine] --- E[XGBoost Ensemble]
+        D --- F[SHAP Interpretability]
+        G[Vision Encoder] --- H[Phikon/PyTorch]
+    end
+
+    subgraph "Data & Storage"
+        I[(Supabase DB)] --- D
+        J[MSK-MET Dataset] --- E
+    end
+
+    B <--> D
+    C <--> |Anthropic Claude 3.5| K[Clinical Knowledge Base]
+    H -.-> |Pathology Slides| G
+```
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** [Next.js](https://nextjs.org/), React, [Tailwind CSS](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/), [Three.js](https://threejs.org/).
-- **Backend:** [FastAPI](https://fastapi.tiangolo.com/), Python, XGBoost, Scikit-learn, [SHAP](https://shap.readthedocs.io/en/latest/).
-- **Deployment:** Vercel (Frontend), FastAPI/Uvicorn (Backend).
+### Frontend
+- **Framework:** Next.js 14 (App Router)
+- **3D Rendering:** Three.js, React Three Fiber, React Three Drei
+- **Animations:** Framer Motion
+- **Styling:** Tailwind CSS
+- **Interactions:** Radix UI components
+
+### Backend & AI
+- **API:** FastAPI, Uvicorn
+- **Machine Learning:** XGBoost, Scikit-learn
+- **Interpretability:** SHAP
+- **Vision:** PyTorch, Phikon (Pathology Foundation Model)
+- **Database:** Supabase (PostgreSQL)
+- **LLM Context:** Anthropic Claude (Haiku & Sonnet)
+
+---
 
 ## 📁 Project Structure
 
-- `oncopath-next/`: Modern Next.js application for the interactive dashboard.
-- `scripts/`: Python implementation for data processing, model training, and the API service.
-  - `api_service.py`: FastAPI server for real-time inference.
-  - `train_iteration_3.py`: Automated ML pipeline for multi-site model training.
-  - `extract_embeddings.py`: [NEW] Vision encoder for multimodal fusion.
+```text
+.
+├── oncopath-next/          # Modern Next.js application (Dashboards & 3D Viewer)
+├── scripts/                # Python backend implementation
+│   ├── api_service.py       # FastAPI server for real-time inference
+│   ├── train_iteration_3.py # Automated ML pipeline
+│   └── extract_embeddings.py # Vision encoder for multimodal fusion
+├── models/                 # Serialized XGBoost & Vision artifacts
+├── iterations/             # Phase-by-phase project documentation
+├── data/                   # Genomic (MSK-MET) and clinical datasets
+└── README.md
+```
 
-### Iteration 1: Multimodal Fusion (Complete)
-- **Goal**: Supplement XGBoost tabular models with Image Embeddings.
-- **Approach**: Use a pre-trained Pathology Foundation Model (Phikon) to extract features from tumor slides.
+---
 
-### Iteration 2: Ensemble Signal & Clinical Audit (Complete)
-- **Goal**: Solve signal scarcity and validate against oncological literature.
-- **Approach**: 
-    - **Ensemble Layer 2**: Specialized `vision_detector.joblib` for conclusive image influence (>70% or <30% confidence).
-    - **Clinical Audit**: Verified model accuracy against KRAS (Colon), HER2 (Breast), and EGFR (Lung) metastatic patterns.
-
-- `iterations/`: Historical reports and upcoming detailed iteration plans.
-- `tasks/`: Granular agent task lists for AI, Frontend, and Timeline modules.
-- `contracts.md`: The "Shared Language" defining API schemas for the team.
-- `models/`: Serialized models and preprocessing artifacts (`joblib`).
-- `data/`: Multi-omic datasets and diagnostic reports.
-
-## 🚦 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v18+)
-- Python (3.9+)
+- **Node.js:** v18 or later
+- **Python:** v3.9 or later
+- **API Keys:** Claude API Key (set in `.env`)
 
 ### 1. Backend Setup
 
 ```bash
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
 
 # Start the Risk Simulator API
@@ -66,18 +118,39 @@ cd oncopath-next
 # Install dependencies
 npm install
 
-# Run the development server
+# Start the development server
 npm run dev
 ```
 
-The application will be available at `http://localhost:3000`.
-
-## 🧬 Model Training & Evaluation
-
-Our models are audited for "Genomic Lift"—measuring the performance improvement when adding genetic data to clinical-only baselines. The pipeline utilizes:
-- **Dynamic Discovery:** Automatically identifies valid targets with sufficient sample sizes.
-- **Strict Leakage Prevention:** Ensures reliable evaluation by purging metadata not available at the time of sequencing.
-- **Cross-Validation:** 5-fold stratified CV for robust accuracy reports.
+The dashboard will be live at `http://localhost:3000`.
 
 ---
-*Created by [Jason Seh](https://linkedin.com/in/jason-seh)*
+
+## 📈 Model Performance & Validation
+
+Our models are audited for **"Genomic Lift"**—measuring the performance improvement when adding genetic data to clinical-only baselines.
+- **21 Organ Sites:** Specifically optimized models for Brain, Lung, Bone, Liver, etc.
+- **Interpretability:** Exact probability reporting and SHAP force plots for transparent reasoning.
+- **Validation:** Audited against clinical literature (e.g., verifying KRAS influence on Colorectal metastasis patterns).
+
+---
+
+## 👥 Contributors
+
+| Name | Role |
+| :--- | :--- |
+| **Jason Seh** | Project Architect & ML Engineer |
+| **Mitchell Eickhoff** | Full Stack Developer |
+| **Konrád Gózon** | Frontend & 3D Specialist |
+| **Rocky Shao** | Business Lead |
+
+---
+
+## ⚖️ License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+<p align="center">
+  Built for the <strong>OncoPath Multimodal Risk Simulation Hackathon</strong>
+</p>
