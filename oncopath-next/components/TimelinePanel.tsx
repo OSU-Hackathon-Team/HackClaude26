@@ -24,6 +24,7 @@ interface TimelinePanelProps {
   selectedMonth: number;
   timeline: TimelinePoint[];
   timelineSource: 'local' | 'backend';
+  simulationSummary?: string;
   baselineRisk: number | null;
   prediction: PredictionSnapshot | null;
   onOrganChange: (organ: string) => void;
@@ -49,6 +50,7 @@ export function TimelinePanel({
   selectedMonth,
   timeline,
   timelineSource,
+  simulationSummary,
   baselineRisk,
   prediction,
   onOrganChange,
@@ -348,22 +350,11 @@ export function TimelinePanel({
 
           <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
             <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
-              SHAP Values
+              Biological Rationale
             </div>
-            {shapEntries.length ? (
-              <div className="space-y-1.5">
-                {shapEntries.map(([key, value]) => (
-                  <div key={key} className="flex justify-between text-[10px] text-slate-300">
-                    <span className="truncate pr-2">{key}</span>
-                    <span className={`font-mono ${value >= 0 ? 'text-rose-300' : 'text-cyan-300'}`}>
-                      {value.toFixed(4)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
-            )}
+            <p className="text-[10px] text-zinc-300 leading-relaxed italic">
+              {simulationSummary || "Analyzing potential genomic-treatment synergy..."}
+            </p>
           </div>
         </div>
       </div>

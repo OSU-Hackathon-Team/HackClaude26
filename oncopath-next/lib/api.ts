@@ -44,10 +44,17 @@ interface PredictRequestPayload {
 
 interface PredictTimelineRequestPayload {
   profile: PatientProfile;
-  baseline_risk: number;
+  risks: Record<string, number>;
+  baseline_risk?: number;
   treatment: string;
   months: number;
   organ?: string;
+}
+
+export interface SystemicSimulationResult {
+  status: string;
+  trajectories: Record<string, TimelinePoint[]>;
+  summary: string;
 }
 
 export interface PredictionRequestOptions {
@@ -110,7 +117,7 @@ function parseNumericMap(value: unknown): Record<string, number> | undefined {
 }
 
 export function normalizeOrganKey(rawKey: string): string {
-  if (rawKey.startsWith("DMETS_DX_") || rawKey.startsWith("SYS_")) {
+  if (rawKey.startsWith("DMETS_DX_") || rawKey.startsWith("SYS_") || rawKey.startsWith("PRIMARY_")) {
     return rawKey;
   }
 
@@ -136,43 +143,36 @@ function normalizeRiskScores(value: unknown): RiskScores | null {
   return Object.keys(normalized).length ? normalized : null;
 }
 
-function normalizeTimelineResponse(value: unknown): TimelinePoint[] | null {
+export function normalizeSystemicTimelineResponse(value: unknown): SystemicSimulationResult | null {
   const obj = objectFromUnknown(value);
-  if (!obj) {
-    return null;
-  }
+  if (!obj) return null;
 
-  const rawTimeline = Array.isArray(obj.timeline) ? obj.timeline : null;
-  if (!rawTimeline) {
-    return null;
-  }
+  const rawTrajectories = objectFromUnknown(obj.trajectories);
+  if (!rawTrajectories) return null;
 
-  const timeline: TimelinePoint[] = [];
-  for (const item of rawTimeline) {
-    const point = objectFromUnknown(item);
-    if (!point) {
-      continue;
+  const trajectories: Record<string, TimelinePoint[]> = {};
+  for (const [site, rawPoints] of Object.entries(rawTrajectories)) {
+    if (!Array.isArray(rawPoints)) continue;
+    
+    const points: TimelinePoint[] = [];
+    for (const item of rawPoints) {
+      const p = objectFromUnknown(item);
+      if (!p) continue;
+      
+      const month = Number(p.month);
+      const risk = Number(p.risk);
+      if (Number.isFinite(month) && Number.isFinite(risk)) {
+        points.push({ month, risk });
+      }
     }
-
-    const rawMonth = point.month;
-    const rawRisk = point.risk;
-    const parsedMonth = typeof rawMonth === "number" ? rawMonth : Number(rawMonth);
-    const parsedRisk = typeof rawRisk === "number" ? rawRisk : Number(rawRisk);
-    if (!Number.isFinite(parsedMonth) || !Number.isFinite(parsedRisk)) {
-      continue;
-    }
-
-    timeline.push({
-      month: Math.max(0, Math.round(parsedMonth)),
-      risk: Math.min(Math.max(parsedRisk, 0), 1),
-    });
+    trajectories[site] = points;
   }
 
-  if (!timeline.length) {
-    return null;
-  }
-
-  return timeline.sort((a, b) => a.month - b.month);
+  return {
+    status: String(obj.status || "unknown"),
+    trajectories,
+    summary: String(obj.summary || "Biological simulation complete.")
+  };
 }
 
 function normalizePredictResponse(value: unknown): PredictionSnapshot | null {
@@ -295,15 +295,15 @@ export async function simulateRisk(
 
 export async function requestPredictTimeline(
   profile: PatientProfile,
-  baselineRisk: number,
+  risksSnapshot: Record<string, number>,
   treatment: string,
   months: number,
   organ?: string,
   signal?: AbortSignal
-): Promise<TimelinePoint[]> {
+): Promise<SystemicSimulationResult> {
   const payload: PredictTimelineRequestPayload = {
     profile,
-    baseline_risk: Math.min(Math.max(baselineRisk, 0), 1),
+    risks: risksSnapshot,
     treatment,
     months: Math.max(1, Math.floor(months)),
     organ,
@@ -325,10 +325,10 @@ export async function requestPredictTimeline(
   }
 
   const data: unknown = await response.json();
-  const normalizedTimeline = normalizeTimelineResponse(data);
-  if (!normalizedTimeline) {
-    throw new Error("Schema mismatch from /predict/timeline: missing timeline array");
+  const result = normalizeSystemicTimelineResponse(data);
+  if (!result) {
+    throw new Error("Schema mismatch from /predict/timeline: missing trajectories");
   }
 
-  return normalizedTimeline;
+  return result;
 }

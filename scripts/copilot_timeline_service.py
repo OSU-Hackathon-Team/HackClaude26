@@ -3,13 +3,6 @@ import re
 from typing import Any, List, Optional, Union
 from pydantic import BaseModel, Field
 
-try:
-    from copilot import CopilotClient
-    from copilot.session import PermissionHandler
-except (ImportError, ModuleNotFoundError, TypeError):
-    CopilotClient = None
-    PermissionHandler = None
-
 class TimelinePoint(BaseModel):
     month: int
     risk: float
@@ -17,111 +10,120 @@ class TimelinePoint(BaseModel):
 class TimelineExplainRequest(BaseModel):
     primary_site: str
     mutations: List[str]
-    baseline_risk: float
+    risks: dict = Field(default_factory=dict)
     treatment: str
     months: int
-    organ: Optional[str] = "Metastatic Site"
+    selected_organ: Optional[str] = None
 
 class TimelineExplainResponse(BaseModel):
     status: str
     treatment: str
-    timeline: List[TimelinePoint]
+    trajectories: dict[str, List[TimelinePoint]]
     summary: str
 
 class CopilotTimelineService:
     def __init__(self):
-        self.model = "gpt-4o" # default model, will try to use Claude 3.5 if available via SDK
+        self.model = "claude-sonnet-4-6"
 
     async def predict_treatment_timeline(self, request: TimelineExplainRequest) -> TimelineExplainResponse:
-        import httpx
         import os
-        
+        from anthropic import AsyncAnthropic, NotFoundError
+
+        # 1. Direct Claude API (Official SDK)
         claude_key = os.getenv("CLAUDE_API_KEY")
-        if claude_key:
-            try:
-                async with httpx.AsyncClient(timeout=30.0) as client:
-                    resp = await client.post(
-                        "https://api.anthropic.com/v1/messages",
-                        headers={
-                            "x-api-key": claude_key,
-                            "anthropic-version": "2023-06-01",
-                            "content-type": "application/json"
-                        },
-                        json={
-                            "model": "claude-3-5-sonnet-20241022",
-                            "max_tokens": 2000,
-                            "messages": [{"role": "user", "content": self._build_prompt(request)}]
-                        }
-                    )
-                    resp.raise_for_status()
-                    data = resp.json()
-                    raw_content = data['content'][0]['text']
-                    parsed_data = self._parse_json(raw_content)
-                    
-                    return TimelineExplainResponse(
-                        status="success",
-                        treatment=request.treatment,
-                        timeline=[TimelinePoint(**p) for p in parsed_data.get("timeline", [])],
-                        summary=parsed_data.get("summary", "Clinical biological simulation complete.")
-                    )
-            except Exception as e:
-                print(f"Direct Claude API Error: {e}")
-                # Fall through to other handlers
+        if not claude_key:
+             print("Warning: CLAUDE_API_KEY NOT FOUND in environment.")
+             return self._fallback_prediction(request)
 
-        if CopilotClient is None:
-            return self._fallback_prediction(request)
+        # OPTIMIZATION: Filter risks to only include significant metastatic sites (> 1% baseline)
+        # This prevents the JSON response from exploding in size and causing syntax errors.
+        significant_risks = {k: v for k, v in request.risks.items() if v > 0.01}
+        if not significant_risks and request.selected_organ and request.selected_organ != "Metastatic Target":
+            # Safety: Ensure the selected organ is always included even if risk is low
+            significant_risks[request.selected_organ] = request.risks.get(request.selected_organ, 0.01)
+        
+        filtered_request = TimelineExplainRequest(
+            primary_site=request.primary_site,
+            mutations=request.mutations,
+            risks=significant_risks,
+            treatment=request.treatment,
+            months=request.months,
+            selected_organ=request.selected_organ
+        )
 
-        client = CopilotClient()
         try:
-            await client.start()
-            session = await client.create_session(
-                on_permission_request=PermissionHandler.approve_all,
-                model="claude-3.5-sonnet"
-            )
+            client = AsyncAnthropic(api_key=claude_key.strip())
+            target_models = ["claude-sonnet-4-6", "claude-haiku-4-0"]
             
-            prompt = self._build_prompt(request)
-            response = await session.send_and_wait(prompt)
+            print(f"Starting Direct Claude API attempt (Standard API) with {len(significant_risks)} focus sites...")
+            for model_id in target_models:
+                try:
+                    response = await client.messages.create(
+                        model=model_id,
+                        max_tokens=2000,
+                        messages=[{"role": "user", "content": self._build_prompt(filtered_request)}]
+                    )
+                    print(f"Claude API Success with {model_id}!")
+                    break 
+                except NotFoundError:
+                    continue 
+                except Exception as e:
+                    print(f"Claude API Error [{model_id}]: {e}")
+                    break 
             
-            # Extract content from response
-            raw_content = self._extract_text(response)
-            parsed_data = self._parse_json(raw_content)
-            
-            return TimelineExplainResponse(
-                status="success",
-                treatment=request.treatment,
-                timeline=[TimelinePoint(**p) for p in parsed_data.get("timeline", [])],
-                summary=parsed_data.get("summary", "Copilot biological simulation complete.")
-            )
+            if response:
+                raw_content = response.content[0].text
+                parsed_data = self._parse_json(raw_content)
+                
+                return TimelineExplainResponse(
+                    status="success",
+                    treatment=request.treatment,
+                    trajectories={
+                        site: [TimelinePoint(**p) for p in pts] 
+                        for site, pts in parsed_data.get("trajectories", {}).items()
+                    },
+                    summary=parsed_data.get("summary", "Clinical systemic simulation complete.")
+                )
         except Exception as e:
-            print(f"Copilot Service Error: {e}")
-            return self._fallback_prediction(request)
-        finally:
-            await client.stop()
+            print(f"Anthropic SDK Initialization Error: {e}")
+
+        return self._fallback_prediction(request)
+
     def _build_prompt(self, request: TimelineExplainRequest) -> str:
+        risk_context = "\n".join([f"- {k}: {v:.2f}" for k, v in request.risks.items() if v > 0.05])
+        
         return f"""
         You are an advanced Oncology Simulation Agent. 
-        Target: Predict the metastatic risk trajectory for {request.organ} over {request.months} months.
+        Target: Predict the systemic metastatic risk trajectory across ALL sites over {request.months} months.
         
         PATIENT DATA:
         - Primary Site: {request.primary_site}
         - Mutations: {", ".join(request.mutations)}
-        - Baseline ML Risk (Soil): {request.baseline_risk:.2f}
+        
+        CURRENT RISK SNAPSHOT (Soil):
+        {risk_context}
         
         TREATMENT PLAN:
         - Selection: {request.treatment}
         
         INSTRUCTIONS:
-        1. Consider the biological synergy between mutations (Seed) and treatment (e.g. PARP inhibitors for BRCA mutations).
-        2. Generate a temporal risk curve from month 0 to {request.months}.
-        3. Respond ONLY with a valid JSON object.
+        1. Consider the biological synergy between mutations (Seed) and treatment.
+        2. Evaluate how this treatment affects EVERY metastatic site listed. Some sites may respond better than others.
+        3. Determine if the treatment is localized or systemic.
+        4. Generate a temporal risk curve for each high-risk site from month 0 to {request.months}.
+        5. Respond ONLY with a valid JSON object.
         
         JSON STRUCTURE:
         {{
-            "timeline": [
-                {{"month": 0, "risk": {request.baseline_risk:.2f}}},
+            "trajectories": {{
+                "ORGAN_ID": [
+                    {{"month": 0, "risk": 0.XX}},
+                    {{"month": 12, "risk": 0.XX}},
+                    ...
+                ],
                 ...
-            ],
-            "summary": "1-2 sentence biological rationale."
+            }},
+            "summary": "1-3 sentence biological rationale for the whole-body response."
         }}
         """
 
@@ -139,25 +141,55 @@ class CopilotTimelineService:
 
     def _parse_json(self, text: str) -> dict:
         try:
-            # Find JSON block if Claude adds preamble
-            match = re.search(r'\{.*\}', text, re.DOTALL)
-            if match:
-                return json.loads(match.group(0))
-            return json.loads(text)
-        except:
-            return {"timeline": [], "summary": "Error parsing LLM response."}
+            # Clean LLM markers if present
+            cleaned = re.sub(r'```(?:json)?', '', text)
+            cleaned = cleaned.strip()
+
+            # Find main JSON block
+            match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+            if not match:
+                raise ValueError("No JSON object found in response.")
+            
+            json_str = match.group(0)
+            
+            # --- REPAIR LAYER: Fix common LLM syntax errors ---
+            # 1. Fix missing commas between objects: } { -> }, {
+            json_str = re.sub(r'\}\s*\{', '}, {', json_str)
+            # 2. Fix missing commas between list items: ] { -> ], {
+            json_str = re.sub(r'\]\s*\{', '], {', json_str)
+            # 3. Remove trailing commas in arrays/objects
+            json_str = re.sub(r',\s*([\}\]])', r'\1', json_str)
+            
+            try:
+                return json.loads(json_str)
+            except json.JSONDecodeError:
+                # If still failing, try to fix truncation by adding closing braces
+                opened_braces = json_str.count('{') - json_str.count('}')
+                opened_brackets = json_str.count('[') - json_str.count(']')
+                json_str += ']' * opened_brackets
+                json_str += '}' * opened_braces
+                return json.loads(json_str)
+
+        except Exception as e:
+            print(f"JSON Parsing/Repair Error: {e}")
+            return {"trajectories": {}, "summary": f"Parse Failure: {str(e)[:60]}..."}
 
     def _fallback_prediction(self, request: TimelineExplainRequest) -> TimelineExplainResponse:
-        # Basic exponential decay as safety net
-        decay = 0.05
-        timeline = []
-        for m in range(0, request.months + 1, 6):
-            risk = request.baseline_risk * (0.9 ** (m / 6))
-            timeline.append(TimelinePoint(month=m, risk=round(risk, 3)))
+        # Basic exponential decay as safety net for all sites
+        trajectories = {}
+        for site, baseline in request.risks.items():
+            if baseline < 0.01: continue
+            
+            decay = 0.05
+            points = []
+            for m in range(0, request.months + 1, 12):
+                risk = baseline * (0.92 ** (m / 12))
+                points.append(TimelinePoint(month=m, risk=round(risk, 3)))
+            trajectories[site] = points
         
         return TimelineExplainResponse(
             status="simulated",
             treatment=request.treatment,
-            timeline=timeline,
-            summary="Deterministic projection used (LLM Agent Offline)."
+            trajectories=trajectories,
+            summary="Deterministic projection used for all sites (LLM Agent Offline)."
         )
