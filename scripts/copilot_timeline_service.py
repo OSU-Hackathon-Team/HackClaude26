@@ -20,6 +20,7 @@ class TimelineExplainResponse(BaseModel):
     treatment: str
     trajectories: dict[str, List[TimelinePoint]]
     summary: str
+    shap_values: dict[str, float] = Field(default_factory=dict)
 
 class CopilotTimelineService:
     def __init__(self):
@@ -80,10 +81,16 @@ class CopilotTimelineService:
                     status="success",
                     treatment=request.treatment,
                     trajectories={
-                        site: [TimelinePoint(**p) for p in pts] 
+                        site: [
+                            TimelinePoint(**p) if isinstance(p, dict) 
+                            else TimelinePoint(month=i*12, risk=float(p)) 
+                            for i, p in enumerate(pts)
+                        ] 
                         for site, pts in parsed_data.get("trajectories", {}).items()
+                        if isinstance(pts, list)
                     },
-                    summary=parsed_data.get("summary") or "Biological rationale unavailable — trajectory data computed successfully."
+                    summary=parsed_data.get("summary") or "Biological rationale unavailable — trajectory data computed successfully.",
+                    shap_values=parsed_data.get("shap_values") or {}
                 )
         except Exception as e:
             print(f"Anthropic SDK Initialization Error: {e}")
@@ -124,16 +131,19 @@ class CopilotTimelineService:
         
         JSON STRUCTURE (summary MUST come first):
         {{
-            "summary": "2-3 sentence Biological Rationale written for a clinical oncologist. Name the primary site ({request.primary_site}), the key driver mutations ({mutations_str}), and explain WHY {request.treatment} is expected to raise or lower metastatic risk over time. Connect to Seed-and-Soil biology. Be specific.",
+            "summary": "2-3 sentence Biological Rationale...",
+            "shap_values": {{
+                "genomic_mut_TP53": 0.045,
+                "clinical_site_breast": -0.02,
+                "demographic_age": 0.015
+            }},
             "trajectories": {{
-                "ORGAN_ID": [
-                    {{"month": 0, "risk": 0.XX}},
-                    {{"month": 12, "risk": 0.XX}},
-                    {{"month": 24, "risk": 0.XX}},
-                    {{"month": 36, "risk": 0.XX}}
-                ]
+                "ORGAN_ID": [...]
             }}
         }}
+
+        NOTE: Use "genomic_", "clinical_", or "demographic_" prefixes for shap_values keys.
+        Values should be in range [-0.5, 0.5] reflecting the absolute shift in probability.
         """
 
     def _extract_text(self, response: Any) -> str:

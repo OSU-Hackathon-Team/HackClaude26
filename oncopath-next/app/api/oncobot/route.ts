@@ -1,18 +1,22 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
-import dotenv from 'dotenv';
 import Anthropic from '@anthropic-ai/sdk';
 
 export async function POST(req: Request) {
   try {
-    // 1. Resolve and Load the User's Root .env Environment Safely
+    // 1. Resolve and Load the User's Root .env Environment Safely (Native Implementation)
     const rootEnvPath = path.resolve(process.cwd(), '../.env');
     if (fs.existsSync(rootEnvPath)) {
-        const envConfig = dotenv.parse(fs.readFileSync(rootEnvPath));
-        for (const k in envConfig) {
-            process.env[k] = envConfig[k];
-        }
+        const envText = fs.readFileSync(rootEnvPath, 'utf-8');
+        envText.split('\n').forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) return;
+            const [key, ...vals] = trimmed.split('=');
+            if (key && vals.length) {
+                process.env[key.trim()] = vals.join('=').trim().replace(/^["']|["']$/g, '');
+            }
+        });
     }
 
     const API_KEY = process.env.CLAUDE_API_KEY || process.env.ANTHROPIC_API_KEY;

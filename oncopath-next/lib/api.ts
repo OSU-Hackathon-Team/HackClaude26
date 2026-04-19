@@ -62,6 +62,7 @@ export interface SystemicSimulationResult {
   treatment?: string;
   prediction_id?: string;
   confidence_metrics?: Record<string, number>;
+  shap_values?: Record<string, number>;
 }
 
 export interface PredictionRequestOptions {
@@ -168,7 +169,8 @@ export function normalizeSystemicTimelineResponse(value: unknown): SystemicSimul
     summary: String(obj.summary || "Biological simulation complete."),
     treatment: String(obj.treatment || ""),
     prediction_id: String(obj.prediction_id || ""),
-    confidence_metrics: parseNumericMap(obj.confidence_metrics)
+    confidence_metrics: parseNumericMap(obj.confidence_metrics),
+    shap_values: parseNumericMap(obj.shap_values)
   };
 }
 

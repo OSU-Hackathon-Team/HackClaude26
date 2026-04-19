@@ -71,12 +71,18 @@ export function BodyDashboard() {
     (async () => {
       setLoading(true); setError(null);
       try {
-        const result = await simulateRisk(simulationProfile, { image: simulationImage });
+        const result = await simulateRisk(simulationProfile, simulationImage);
         if (!cancelled) { 
-          setPrediction(result); 
-          setRisks(result.risk_scores); 
+          // Align backend 'simulated_risks' with frontend 'risk_scores'
+          const risksMap = result.simulated_risks;
+          setPrediction({
+            source: "/simulate",
+            risk_scores: risksMap,
+            ...result
+          } as any); 
+          setRisks(risksMap); 
           // Default active organ to Primary Site if none selected
-          const primaryKey = Object.keys(result.risk_scores).find(k => k.startsWith('PRIMARY_'));
+          const primaryKey = Object.keys(risksMap).find(k => k.startsWith('PRIMARY_'));
           if (primaryKey && !activeOrganId) {
             setActiveOrganId(primaryKey);
           }
@@ -124,6 +130,12 @@ export function BodyDashboard() {
       .then(result => {
         setTrajectories(result.trajectories);
         setSimulationSummary(result.summary);
+        setPrediction(prev => prev ? {
+          ...prev,
+          summary: result.summary,
+          shap_values: result.shap_values,
+          confidence_metrics: result.confidence_metrics
+        } : null);
         setTimelineSource('backend');
         setIsTimelineLoading(false);
       })
