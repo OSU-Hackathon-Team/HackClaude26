@@ -1,47 +1,55 @@
-# Data Dictionary: OncoPath Project (Verified Headers)
+# Data Dictionary: Runtime + Modeling Fields
 
-This dictionary uses the **verified raw headers** from the MSK-MET (2021) study download, now consolidated in `data_clean.tsv`.
+_Last code-verified update: 2026-04-18_
 
-## 1. Core Clinical Features (The "Soil")
-These define the patient's baseline risk profile.
+This dictionary reflects fields actively used by the current API/frontend contracts and model artifacts.
 
-| Feature Name | Header in `data_clean.tsv` | Type | Possible Values |
-| :--- | :--- | :--- | :--- |
-| **Age** | `AGE_AT_SEQUENCING` | Numeric | Age (Years) at time of sequencing. |
-| **Sex** | `SEX` | Categorical | 'Female', 'Male'. |
-| **Primary Site** | `PRIMARY_SITE` | Categorical | Site of origin (e.g., 'Lung', 'Breast'). |
-| **Histology** | `CANCER_TYPE_DETAILED` | Categorical | Specific histological subtype. |
-| **OncoTree** | `ONCOTREE_CODE` | Categorical | Standardized cancer code (e.g., 'LUAD'). |
+## 1. Runtime profile fields (`/simulate`)
+| Field | Type | Notes |
+| :--- | :--- | :--- |
+| `profile.name` | string | Display/persistence identifier. |
+| `profile.age` | number | Used as `AGE_AT_SEQUENCING` feature. |
+| `profile.sex` | string | Encoded categorical feature. |
+| `profile.primary_site` | string | Encoded categorical feature. |
+| `profile.oncotree_code` | string | Encoded categorical feature. |
+| `profile.mutations` | object<string, int> | Mutation toggles/values keyed by gene. |
+| `image` | string \| null | Optional image (base64 or path), currently used for breast profile vision signal path. |
+| `doctor_id` | string \| null | Optional persistence linkage. |
 
-## 2. Genomic Drivers (The "Seed")
-Merged from the clinical files; gene-specific markers (TP53, etc.) reside in `data_mutations_extended.txt`.
+## 2. `/predict` request fields
+| Field | Type | Notes |
+| :--- | :--- | :--- |
+| `age_at_sequencing` | number | Clinical numeric input. |
+| `sex` | string | Clinical categorical input. |
+| `primary_site` | string | Clinical categorical input. |
+| `oncotree_code` | string | Clinical categorical input. |
+| `genomic_markers` | object<string, number> | Marker/value map used to build genomic vector. |
 
-| Feature Name | Header in `data_clean.tsv` | Type | Significance |
-| :--- | :--- | :--- | :--- |
-| **Mut. Count** | `MUTATION_COUNT` | Numeric | Total identified mutations. |
-| **TMB** | `TMB_NONSYNONYMOUS` | Numeric | Tumor Mutational Burden. |
-| **FGA** | `FGA` | Numeric | Fraction of Genome Altered. |
-| **MSI** | `MSI_SCORE` | Numeric | Microsatellite Instability. |
-| **Purity** | `TUMOR_PURITY` | Numeric | Control for sample cellularity. |
+## 3. Core model artifacts (loaded at API startup)
+| Artifact | Path | Purpose |
+| :--- | :--- | :--- |
+| Clinical encoder | `models/clinical_encoder.joblib` | Encodes sex/site/oncotree fields. |
+| Clinical scaler | `models/clinical_scaler.joblib` | Scales age field. |
+| Genomic feature index | `models/genomic_features.joblib` | Canonical feature order for mutation vector. |
+| Site models | `models/model_dmets_dx_*.joblib` | Organ/site risk classifiers (21 targets). |
+| Vision detector | `models/vision_detector.joblib` | Optional image-based conclusive signal stage. |
 
-## 3. Metastatic Target Labels (Targets)
-These columns indicate where the cancer was present at the time of the study record.
+## 4. Target/site keys currently modeled
+`DMETS_DX_ADRENAL_GLAND`, `DMETS_DX_BILIARY_TRACT`, `DMETS_DX_BLADDER_UT`, `DMETS_DX_BONE`, `DMETS_DX_BOWEL`, `DMETS_DX_BREAST`, `DMETS_DX_CNS_BRAIN`, `DMETS_DX_DIST_LN`, `DMETS_DX_FEMALE_GENITAL`, `DMETS_DX_HEAD_NECK`, `DMETS_DX_INTRA_ABDOMINAL`, `DMETS_DX_KIDNEY`, `DMETS_DX_LIVER`, `DMETS_DX_LUNG`, `DMETS_DX_MALE_GENITAL`, `DMETS_DX_MEDIASTINUM`, `DMETS_DX_OVARY`, `DMETS_DX_PLEURA`, `DMETS_DX_PNS`, `DMETS_DX_SKIN`, `DMETS_DX_UNSPECIFIED`.
 
-> [!IMPORTANT]
-> **Encoding:** These columns use **'Yes'** and **'No'** string labels. In Phase 1 modeling, we will map these to `1` (Yes) and `0` (No).
+## 5. Timeline assistant payload fields
+| Field | Type | Constraints in code |
+| :--- | :--- | :--- |
+| `patient_summary.age` | int | 0..130 |
+| `patient_summary.primary_site` | string | non-empty |
+| `patient_summary.key_mutations` | string[] | non-empty strings, max 50 |
+| `selected_organ` | string | non-empty |
+| `treatment` | string | non-empty |
+| `timeline_points[].month` | int | 0..120, ascending unique |
+| `timeline_points[].risk` | float | 0.0..1.0 |
+| `active_month` | int | must match one timeline point month |
 
-| Target Site | Column Header |
-| :--- | :--- |
-| **Liver** | `DMETS_DX_LIVER` |
-| **Lung** | `DMETS_DX_LUNG` |
-| **Bone** | `DMETS_DX_BONE` |
-| **Brain** | `DMETS_DX_CNS_BRAIN` |
-| **Adrenal** | `DMETS_DX_ADRENAL_GLAND` |
-| **Pleura** | `DMETS_DX_PLEURA` |
-
-## 4. Outcomes
-- **Survival:** `OS_MONTHS`, `OS_STATUS`.
-- **Burden:** `MET_COUNT`, `MET_SITE_COUNT`.
-
----
-*Verified against `data_clean.tsv` - 2026-02-25*
+## 6. Training dataset conventions still referenced in scripts
+- Clinical base columns: `AGE_AT_SEQUENCING`, `SEX`, `PRIMARY_SITE`, `ONCOTREE_CODE`
+- Target columns: `DMETS_DX_*` with legacy `"Yes"/"No"` labels mapped to `1/0`
+- Additional genomic numeric columns are discovered dynamically during training and serialized into `genomic_features.joblib`
