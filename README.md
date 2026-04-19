@@ -1,6 +1,6 @@
 # OncoPath: Multimodal Cancer Metastasis Risk Prediction
 
-![OncoPath Hero Banner](data/slides/oncopath_hero.png)
+![OncoPath Hero Banner](data/oncopath_hero.png)
 
 <p align="center">
   <strong>Transforming Genomic Complexity into Clinical Insight with 3D Anatomical Visualizations and Multimodal AI.</strong>
@@ -31,28 +31,7 @@ OncoPath is a state-of-the-art AI-driven platform designed to predict organ-spec
 
 ## 🏗️ System Architecture
 
-```mermaid
-graph TD
-    subgraph "Frontend (Next.js)"
-        A[3D Anatomical Viewer] --- B[Dashboard UI]
-        B --- C[OncoBot AI Chat]
-    end
-
-    subgraph "Backend (FastAPI)"
-        D[Inference Engine] --- E[XGBoost Ensemble]
-        D --- F[SHAP Interpretability]
-        G[Vision Encoder] --- H[Phikon/PyTorch]
-    end
-
-    subgraph "Data & Storage"
-        I[(Supabase DB)] --- D
-        J[MSK-MET Dataset] --- E
-    end
-
-    B <--> D
-    C <--> |Anthropic Claude 3.5| K[Clinical Knowledge Base]
-    H -.-> |Pathology Slides| G
-```
+![OncoPath System Architecture](data/architecture.png)
 
 ---
 
