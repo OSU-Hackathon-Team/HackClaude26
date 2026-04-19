@@ -237,8 +237,8 @@ export function TimelinePanel({
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-amber-500/30 bg-amber-950/30 px-3 py-2 text-[10px] text-amber-200">
-              No baseline risk available for this organ selection.
+            <div className="rounded-lg border border-slate-800/40 bg-slate-900/20 px-3 py-2 text-[10px] text-slate-500 italic">
+              Baseline risk data unavailable for selected site.
             </div>
           )}
         </div>
@@ -272,10 +272,9 @@ export function TimelinePanel({
               </p>
             </div>
           ) : baselineRisk === null ? (
-            <div className="h-[220px] rounded-lg border border-amber-500/30 bg-amber-950/20 flex items-center justify-center px-6 text-center gap-2">
-              <AlertCircle size={14} className="text-amber-300" />
-              <p className="text-xs text-amber-100">
-                Selected organ has no baseline risk. Choose another organ with a valid risk score.
+            <div className="h-[220px] rounded-lg border border-slate-800/40 bg-slate-900/10 flex items-center justify-center px-6 text-center">
+              <p className="text-xs text-slate-500 italic">
+                No projection curve available for this profile.
               </p>
             </div>
           ) : isProjectionLoading ? (

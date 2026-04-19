@@ -220,23 +220,38 @@ function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: str
     geom.computeVertexNormals();
   }
 
-  const color = region.includes('Arteries') ? '#ef4444' :
-    region.includes('Veins') ? '#3b82f6' :
-      region.includes('Nerves') ? '#fbbf24' :
-        region.includes('Bones') ? '#e5decd' :
-          region.includes('Muscles') ? '#a33327' :
-            region.includes('Skin') ? '#d4a574' : '#f87171';
+  // Anatomically accurate color palette
+  const getColor = () => {
+    if (region.includes('Arteries')) return '#ef4444'; // Bright arterial red
+    if (region.includes('Veins')) return '#1e40af';     // Deep venous blue
+    if (region.includes('Nerves')) return '#eab308';    // Nerve yellow
+    if (region.includes('Bones')) return '#f5f5f0';     // Ivory bone
+    if (region.includes('Muscles')) return '#8b0000';   // Deep muscle crimson
+    if (region.includes('Skin')) return '#d4a574';      // Natural skin tone
+    return '#f43f5e'; // Default organ pink
+  };
 
   const mat = new THREE.MeshPhysicalMaterial({
-    color: color,
-    roughness: region.includes('Skin') ? 0.3 : 0.6,
-    metalness: 0.1,
+    color: getColor(),
+    roughness: region.includes('Bones') ? 0.9 : 0.45,
+    metalness: 0.05,
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: 1.0,
+    opacity: region.includes('Skin') ? skinOpacity : 1.0,
     depthWrite: true,
+    // Add biological realism
+    sheen: region.includes('Bones') || region.includes('Skin') ? 0 : 0.8,
+    sheenRoughness: 0.2,
+    sheenColor: new THREE.Color('#ffffff'),
+    ior: 1.45, // Soft tissue IOR
+    thickness: 0.5,
   });
 
+  if (region.includes('Arteries')) {
+    mat.emissive = new THREE.Color('#ef4444');
+    mat.emissiveIntensity = 0.2;
+  }
+  
   const mesh = new THREE.Mesh(geom, mat);
   mesh.name = region;
   mesh.userData = { isBaseMesh: true, region: region };
