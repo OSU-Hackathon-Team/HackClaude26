@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "oncopath-next": "file:oncopath-next"
+  }
+}
