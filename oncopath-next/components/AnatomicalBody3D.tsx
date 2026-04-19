@@ -506,6 +506,28 @@ function AnatomyModelRawJSON({
 }) {
   const [meshes, setMeshes] = useState<THREE.Mesh[]>([]);
   const [progress, setProgress] = useState(0);
+
+  const getOrganIdFromRegion = (region: string): string | null => {
+    const r = region.toLowerCase();
+    if (r.includes('lungs')) return 'DMETS_DX_LUNG';
+    if (r.includes('heart')) return 'SYS_HEART';
+    if (r.includes('brainstem')) return 'DMETS_DX_CNS_BRAIN';
+    if (r.includes('nerves')) return 'DMETS_DX_PNS';
+    if (r.includes('spinal nerves')) return 'SYS_SPINAL_NERVES';
+    if (r.includes('bladder')) return 'DMETS_DX_BLADDER_UT';
+    if (r.includes('gastrointestinal')) {
+      if (r.includes('liver')) return 'DMETS_DX_LIVER';
+      if (r.includes('kidney')) return 'DMETS_DX_KIDNEY';
+      if (r.includes('biliary')) return 'DMETS_DX_BILIARY_TRACT';
+      return 'DMETS_DX_BOWEL';
+    }
+    if (r.includes('muscles')) return 'SYS_MUSCLES';
+    if (r.includes('arteries')) return 'SYS_ARTERIES';
+    if (r.includes('veins')) return 'SYS_VEINS';
+    if (r.includes('bones')) return 'DMETS_DX_BONE';
+    if (r.includes('skin')) return 'DMETS_DX_SKIN';
+    return null;
+  };
   
   useEffect(() => {
     let mounted = true;
@@ -742,6 +764,14 @@ function AnatomyModelRawJSON({
              onPointerOut={(e: any) => {
                document.body.style.cursor = 'auto';
              }}
+             onClick={(e: any) => {
+                e.stopPropagation();
+                const id = getOrganIdFromRegion(m.name);
+                if (id) {
+                   const meta = ANATOMY_MAPPING_3D[id];
+                   onOrganSelect?.(id, meta?.label || id, e.clientX, e.clientY);
+                }
+             }}
           />
         ))}
 
@@ -901,6 +931,20 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
     return allOrganMarkers.filter(m => m.prob > 0.03);
   }, [allOrganMarkers]);
 
+  const handleInternalSelect = (id: string, name: string, x: number, y: number) => {
+    const marker = allOrganMarkers.find(m => m.id === id);
+    if (marker) {
+      setSelectedStructure({
+        id: marker.id,
+        name: marker.meta.label,
+        system: marker.meta.system,
+        isMarker: true,
+        position: new THREE.Vector3(...marker.meta.position).add(new THREE.Vector3(0, -1, 0))
+      });
+    }
+    onOrganSelect?.(id, name, x, y);
+  };
+
   return (
     <div className="w-full h-full bg-zinc-950 relative overflow-hidden">
       
@@ -929,7 +973,7 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
                  visibleMarkers={visibleMarkers}
                  hoveredOrgan={hoveredOrgan}
                  setHoveredOrgan={setHoveredOrgan}
-                 onOrganSelect={onOrganSelect}
+                 onOrganSelect={handleInternalSelect}
               />
               {selectedStructure && PROCEDURAL_ORGANS[selectedStructure.id] && (
                  <ProceduralOrgan id={selectedStructure.id} />
@@ -938,7 +982,7 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
         </group>
         
         <Particles />
-        <OrbitControls makeDefault enablePan={true} enableZoom={true} enableRotate={false} minDistance={1} maxDistance={20} minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} enableDamping dampingFactor={0.05} autoRotate={false} />
+        <OrbitControls makeDefault enablePan={true} enableZoom={true} enableRotate={true} minDistance={1} maxDistance={20} enableDamping dampingFactor={0.05} autoRotate={false} />
       </Canvas>
       </div>
 

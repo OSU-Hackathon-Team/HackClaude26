@@ -53,14 +53,15 @@ class CopilotTimelineService:
 
         try:
             client = AsyncAnthropic(api_key=claude_key.strip())
-            target_models = ["claude-sonnet-4-6", "claude-haiku-4-0"]
+            target_models = ["claude-haiku-4-5"]
             
             print(f"Starting Direct Claude API attempt (Standard API) with {len(significant_risks)} focus sites...")
+            response = None
             for model_id in target_models:
                 try:
                     response = await client.messages.create(
                         model=model_id,
-                        max_tokens=2000,
+                        max_tokens=3500,
                         messages=[{"role": "user", "content": self._build_prompt(filtered_request)}]
                     )
                     print(f"Claude API Success with {model_id}!")
@@ -71,7 +72,7 @@ class CopilotTimelineService:
                     print(f"Claude API Error [{model_id}]: {e}")
                     break 
             
-            if response:
+            if response is not None:
                 raw_content = response.content[0].text
                 parsed_data = self._parse_json(raw_content)
                 
@@ -82,7 +83,7 @@ class CopilotTimelineService:
                         site: [TimelinePoint(**p) for p in pts] 
                         for site, pts in parsed_data.get("trajectories", {}).items()
                     },
-                    summary=parsed_data.get("summary", "Clinical systemic simulation complete.")
+                    summary=parsed_data.get("summary") or "Biological rationale unavailable — trajectory data computed successfully."
                 )
         except Exception as e:
             print(f"Anthropic SDK Initialization Error: {e}")
@@ -91,39 +92,47 @@ class CopilotTimelineService:
 
     def _build_prompt(self, request: TimelineExplainRequest) -> str:
         risk_context = "\n".join([f"- {k}: {v:.2f}" for k, v in request.risks.items() if v > 0.05])
+        top_risks = sorted(request.risks.items(), key=lambda x: x[1], reverse=True)[:3]
+        top_risk_summary = ", ".join([f"{k} ({v:.0%})" for k, v in top_risks if v > 0.01])
+        mutations_str = ", ".join(request.mutations) if request.mutations else "None detected"
+        focus_organ = request.selected_organ or "systemic"
         
         return f"""
-        You are an advanced Oncology Simulation Agent. 
-        Target: Predict the systemic metastatic risk trajectory across ALL sites over {request.months} months.
+        You are an advanced Oncology Simulation Agent applying the \"Seed and Soil\" theory of metastasis.
         
         PATIENT DATA:
         - Primary Site: {request.primary_site}
-        - Mutations: {", ".join(request.mutations)}
+        - Active Mutations (Seed): {mutations_str}
+        - Top Metastatic Risks (Soil): {top_risk_summary}
+        - Focus Organ: {focus_organ}
         
-        CURRENT RISK SNAPSHOT (Soil):
+        CURRENT RISK SNAPSHOT:
         {risk_context}
         
         TREATMENT PLAN:
         - Selection: {request.treatment}
+        - Duration: {request.months} months
         
-        INSTRUCTIONS:
-        1. Consider the biological synergy between mutations (Seed) and treatment.
-        2. Evaluate how this treatment affects EVERY metastatic site listed. Some sites may respond better than others.
-        3. Determine if the treatment is localized or systemic.
-        4. Generate a temporal risk curve for each high-risk site from month 0 to {request.months}.
-        5. Respond ONLY with a valid JSON object.
+        SIMULATION INSTRUCTIONS:
+        1. Evaluate how {request.treatment} affects each metastatic site given the active mutations ({mutations_str}).
+        2. Determine if this treatment is localized (organ-specific) or systemic (whole-body).
+        3. Consider known mutation-treatment interactions (e.g., TP53 loss reduces chemo sensitivity; PIK3CA responds to PI3K inhibitors; KRAS drives liver tropism via portal vein).
+        4. Generate a temporal risk trajectory for EACH site from month 0 to {request.months} (use 12-month intervals).
+        5. Risk values must stay in [0.0, 1.0].
+        6. CRITICAL: Respond ONLY with a valid JSON object — no markdown, no prose outside the JSON.
+        7. CRITICAL: Write the "summary" field FIRST in the JSON, before "trajectories". This ensures it is never truncated.
         
-        JSON STRUCTURE:
+        JSON STRUCTURE (summary MUST come first):
         {{
+            "summary": "2-3 sentence Biological Rationale written for a clinical oncologist. Name the primary site ({request.primary_site}), the key driver mutations ({mutations_str}), and explain WHY {request.treatment} is expected to raise or lower metastatic risk over time. Connect to Seed-and-Soil biology. Be specific.",
             "trajectories": {{
                 "ORGAN_ID": [
                     {{"month": 0, "risk": 0.XX}},
                     {{"month": 12, "risk": 0.XX}},
-                    ...
-                ],
-                ...
-            }},
-            "summary": "1-3 sentence biological rationale for the whole-body response."
+                    {{"month": 24, "risk": 0.XX}},
+                    {{"month": 36, "risk": 0.XX}}
+                ]
+            }}
         }}
         """
 

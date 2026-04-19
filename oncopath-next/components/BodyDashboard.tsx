@@ -56,6 +56,7 @@ export function BodyDashboard() {
   const [trajectories, setTrajectories] = useState<Record<string, any[]>>({});
   const [simulationSummary, setSimulationSummary] = useState<string>("");
   const [timelineSource, setTimelineSource] = useState<'local' | 'backend'>('local');
+  const [isTimelineLoading, setIsTimelineLoading] = useState(false);
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
   const [isParametersOpen, setIsParametersOpen] = useState(false);
 
@@ -97,13 +98,16 @@ export function BodyDashboard() {
     setProj12m(at12?.risk);
   }, [trajectories, activeOrganId, popover?.organId, risks]);
 
-  // ── Long-range timeline fetch (3.5 Sonnet Driven) ─────────────────────── //
+  // ── Long-range timeline fetch (Claude-driven) ─────────────────────────── //
   useEffect(() => {
     const activeId = activeOrganId || popover?.organId || Object.keys(risks).find(k => k.startsWith('PRIMARY_'));
     if (!activeId || risks[activeId] === undefined) return;
     
     const ctrl = new AbortController();
-    setTimelineSource('local'); // Default to local while fetching
+    // Reset summary + mark projection as loading
+    setTimelineSource('local');
+    setIsTimelineLoading(true);
+    setSimulationSummary("Analyzing genomic-treatment interactions — computing biological rationale…");
 
     requestPredictTimeline(
       simulationProfile, 
@@ -117,10 +121,11 @@ export function BodyDashboard() {
         setTrajectories(result.trajectories);
         setSimulationSummary(result.summary);
         setTimelineSource('backend');
+        setIsTimelineLoading(false);
       })
       .catch(err => {
+        if ((err as Error)?.name === 'AbortError') return;
         console.error('Temporal Fetch Failed:', err);
-        // Fallback to local deterministic projection for the whole body
         const fallbackTrajectories: Record<string, any[]> = {};
         Object.entries(risks).forEach(([site, baseline]) => {
           fallbackTrajectories[site] = generateLocalTimelineProjection({
@@ -131,8 +136,9 @@ export function BodyDashboard() {
           });
         });
         setTrajectories(fallbackTrajectories);
-        setSimulationSummary("Simulated systemic projection (Experimental).");
+        setSimulationSummary("Deterministic systemic projection applied (AI agent offline).");
         setTimelineSource('local');
+        setIsTimelineLoading(false);
       });
 
     return () => ctrl.abort();
@@ -282,6 +288,7 @@ export function BodyDashboard() {
               simulationSummary={simulationSummary}
               baselineRisk={risks[activeOrganId || Object.keys(risks).find(k => k.startsWith('PRIMARY_')) || ''] || null}
               prediction={prediction}
+              isProjectionLoading={isTimelineLoading}
               onOrganChange={handleManualOrganChange}
               onTreatmentChange={setSelectedTreatment}
               onMonthChange={setSelectedMonth}

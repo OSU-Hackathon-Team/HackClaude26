@@ -210,6 +210,7 @@ function normalizeSimulationResponse(value: unknown): PredictionSnapshot {
   return {
     source: "/simulate",
     risk_scores,
+    shap_values: parseNumericMap(obj.shap_values),
   };
 }
 

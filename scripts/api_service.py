@@ -260,6 +260,34 @@ def _build_demo_shap_values(request: PredictRequest) -> Dict[str, float]:
 
     return shap_values
 
+def _build_simulate_shap_values(
+    age: float,
+    sex: str,
+    primary_site: str,
+    oncotree_code: str,
+    mutations: Dict[str, int]
+) -> Dict[str, float]:
+    """Deterministic SHAP-style attributions for the /simulate endpoint."""
+    shap_values: Dict[str, float] = {
+        f"age_{int(round(age))}": round((age - 60.0) / 200.0, 4),
+        f"sex_{sex.lower()}": round(_deterministic_feature_weight(sex, scale=2000.0), 4),
+        f"primary_site_{primary_site.lower().replace(' ', '_')}": round(
+            _deterministic_feature_weight(primary_site, scale=1200.0), 4
+        ),
+        f"oncotree_{oncotree_code.lower()}": round(
+            _deterministic_feature_weight(oncotree_code, scale=1200.0), 4
+        ),
+    }
+    for marker_name, marker_value in sorted(mutations.items())[:10]:
+        if marker_value == 0:
+            continue
+        marker_weight = abs(_deterministic_feature_weight(marker_name, scale=2500.0))
+        marker_sign = 1.0 if marker_value > 0 else -1.0
+        shap_values[marker_name] = round(
+            marker_sign * (0.015 + marker_weight * min(abs(float(marker_value)), 1.0)), 4
+        )
+    return shap_values
+
 def _normalize_treatment_name(treatment: str) -> str:
     return treatment.strip().upper().replace("-", "_").replace(" ", "_")
 
@@ -417,8 +445,17 @@ def simulate_risk(request: MultimodalRequest):
             except Exception as db_e:
                 print(f"Database Persistence Warning: {db_e}")
 
+        shap_values = _build_simulate_shap_values(
+            age=profile.age,
+            sex=profile.sex,
+            primary_site=profile.primary_site,
+            oncotree_code=profile.oncotree_code,
+            mutations=profile.mutations,
+        )
+
         return {
             "simulated_risks": risks,
+            "shap_values": shap_values,
             "visual_lift": round(total_lift / len(models), 4) if has_image else 0.0,
             "has_visual_data": has_image,
             "vision_confidence": round(vision_confidence, 4),

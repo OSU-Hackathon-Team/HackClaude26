@@ -25,6 +25,7 @@ interface TimelinePanelProps {
   timeline: TimelinePoint[];
   timelineSource: 'local' | 'backend';
   simulationSummary?: string;
+  isProjectionLoading?: boolean;
   baselineRisk: number | null;
   prediction: PredictionSnapshot | null;
   onOrganChange: (organ: string) => void;
@@ -51,6 +52,7 @@ export function TimelinePanel({
   timeline,
   timelineSource,
   simulationSummary,
+  isProjectionLoading = false,
   baselineRisk,
   prediction,
   onOrganChange,
@@ -249,6 +251,79 @@ export function TimelinePanel({
                 Selected organ has no baseline risk. Choose another organ with a valid risk score.
               </p>
             </div>
+          ) : isProjectionLoading ? (
+            /* ── Animated skeleton while Claude computes the projection ── */
+            <div className="rounded-lg border border-blue-500/20 bg-slate-950/60 p-2 relative overflow-hidden">
+              <style>{`
+                @keyframes wave-drift {
+                  0%   { transform: translateX(0);   }
+                  100% { transform: translateX(-50%); }
+                }
+                @keyframes scan-sweep {
+                  0%   { transform: translateX(0);   opacity: 0.8; }
+                  90%  { transform: translateX(552px); opacity: 0.8; }
+                  100% { transform: translateX(552px); opacity: 0; }
+                }
+                @keyframes label-pulse {
+                  0%, 100% { opacity: 0.4; }
+                  50%       { opacity: 1;   }
+                }
+              `}</style>
+              <svg
+                viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+                className="w-full h-[220px]"
+                aria-label="Computing projection…"
+              >
+                {/* Ghost grid lines */}
+                {[0, 0.25, 0.5, 0.75, 1].map((level) => {
+                  const y = CHART_HEIGHT - CHART_PADDING_Y - level * (CHART_HEIGHT - CHART_PADDING_Y * 2);
+                  return (
+                    <line key={level} x1={CHART_PADDING_X} y1={y}
+                      x2={CHART_WIDTH - CHART_PADDING_X} y2={y}
+                      stroke="rgba(100,116,139,0.12)" strokeWidth={1} />
+                  );
+                })}
+
+                {/* Animated sine-wave skeleton — two copies tiled so loop is seamless */}
+                <g style={{ animation: 'wave-drift 2.8s linear infinite' }}>
+                  {[0, 1].map((offset) => {
+                    const W = CHART_WIDTH - CHART_PADDING_X * 2;
+                    const pts = Array.from({ length: 81 }, (_, i) => {
+                      const x = CHART_PADDING_X + offset * W + (i / 80) * W;
+                      const y = CHART_HEIGHT / 2 +
+                        Math.sin((i / 80) * Math.PI * 4) * 28 +
+                        Math.sin((i / 80) * Math.PI * 7 + 1) * 12;
+                      return `${x},${y}`;
+                    }).join(' ');
+                    return (
+                      <polyline key={offset} fill="none"
+                        stroke="rgba(96,165,250,0.25)" strokeWidth={2.5}
+                        strokeLinecap="round" strokeLinejoin="round"
+                        points={pts} />
+                    );
+                  })}
+                </g>
+
+                {/* Scanning vertical beam */}
+                <line
+                  x1={CHART_PADDING_X} y1={CHART_PADDING_Y}
+                  x2={CHART_PADDING_X} y2={CHART_HEIGHT - CHART_PADDING_Y}
+                  stroke="rgba(147,197,253,0.7)" strokeWidth={1.5} strokeDasharray="4 4"
+                  style={{ animation: 'scan-sweep 2s ease-in-out infinite' }}
+                />
+
+                {/* Central label */}
+                <text
+                  x={CHART_WIDTH / 2} y={CHART_HEIGHT / 2 + 5}
+                  textAnchor="middle" fontSize={11}
+                  fill="rgba(148,163,184,1)"
+                  fontFamily="ui-monospace, monospace"
+                  style={{ animation: 'label-pulse 1.6s ease-in-out infinite' }}
+                >
+                  Computing projection…
+                </text>
+              </svg>
+            </div>
           ) : !chart ? (
             <div className="h-[220px] rounded-lg border border-slate-700/50 bg-slate-950/50 flex items-center justify-center">
               <p className="text-xs text-slate-400">Projection curve not available.</p>
@@ -319,6 +394,7 @@ export function TimelinePanel({
         <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4 space-y-3">
           <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Explainability</h3>
 
+          {/* ── Metadata ──────────────────────────────────────────────── */}
           <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3 space-y-1">
             <div className="flex justify-between text-[10px] text-slate-400">
               <span>Prediction ID</span>
@@ -330,6 +406,62 @@ export function TimelinePanel({
             </div>
           </div>
 
+          {/* ── SHAP Feature Attribution ─────────────────────────────── */}
+          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-3">
+              SHAP Feature Attribution
+            </div>
+            {shapEntries.length ? (
+              <div className="space-y-2">
+                {(() => {
+                  const maxAbs = Math.max(...shapEntries.map(([, v]) => Math.abs(v)), 0.001);
+                  return shapEntries.map(([key, value]) => {
+                    const pct = Math.abs(value) / maxAbs;
+                    const isPositive = value >= 0;
+                    const label = key
+                      .replace(/^(primary_site_|oncotree_|age_|sex_)/, (m) =>
+                        m === 'primary_site_' ? 'Site · ' :
+                        m === 'oncotree_' ? 'Code · ' :
+                        m === 'age_' ? 'Age · ' :
+                        m === 'sex_' ? 'Sex · ' : m
+                      )
+                      .replace(/_/g, ' ')
+                      .replace(/\b\w/g, (c) => c.toUpperCase());
+                    return (
+                      <div key={key} className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[9px] text-slate-300 truncate max-w-[140px]" title={label}>
+                            {label}
+                          </span>
+                          <span className={`text-[9px] font-mono tabular-nums ${isPositive ? 'text-rose-400' : 'text-teal-400'}`}>
+                            {isPositive ? '+' : ''}{value.toFixed(4)}
+                          </span>
+                        </div>
+                        {/* Signed waterfall bar */}
+                        <div className="relative h-1.5 w-full rounded-full bg-slate-800/80 overflow-hidden">
+                          <div
+                            className={`absolute top-0 h-full rounded-full transition-all duration-700 ${
+                              isPositive
+                                ? 'left-0 bg-gradient-to-r from-rose-600 to-rose-400'
+                                : 'right-0 bg-gradient-to-l from-teal-600 to-teal-400'
+                            }`}
+                            style={{ width: `${Math.round(pct * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+                <p className="text-[9px] text-slate-600 pt-1 italic">
+                  Red = risk driver · Teal = protective factor
+                </p>
+              </div>
+            ) : (
+              <p className="text-[10px] text-slate-500">Run a simulation to generate feature attributions.</p>
+            )}
+          </div>
+
+          {/* ── Confidence Metrics ───────────────────────────────────── */}
           <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
             <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
               Confidence Metrics
@@ -348,11 +480,22 @@ export function TimelinePanel({
             )}
           </div>
 
+          {/* ── Biological Rationale ─────────────────────────────────── */}
           <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
-              Biological Rationale
+            <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
+              <span>Biological Rationale</span>
+              {simulationSummary?.includes('computing') || simulationSummary?.includes('Analyzing') ? (
+                <span className="flex items-center gap-1 text-blue-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse inline-block" />
+                  Computing…
+                </span>
+              ) : null}
             </div>
-            <p className="text-[10px] text-zinc-300 leading-relaxed italic">
+            <p className={`text-[10px] leading-relaxed italic ${
+              simulationSummary?.includes('computing') || simulationSummary?.includes('Analyzing')
+                ? 'text-slate-500 animate-pulse'
+                : 'text-zinc-300'
+            }`}>
               {simulationSummary || "Analyzing potential genomic-treatment synergy..."}
             </p>
           </div>
