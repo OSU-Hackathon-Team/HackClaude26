@@ -36,9 +36,9 @@ interface TimelinePanelProps {
 }
 
 const CHART_WIDTH = 640;
-const CHART_HEIGHT = 220;
-const CHART_PADDING_X = 44;
-const CHART_PADDING_Y = 24;
+const CHART_HEIGHT = 240;
+const CHART_PADDING_X = 56;  // wider to fit Y-axis labels
+const CHART_PADDING_Y = 28;
 const TREATMENT_IDS = new Set<string>(TIMELINE_TREATMENT_PRESETS.map((preset) => preset.id));
 
 function asPercent(risk: number): string {
@@ -79,7 +79,7 @@ export function TimelinePanel({
     }
 
     const toX = (month: number) =>
-      CHART_PADDING_X + (month / Math.max(maxMonth, 1)) * (CHART_WIDTH - CHART_PADDING_X * 2);
+      CHART_PADDING_X + (month / Math.max(maxMonth, 1)) * (CHART_WIDTH - CHART_PADDING_X - 16);
     const toY = (risk: number) =>
       CHART_HEIGHT - CHART_PADDING_Y - risk * (CHART_HEIGHT - CHART_PADDING_Y * 2);
 
@@ -102,7 +102,11 @@ export function TimelinePanel({
             y: toY(activePoint.risk),
           };
 
-    return { linePoints, areaPath, marker, toX, toY };
+    // Peak risk point
+    const peakPoint = timeline.reduce((best, pt) => pt.risk > best.risk ? pt : best, timeline[0]);
+    const peak = { x: toX(peakPoint.month), y: toY(peakPoint.risk), risk: peakPoint.risk };
+
+    return { linePoints, areaPath, marker, toX, toY, peak };
   }, [activePoint, maxMonth, timeline]);
 
   const monthTicks = useMemo(() => {
@@ -336,61 +340,170 @@ export function TimelinePanel({
             <div className="rounded-lg border border-slate-700/50 bg-slate-950/40 p-2">
               <svg
                 viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
-                className="w-full h-[220px]"
+                className="w-full h-[260px]"
                 role="img"
                 aria-label="Risk projection over time"
               >
+                <defs>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="rgba(239,68,68,0.28)" />
+                    <stop offset="55%"  stopColor="rgba(59,130,246,0.18)" />
+                    <stop offset="100%" stopColor="rgba(59,130,246,0.02)" />
+                  </linearGradient>
+                  <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%"   stopColor="rgb(96,165,250)" />
+                    <stop offset="60%"  stopColor="rgb(129,140,248)" />
+                    <stop offset="100%" stopColor="rgb(167,139,250)" />
+                  </linearGradient>
+                </defs>
+
+                {/* ── Y-axis grid lines + labels ─────────────────────── */}
                 {[0, 0.25, 0.5, 0.75, 1].map((level) => (
-                  <line
-                    key={`grid-${level}`}
-                    x1={CHART_PADDING_X}
-                    y1={chart.toY(level)}
-                    x2={CHART_WIDTH - CHART_PADDING_X}
-                    y2={chart.toY(level)}
-                    stroke="rgba(100,116,139,0.22)"
-                    strokeWidth={1}
-                  />
+                  <g key={`y-${level}`}>
+                    <line
+                      x1={CHART_PADDING_X} y1={chart.toY(level)}
+                      x2={CHART_WIDTH - 16}  y2={chart.toY(level)}
+                      stroke={level === 0 ? 'rgba(100,116,139,0.35)' : 'rgba(100,116,139,0.18)'}
+                      strokeWidth={level === 0 ? 1.5 : 1}
+                      strokeDasharray={level === 0 ? '' : '3 4'}
+                    />
+                    <text
+                      x={CHART_PADDING_X - 6} y={chart.toY(level) + 4}
+                      textAnchor="end" fontSize={9.5}
+                      fontFamily="ui-monospace,monospace"
+                      fill={level === 0 ? 'rgba(100,116,139,0.6)' : 'rgba(148,163,184,0.75)'}
+                    >
+                      {`${Math.round(level * 100)}%`}
+                    </text>
+                  </g>
                 ))}
+
+                {/* ── Y-axis spine ──────────────────────────────────── */}
+                <line
+                  x1={CHART_PADDING_X} y1={CHART_PADDING_Y - 4}
+                  x2={CHART_PADDING_X} y2={CHART_HEIGHT - CHART_PADDING_Y}
+                  stroke="rgba(100,116,139,0.4)" strokeWidth={1.5}
+                />
+
+                {/* ── X-axis tick lines + month labels ─────────────── */}
                 {monthTicks.map((tick) => (
-                  <line
-                    key={`tick-${tick}`}
-                    x1={chart.toX(tick)}
-                    y1={CHART_HEIGHT - CHART_PADDING_Y}
-                    x2={chart.toX(tick)}
-                    y2={CHART_PADDING_Y}
-                    stroke="rgba(100,116,139,0.2)"
-                    strokeWidth={1}
-                  />
+                  <g key={`x-${tick}`}>
+                    <line
+                      x1={chart.toX(tick)} y1={CHART_HEIGHT - CHART_PADDING_Y}
+                      x2={chart.toX(tick)} y2={CHART_PADDING_Y - 4}
+                      stroke="rgba(100,116,139,0.15)" strokeWidth={1}
+                    />
+                    <line
+                      x1={chart.toX(tick)} y1={CHART_HEIGHT - CHART_PADDING_Y}
+                      x2={chart.toX(tick)} y2={CHART_HEIGHT - CHART_PADDING_Y + 4}
+                      stroke="rgba(100,116,139,0.5)" strokeWidth={1.5}
+                    />
+                    <text
+                      x={chart.toX(tick)} y={CHART_HEIGHT - CHART_PADDING_Y + 14}
+                      textAnchor="middle" fontSize={9}
+                      fontFamily="ui-monospace,monospace"
+                      fill="rgba(100,116,139,0.8)"
+                    >
+                      {tick === 0 ? 'Dx' : `M${tick}`}
+                    </text>
+                  </g>
                 ))}
-                <path d={chart.areaPath} fill="rgba(59,130,246,0.14)" />
+
+                {/* ── Baseline risk reference line ──────────────────── */}
+                {baselineRisk !== null && (
+                  <>
+                    <line
+                      x1={CHART_PADDING_X} y1={chart.toY(baselineRisk)}
+                      x2={CHART_WIDTH - 16} y2={chart.toY(baselineRisk)}
+                      stroke="rgba(251,191,36,0.55)" strokeWidth={1.2}
+                      strokeDasharray="5 4"
+                    />
+                    <text
+                      x={CHART_WIDTH - 14} y={chart.toY(baselineRisk) + 4}
+                      textAnchor="end" fontSize={8.5}
+                      fontFamily="ui-monospace,monospace"
+                      fill="rgba(251,191,36,0.8)"
+                    >
+                      Base
+                    </text>
+                  </>
+                )}
+
+                {/* ── Area fill + projection line ───────────────────── */}
+                <path d={chart.areaPath} fill="url(#areaGrad)" />
                 <polyline
                   fill="none"
-                  stroke="rgb(96,165,250)"
-                  strokeWidth={3}
+                  stroke="url(#lineGrad)"
+                  strokeWidth={2.5}
                   points={chart.linePoints}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                {chart.marker && (
+
+                {/* ── Peak risk annotation ──────────────────────────── */}
+                {chart.peak.risk > (baselineRisk ?? 0) + 0.03 && (
+                  <g>
+                    <circle cx={chart.peak.x} cy={chart.peak.y} r={3.5}
+                      fill="rgba(239,68,68,0.9)" />
+                    <text
+                      x={chart.peak.x} y={chart.peak.y - 9}
+                      textAnchor="middle" fontSize={8.5}
+                      fontFamily="ui-monospace,monospace"
+                      fill="rgba(252,165,165,0.9)"
+                    >
+                      Peak {Math.round(chart.peak.risk * 100)}%
+                    </text>
+                  </g>
+                )}
+
+                {/* ── Scrubber marker + live callout ────────────────── */}
+                {chart.marker && activePoint && (
                   <>
+                    {/* Vertical cursor */}
                     <line
-                      x1={chart.marker.x}
-                      y1={CHART_HEIGHT - CHART_PADDING_Y}
-                      x2={chart.marker.x}
-                      y2={CHART_PADDING_Y}
-                      stroke="rgba(147,197,253,0.7)"
-                      strokeWidth={1.5}
-                      strokeDasharray="4 4"
+                      x1={chart.marker.x} y1={CHART_HEIGHT - CHART_PADDING_Y}
+                      x2={chart.marker.x} y2={CHART_PADDING_Y - 4}
+                      stroke="rgba(147,197,253,0.6)" strokeWidth={1.5}
+                      strokeDasharray="4 3"
                     />
-                    <circle cx={chart.marker.x} cy={chart.marker.y} r={6} fill="rgb(191,219,254)" />
-                    <circle cx={chart.marker.x} cy={chart.marker.y} r={10} fill="rgba(59,130,246,0.25)" />
+                    {/* Halo + dot */}
+                    <circle cx={chart.marker.x} cy={chart.marker.y} r={10}
+                      fill="rgba(59,130,246,0.18)" />
+                    <circle cx={chart.marker.x} cy={chart.marker.y} r={5}
+                      fill="white" stroke="rgb(96,165,250)" strokeWidth={1.5} />
+                    {/* Callout bubble — flip to left side when near right edge */}
+                    {(() => {
+                      const flipLeft = chart.marker.x > CHART_WIDTH * 0.72;
+                      const bw = 82;
+                      const bx = flipLeft ? chart.marker.x - bw - 8 : chart.marker.x + 8;
+                      const by = Math.max(CHART_PADDING_Y, chart.marker.y - 26);
+                      const delta = baselineRisk !== null
+                        ? Math.round((activePoint.risk - baselineRisk) * 100)
+                        : null;
+                      const deltaStr = delta !== null
+                        ? `${delta >= 0 ? '+' : ''}${delta}%`
+                        : '';
+                      const deltaColor = delta !== null && delta > 0
+                        ? 'rgba(252,165,165,1)'
+                        : 'rgba(110,231,183,1)';
+                      return (
+                        <g>
+                          <rect x={bx} y={by} width={bw} height={36} rx={5}
+                            fill="rgba(15,23,42,0.92)" stroke="rgba(96,165,250,0.4)" strokeWidth={1} />
+                          <text x={bx + 8} y={by + 13} fontSize={10} fontFamily="ui-monospace,monospace"
+                            fill="rgba(191,219,254,1)" fontWeight="700">
+                            {Math.round(activePoint.risk * 100)}%
+                          </text>
+                          <text x={bx + 8} y={by + 26} fontSize={8.5} fontFamily="ui-monospace,monospace"
+                            fill={deltaColor}>
+                            {deltaStr ? `Δ ${deltaStr} vs base` : `Mo. ${activePoint.month}`}
+                          </text>
+                        </g>
+                      );
+                    })()}
                   </>
                 )}
               </svg>
-              <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500 px-2">
-                <span>Month 0</span>
-                <span>Month {maxMonth}</span>
-              </div>
             </div>
           )}
         </div>
