@@ -6,7 +6,7 @@
 
 import type { TimelinePoint } from "@/lib/timeline";
 
-export const API_URL = process.env.API_URL;
+export const API_URL = "http://127.0.0.1:8000";
 
 export interface PatientProfile {
   name: string;
