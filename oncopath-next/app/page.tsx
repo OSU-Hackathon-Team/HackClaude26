@@ -25,6 +25,12 @@ export default function LandingPage() {
 
           {/* Fallback buttons in header just in case layout header missed it */}
           <div className="flex items-center gap-4">
+             <Show when="signed-out">
+                <SignInButton forceRedirectUrl="/viewer" mode="modal"><button className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Sign In</button></SignInButton>
+                <SignUpButton forceRedirectUrl="/viewer" mode="modal"><button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
+                      Get Started Free
+                   </button></SignUpButton>
+             </Show>
              <Show when="signed-in">
                 <a href="/viewer" className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all flex items-center gap-2">
                    Access 3D Viewer <Zap size={14} />
