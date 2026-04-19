@@ -159,6 +159,32 @@ export function BodyDashboard() {
     return newRisks;
   }, [risks, trajectories, selectedMonth]);
 
+  // ── Dynamic confidence signals (update with treatment) ─────────────────── //
+  const dynamicConfidenceMetrics = useMemo(() => {
+    const base = prediction?.confidence_metrics ?? {};
+    const trajectoryKeys = Object.keys(trajectories);
+    if (trajectoryKeys.length < 2) return base;
+
+    // Target Clarity: fraction of total risk mass in top-3 sites at projection endpoint.
+    // Matches the Gini-like formula in _build_clinical_confidence_metrics on the backend.
+    // This is the only metric that changes with treatment — GDS and Data Confidence are patient-level.
+    const endpointRisks = trajectoryKeys
+      .map(site => {
+        const pts = trajectories[site];
+        return pts?.length ? pts[pts.length - 1].risk : (risks[site] ?? 0);
+      })
+      .sort((a, b) => b - a);
+
+    const totalRisk = endpointRisks.reduce((a, b) => a + b, 0);
+    const top3Risk  = endpointRisks.slice(0, 3).reduce((a, b) => a + b, 0);
+    const targetClarity = totalRisk > 0 ? top3Risk / totalRisk : 0;
+
+    return {
+      ...base,
+      'Target Clarity': Math.round(targetClarity * 1000) / 1000,
+    };
+  }, [prediction?.confidence_metrics, trajectories, risks]);
+
   // ── Organ click handler ────────────────────────────────────────────────── //
   const handleOrganSelect = useCallback((organId: string, name: string, x: number, y: number) => {
     setActiveOrganId(organId);
@@ -272,7 +298,7 @@ export function BodyDashboard() {
       {/* ── Timeline Panel ────────────────────────────────────────────── */}
       {isTimelineOpen && (
         <div className="absolute bottom-0 left-0 right-0 z-30 pointer-events-none">
-          <div className="pointer-events-auto">
+          <div className="pointer-events-auto max-h-[60vh] overflow-y-auto overscroll-contain">
             <TimelinePanel
               organOptions={Object.keys(risks).sort((a,b) => a.startsWith('PRIMARY_') ? -1 : 1).map(k => ({ 
                 key: k, 
@@ -288,6 +314,7 @@ export function BodyDashboard() {
               simulationSummary={simulationSummary}
               baselineRisk={risks[activeOrganId || Object.keys(risks).find(k => k.startsWith('PRIMARY_')) || ''] || null}
               prediction={prediction}
+              confidenceMetrics={dynamicConfidenceMetrics}
               isProjectionLoading={isTimelineLoading}
               onOrganChange={handleManualOrganChange}
               onTreatmentChange={setSelectedTreatment}

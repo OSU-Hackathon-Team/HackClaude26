@@ -26,6 +26,7 @@ interface TimelinePanelProps {
   timelineSource: 'local' | 'backend';
   simulationSummary?: string;
   isProjectionLoading?: boolean;
+  confidenceMetrics?: Record<string, number>;
   baselineRisk: number | null;
   prediction: PredictionSnapshot | null;
   onOrganChange: (organ: string) => void;
@@ -53,6 +54,7 @@ export function TimelinePanel({
   timelineSource,
   simulationSummary,
   isProjectionLoading = false,
+  confidenceMetrics,
   baselineRisk,
   prediction,
   onOrganChange,
@@ -109,8 +111,10 @@ export function TimelinePanel({
   }, [maxMonth]);
 
   const confidenceEntries = useMemo(() => {
-    return Object.entries(prediction?.confidence_metrics ?? {}).sort((a, b) => b[1] - a[1]);
-  }, [prediction?.confidence_metrics]);
+    // Prefer the dynamic merged metrics (updated per treatment/month) over the static snapshot
+    const source = confidenceMetrics ?? prediction?.confidence_metrics ?? {};
+    return Object.entries(source).sort((a, b) => b[1] - a[1]);
+  }, [confidenceMetrics, prediction?.confidence_metrics]);
 
   const shapEntries = useMemo(() => {
     return Object.entries(prediction?.shap_values ?? {})
@@ -391,20 +395,8 @@ export function TimelinePanel({
           )}
         </div>
 
-        <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4 space-y-3">
+        <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4 space-y-3 max-h-[50vh] overflow-y-auto overscroll-contain">
           <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Explainability</h3>
-
-          {/* ── Metadata ──────────────────────────────────────────────── */}
-          <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3 space-y-1">
-            <div className="flex justify-between text-[10px] text-slate-400">
-              <span>Prediction ID</span>
-              <span className="font-mono text-slate-200">{prediction?.prediction_id ?? 'Not available'}</span>
-            </div>
-            <div className="flex justify-between text-[10px] text-slate-400">
-              <span>Status</span>
-              <span className="font-mono text-slate-200">{prediction?.status ?? 'Not available'}</span>
-            </div>
-          </div>
 
           {/* ── SHAP Feature Attribution ─────────────────────────────── */}
           <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
@@ -463,20 +455,71 @@ export function TimelinePanel({
 
           {/* ── Confidence Metrics ───────────────────────────────────── */}
           <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-3">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-2">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-3">
               Confidence Metrics
             </div>
-            {confidenceEntries.length ? (
-              <div className="space-y-1.5">
-                {confidenceEntries.slice(0, 4).map(([key, value]) => (
-                  <div key={key} className="flex justify-between text-[10px] text-slate-300">
-                    <span className="truncate pr-2">{key}</span>
-                    <span className="font-mono text-emerald-300">{value.toFixed(3)}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[10px] text-slate-500">Not available for this prediction snapshot.</p>
+            {confidenceEntries.length ? (() => {
+              type MetaCfg = {
+                tooltip: string;
+                verdict: (v: number) => string;
+                note: (v: number) => string;
+                // thresholds: [high, mid] — above high = green, above mid = amber, else = rose
+                thresholds: [number, number];
+              };
+              const META: Record<string, MetaCfg> = {
+                "Genetic Driver Score": {
+                  tooltip: "Combined score reflecting how much the patient's specific mutations (vs. age/sex/primary site) are driving this prediction, weighted by how well those mutations are represented in training data.",
+                  verdict: (v) => v > 0.65 ? "Your mutations are the primary risk driver" : v > 0.35 ? "Shared genomic & demographic influence" : "Demographics are the primary driver",
+                  note: (v) => v < 0.35 ? "Genomic sequencing added limited lift over demographic baseline. Predictions rely heavily on cancer type rather than individual genetics." : "",
+                  thresholds: [0.65, 0.35],
+                },
+                "Target Clarity": {
+                  tooltip: "Fraction of total metastatic risk mass concentrated in the top 3 organs. High = the model has identified clear targets; Low = risk is spread diffusely, making targeted screening less effective.",
+                  verdict: (v) => v > 0.70 ? "Clear target organs identified — focused screening recommended" : v > 0.45 ? "Moderate focus — review top-3 sites closely" : "Diffuse risk pattern — broad imaging may be warranted",
+                  note: (v) => v < 0.45 ? "Risk is not concentrated in specific organs. Consider whole-body imaging rather than targeted surveillance." : "",
+                  thresholds: [0.70, 0.45],
+                },
+                "Data Confidence": {
+                  tooltip: "How well-studied this cancer profile (primary site, oncotree code, mutation panel size) is in the MSK-MET training dataset of 25,000+ patients.",
+                  verdict: (v) => v > 0.75 ? "Well-studied cancer profile" : v > 0.55 ? "Moderately studied profile" : "Limited training data for this subtype",
+                  note: (v) => v < 0.55 ? "This cancer subtype is less represented in training data. Treat risk scores as indicative, not definitive. Seek specialist review." : "",
+                  thresholds: [0.75, 0.55],
+                },
+              };
+
+              return (
+                <div className="space-y-3.5">
+                  {confidenceEntries.map(([key, value]) => {
+                    const cfg = META[key];
+                    const pct = Math.round(value * 100);
+                    const [hi, mid] = cfg?.thresholds ?? [0.75, 0.5];
+                    const level = value > hi ? 'high' : value > mid ? 'mid' : 'low';
+                    const bar   = level === 'high' ? 'bg-emerald-500' : level === 'mid' ? 'bg-amber-500' : 'bg-rose-500';
+                    const txt   = level === 'high' ? 'text-emerald-400' : level === 'mid' ? 'text-amber-400' : 'text-rose-400';
+                    const clinicalNote = cfg?.note(value) ?? '';
+
+                    return (
+                      <div key={key} className="space-y-1" title={cfg?.tooltip ?? key}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] text-slate-300 font-medium">{key}</span>
+                          <span className={`text-[9px] font-mono font-bold ${txt}`}>{pct}%</span>
+                        </div>
+                        <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                          <div className={`h-full ${bar} transition-all duration-700`} style={{ width: `${pct}%` }} />
+                        </div>
+                        {cfg && (
+                          <p className={`text-[8.5px] font-medium ${txt}`}>{cfg.verdict(value)}</p>
+                        )}
+                        {clinicalNote && (
+                          <p className="text-[8px] text-slate-500 italic leading-relaxed">{clinicalNote}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })() : (
+              <p className="text-[10px] text-slate-500">Confidence analysis pending simulation results.</p>
             )}
           </div>
 
