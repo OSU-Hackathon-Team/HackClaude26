@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { AlertCircle, ActivitySquare } from 'lucide-react';
+import { AlertCircle, ActivitySquare, X } from 'lucide-react';
 import { Select, SelectItem, Slider } from '@/components/ui';
 import type { PredictionSnapshot } from '@/lib/api';
 import {
@@ -29,6 +29,7 @@ interface TimelinePanelProps {
   onOrganChange: (organ: string) => void;
   onTreatmentChange: (treatment: TreatmentPresetId) => void;
   onMonthChange: (month: number) => void;
+  onClose?: () => void;
 }
 
 const CHART_WIDTH = 640;
@@ -53,6 +54,7 @@ export function TimelinePanel({
   onOrganChange,
   onTreatmentChange,
   onMonthChange,
+  onClose,
 }: TimelinePanelProps) {
   const selectedOrganLabel = useMemo(
     () => organOptions.find((option) => option.key === selectedOrgan)?.label ?? selectedOrgan,
@@ -116,7 +118,16 @@ export function TimelinePanel({
   const sourceLabel = timelineSource === 'backend' ? 'Backend Projection' : 'Simulated Projection';
 
   return (
-    <section className="border-t border-slate-800/40 bg-[#060d1a]/90 backdrop-blur-sm px-6 py-4 z-20">
+    <section className="relative border-t border-slate-800/40 bg-[#060d1a]/90 backdrop-blur-sm px-6 py-4 z-20">
+      {onClose && (
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 rounded-lg bg-slate-800/40 hover:bg-slate-800/80 text-slate-400 hover:text-slate-100 transition-all border border-slate-700/50"
+          title="Close clinical timeline"
+        >
+          <X size={14} />
+        </button>
+      )}
       <div className="grid grid-cols-1 xl:grid-cols-[300px_1fr_330px] gap-4 items-start">
         <div className="rounded-xl border border-slate-800/60 bg-[#0a1324] p-4 space-y-4">
           <div>

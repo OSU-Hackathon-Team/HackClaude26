@@ -1,61 +1,25 @@
-# Timeline Implementation Task (Updated)
+# Experimental Timeline: LLM-Driven Treatment Simulation
 
-## Current implementation status (repository-aligned)
-- Backend now exposes:
-  - `POST /simulate`
-  - `POST /predict`
-  - `POST /predict/timeline`
-- Frontend API layer now has:
-  - normalized `PredictionSnapshot`
-  - `/predict`-first toggle via env
-  - automatic `/simulate` fallback on `404/405/501` and schema mismatch
-  - organ-key normalization for legacy and target keys
-- Frontend viewer now includes:
-  - timeline panel (organ selector, treatment selector, month slider, curve)
-  - deterministic local timeline generator fallback
-  - optional explainability rendering (`prediction_id`, `status`, confidence metrics, SHAP)
+This task focuses on replacing deterministic decay models with Claude 3.5 Sonnet to predict treatment-specific metastatic trajectories, grounded in the existing Seed & Soil ML inference data.
 
-## Phase progress
+## Phase 1: LLM Treatment Agent (Backend)
+- [ ] Implement `LLMTreatmentAgent` in `scripts/api_service.py`.
+- [ ] Connect agent to Claude 3.5 Sonnet (via Anthropic SDK or Copilot wrapper).
+- [ ] Develop data-grounded prompt:
+    - Input: ML Risk Scores (Soil) + Patient Mutations (Seed) + Treatment Selection.
+    - Output: Temporal risk array (months 0-120).
+- [ ] Implement multi-site temporal prediction (predicting separate curves for Bone vs Lung based on treatment).
 
-### Phase 1 — Contract stabilization + compatibility adapter
-- [x] Frontend request normalizer supports `/simulate` and `/predict` payloads.
-- [x] Unified `PredictionSnapshot` model (`risk_scores` + optional explainability fields).
-- [x] Predict-first endpoint strategy with fallback to `/simulate`.
-- [x] `/simulate` support retained.
+## Phase 2: Dynamic Simulation Dashboard (Frontend)
+- [ ] Update `TimelinePanel.tsx` to handle treatment-specific curves from the backend.
+- [ ] Wire user month selection to a global "Temporal Focus" state.
+- [ ] Ensure `AnatomicalBody3D` listens to temporal risk scores for the active month.
 
-### Phase 2 — Timeline v1 on current backend
-- [x] Deterministic client timeline generator implemented.
-- [x] Timeline panel UI implemented.
-- [x] Treatment presets defined in `oncopath-next/lib/timeline.ts`.
-- [x] Timeline source labeling implemented (`Backend Projection` / `Simulated Projection`).
-- [x] Month selection wired to timeline state and active organ risk display.
+## Phase 3: 3D Biological Visualization
+- [ ] Implement "Dynamic Regression" in `AnatomicalBody3D.tsx`.
+- [ ] Mesh properties (Opacity/Emissive) should normalize between "Baseline" and "Timeline Month" values.
+- [ ] Add visual cues for "Treatment Effect" (e.g. glowing green highlights for regressing tumors).
 
-### Phase 3 — `/predict` migration
-- [x] Backend `POST /predict` implemented.
-- [x] Backend `/simulate` preserved.
-- [x] Frontend config-controlled predict-first rollout implemented.
-- [ ] Shared fixture-based parity tests between `/simulate` and `/predict` are not implemented.
-- [ ] Explicit parity thresholds (rank overlap + numeric tolerance) are not yet codified.
-
-### Phase 4 — Explainability + temporal hardening
-- [x] `/predict` returns `prediction_id`, `status`, `confidence_metrics`, `shap_values`.
-- [x] Explainability panels render with presence checks and “Not available” fallback.
-- [x] Backend `POST /predict/timeline` implemented.
-- [x] Client falls back to deterministic local timeline when temporal API is unavailable.
-
-## 3D mapping constraints status
-- [x] Canonical organ-key normalization exists in frontend API adapter.
-- [ ] Explicit UI “Proxy visualization” badge/label for proxy mesh mappings is still pending.
-- [ ] Full exact-mesh coverage is still pending for several metastatic sites.
-
-## Recent validation notes
-- Playwright validation was run for:
-  - simulate flow + timeline
-  - predict flow + explainability
-  - predict 404 fallback to simulate
-- These Playwright runs used network route mocks for API responses.
-
-## Remaining priority work
-1. Add contract/parity tests for `/simulate` vs `/predict`.
-2. Add explicit proxy-visualization labeling in 3D UI.
-3. Define and enforce migration parity thresholds in automated checks.
+## Phase 4: Validation & Parity
+- [ ] Verify that Claude's predictions are biologically plausible (e.g. PARP inhibitors having higher impact on BRCA+ cases).
+- [ ] Synchronize `SeedSoilAnalysis` popovers with the selected timeline month.

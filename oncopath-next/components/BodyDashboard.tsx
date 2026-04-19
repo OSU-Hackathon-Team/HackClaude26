@@ -1,7 +1,7 @@
 'use client';
 
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Activity } from 'lucide-react';
+import { AlertCircle, Activity, Clock } from 'lucide-react';
 import { OrganPopover, type OrganPopoverData } from '@/components/ui/OrganPopover';
 import { GenomicDrawer } from '@/components/ui/GenomicDrawer';
 import {
@@ -10,6 +10,7 @@ import {
   requestPredictTimeline,
   type PredictionSnapshot,
 } from '@/lib/api';
+import { TimelinePanel } from '@/components/TimelinePanel';
 import {
   DEFAULT_TIMELINE_MONTHS,
   generateLocalTimelineProjection,
@@ -48,6 +49,14 @@ export function BodyDashboard() {
   // 12-month projection for the selected organ
   const [proj12m, setProj12m] = useState<number | undefined>(undefined);
 
+  // Timeline & Simulation Engine State
+  const [selectedMonth, setSelectedMonth] = useState(0);
+  const [selectedTreatment, setSelectedTreatment] = useState<TreatmentPresetId>(DEFAULT_TREATMENT);
+  const [timeline, setTimeline] = useState<any[]>([]);
+  const [timelineSource, setTimelineSource] = useState<'local' | 'backend'>('local');
+  const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+  const [isParametersOpen, setIsParametersOpen] = useState(false);
+
   // ── Simulation ─────────────────────────────────────────────────────────── //
   useEffect(() => {
     const ctrl = new AbortController();
@@ -66,36 +75,72 @@ export function BodyDashboard() {
     return () => { cancelled = true; ctrl.abort(); };
   }, [simulationProfile, simulationImage]);
 
-  // ── 12-month projection for hovered organ ─────────────────────────────── //
+  // ── 12-month projection derived from active timeline ────────────────── //
   useEffect(() => {
-    if (!popover) { setProj12m(undefined); return; }
-    const baseline = risks[popover.organId];
-    if (baseline === undefined) { setProj12m(undefined); return; }
-
-    // Optimistic local estimate immediately
-    const local = generateLocalTimelineProjection({
-      organKey: popover.organId, baselineRisk: baseline,
-      treatment: DEFAULT_TREATMENT, months: 12,
-    });
-    const at12 = local.find(p => p.month === 12) ?? local[local.length - 1];
+    if (!timeline.length) {
+      setProj12m(undefined);
+      return;
+    }
+    const at12 = timeline.find((p) => p.month >= 12) ?? timeline[timeline.length - 1];
     setProj12m(at12?.risk);
+  }, [timeline]);
 
-    // Try to fetch from backend too
+  // ── Long-range timeline fetch (3.5 Sonnet Driven) ─────────────────────── //
+  useEffect(() => {
+    if (!popover?.organId || risks[popover.organId] === undefined) return;
+    
     const ctrl = new AbortController();
-    requestPredictTimeline(baseline, DEFAULT_TREATMENT, DEFAULT_TIMELINE_MONTHS, ctrl.signal)
+    setTimelineSource('local'); // Default to local while fetching
+
+    requestPredictTimeline(
+      simulationProfile, 
+      risks[popover.organId], 
+      selectedTreatment, 
+      120, 
+      popover.name, 
+      ctrl.signal
+    )
       .then(pts => {
-        const at12b = pts.find(p => p.month >= 12) ?? pts[pts.length - 1];
-        if (at12b) setProj12m(at12b.risk);
+        setTimeline(pts);
+        setTimelineSource('backend');
       })
-      .catch(() => {});
+      .catch(err => {
+        console.error('Temporal Fetch Failed:', err);
+        // Fallback to local deterministic projection
+        const local = generateLocalTimelineProjection({
+          organKey: popover.organId,
+          baselineRisk: risks[popover.organId],
+          treatment: selectedTreatment,
+          months: 120
+        });
+        setTimeline(local);
+        setTimelineSource('local');
+      });
+
     return () => ctrl.abort();
-  }, [popover?.organId, risks]);
+  }, [popover?.organId, risks, selectedTreatment, simulationProfile]);
+
+  // ── Compute Active Risk (Time-Shifted) ────────────────────────────────── //
+  const temporalRisks = useMemo(() => {
+    if (selectedMonth === 0) return risks;
+    if (!popover?.organId || !timeline.length) return risks;
+
+    const point = timeline.find(p => p.month === selectedMonth) || 
+                  timeline.reduce((prev, curr) => Math.abs(curr.month - selectedMonth) < Math.abs(prev.month - selectedMonth) ? curr : prev);
+    
+    return {
+      ...risks,
+      [popover.organId]: point.risk
+    };
+  }, [risks, popover?.organId, timeline, selectedMonth]);
 
   // ── Organ click handler ────────────────────────────────────────────────── //
   const handleOrganSelect = useCallback((organId: string, name: string, x: number, y: number) => {
-    setPopover(prev =>
-      prev?.organId === organId ? null : { organId, name, clientX: x, clientY: y }
-    );
+    setPopover(prev => {
+      if (prev?.organId === organId) return null;
+      setSelectedMonth(0); // Reset time when folder changes
+      return { organId, name, clientX: x, clientY: y };
+    });
   }, []);
 
   const activeMutations = useMemo(() =>
@@ -120,7 +165,11 @@ export function BodyDashboard() {
             </div>
           </div>
         }>
-          <AnatomicalBody3D risks={risks} profile={simulationProfile} onOrganSelect={handleOrganSelect} />
+          <AnatomicalBody3D 
+            risks={temporalRisks} 
+            profile={simulationProfile} 
+            onOrganSelect={handleOrganSelect} 
+          />
         </Suspense>
 
         {/* Computing overlay */}
@@ -149,12 +198,14 @@ export function BodyDashboard() {
         </div>
       </div>
 
-      {/* ── Bottom status bar ────────────────────────────────────────────── */}
-      <div className="absolute bottom-4 left-4 z-20 flex items-end pointer-events-none">
-        {/* Parameters FAB */}
+      {/* ── Parameters & Timeline FABs ────────────────────────────── */}
+      <div className="absolute bottom-4 left-4 z-40 flex items-center gap-3">
         <div className="pointer-events-auto">
           <GenomicDrawer 
             profile={profile} 
+            open={isParametersOpen}
+            hideTrigger={isTimelineOpen || isParametersOpen}
+            onOpenChange={setIsParametersOpen}
             onChange={setProfile} 
             onRunSimulation={(slideImage?: string) => {
               setSimulationProfile(profile);
@@ -162,6 +213,19 @@ export function BodyDashboard() {
             }} 
           />
         </div>
+        
+        {(!isTimelineOpen && !isParametersOpen) && (
+          <div className="pointer-events-auto">
+            <button
+              onClick={(e) => { e.stopPropagation(); setIsTimelineOpen(!isTimelineOpen); }}
+              title="Toggle treatment simulation timeline"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900/80 backdrop-blur-md border border-zinc-800 hover:border-blue-600/50 text-xs font-semibold tracking-wide transition-all shadow-lg group ${isTimelineOpen ? 'text-blue-400 border-blue-600/40' : 'text-zinc-400 hover:text-zinc-100'}`}
+            >
+              <Clock size={14} className={isTimelineOpen ? 'text-blue-400' : 'group-hover:text-blue-400 transition-colors'} />
+              <span>Simulation Timeline</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Organ Popover ────────────────────────────────────────────────── */}
@@ -173,6 +237,28 @@ export function BodyDashboard() {
           projectedRisk12m={proj12m}
           onClose={() => setPopover(null)}
         />
+      )}
+
+      {/* ── Timeline Panel ────────────────────────────────────────────── */}
+      {isTimelineOpen && (
+        <div className="absolute bottom-0 left-0 right-0 z-30 pointer-events-none">
+          <div className="pointer-events-auto">
+            <TimelinePanel
+              organOptions={Object.keys(risks).map(k => ({ key: k, label: k.replace('DMETS_DX_', '').replace(/_/g, ' ') }))}
+              selectedOrgan={popover?.organId || ''}
+              selectedTreatment={selectedTreatment}
+              selectedMonth={selectedMonth}
+              timeline={timeline}
+              timelineSource={timelineSource}
+              baselineRisk={popover ? risks[popover.organId] : null}
+              prediction={prediction}
+              onOrganChange={(key) => handleOrganSelect(key, key, 0, 0)}
+              onTreatmentChange={setSelectedTreatment}
+              onMonthChange={setSelectedMonth}
+              onClose={() => setIsTimelineOpen(false)}
+            />
+          </div>
+        </div>
       )}
 
       {/* ── Error toast ─────────────────────────────────────────────────── */}

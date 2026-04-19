@@ -43,9 +43,11 @@ interface PredictRequestPayload {
 }
 
 interface PredictTimelineRequestPayload {
+  profile: PatientProfile;
   baseline_risk: number;
   treatment: string;
   months: number;
+  organ?: string;
 }
 
 export interface PredictionRequestOptions {
@@ -292,15 +294,19 @@ export async function simulateRisk(
 }
 
 export async function requestPredictTimeline(
+  profile: PatientProfile,
   baselineRisk: number,
   treatment: string,
   months: number,
+  organ?: string,
   signal?: AbortSignal
 ): Promise<TimelinePoint[]> {
   const payload: PredictTimelineRequestPayload = {
+    profile,
     baseline_risk: Math.min(Math.max(baselineRisk, 0), 1),
     treatment,
     months: Math.max(1, Math.floor(months)),
+    organ,
   };
 
   const response = await fetch(`${API_URL}/predict/timeline`, {

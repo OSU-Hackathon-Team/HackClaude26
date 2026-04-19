@@ -285,7 +285,25 @@ function createMeshFromEntry(meshData: AnatomyMeshEntry | undefined, region: str
 /* ───────────────────────────────────────────────────────
    Procedural ZygoteBody JSON Loader
 ─────────────────────────────────────────────────────── */
-function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, visibleMarkers = [], hoveredOrgan = null, setHoveredOrgan = () => {}, onOrganSelect }: { activeSystem: string, skinOpacity: number, selectedStructure: SelectedStructure | null, visibleMarkers?: any[], hoveredOrgan?: string | null, setHoveredOrgan?: (id: string | null) => void, onOrganSelect?: (id: string, name: string, x: number, y: number) => void }) {
+function AnatomyModelRawJSON({ 
+  activeSystem, 
+  skinOpacity, 
+  selectedStructure, 
+  risks = {},
+  visibleMarkers = [], 
+  hoveredOrgan = null, 
+  setHoveredOrgan = () => {}, 
+  onOrganSelect 
+}: { 
+  activeSystem: string, 
+  skinOpacity: number, 
+  selectedStructure: SelectedStructure | null, 
+  risks?: Record<string, number>,
+  visibleMarkers?: any[], 
+  hoveredOrgan?: string | null, 
+  setHoveredOrgan?: (id: string | null) => void, 
+  onOrganSelect?: (id: string, name: string, x: number, y: number) => void 
+}) {
   const [meshes, setMeshes] = useState<THREE.Mesh[]>([]);
   const [progress, setProgress] = useState(0);
   
@@ -419,7 +437,31 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
       }
 
       m.visible = visible;
-      mat.emissive.setHex(0x000000);
+      
+      // Dynamic Risk-based Visuals
+      let riskVal = 0;
+      Object.entries(risks).forEach(([site, p]) => {
+        let isSimMatch = false;
+        if (site === 'DMETS_DX_LUNG' && region.includes('Lungs')) isSimMatch = true;
+        if (site === 'DMETS_DX_BONE' && region.includes('Bones')) isSimMatch = true;
+        if (site === 'DMETS_DX_LIVER' && region.includes('Gastrointestinal') && region.includes('Liver')) isSimMatch = true;
+        if (site === 'DMETS_DX_CNS_BRAIN' && region.includes('Brainstem')) isSimMatch = true;
+        
+        if (isSimMatch) riskVal = Math.max(riskVal, p);
+      });
+
+      if (riskVal > 0.05) {
+        const riskColor = getRiskColor3D(riskVal);
+        mat.emissive.copy(riskColor);
+        mat.emissiveIntensity = 0.4 + riskVal * 1.5;
+        if (!selectedStructure) {
+          mat.opacity = Math.max(mat.opacity, 0.7 + riskVal * 0.3);
+          mat.transparent = true;
+        }
+      } else {
+        mat.emissive.setHex(0x000000);
+        mat.emissiveIntensity = 0;
+      }
 
       if (selectedStructure) {
         const id = selectedStructure.id;
@@ -480,7 +522,7 @@ function AnatomyModelRawJSON({ activeSystem, skinOpacity, selectedStructure, vis
         }
       }
     });
-  }, [meshes, activeSystem, skinOpacity, selectedStructure]);
+  }, [meshes, activeSystem, skinOpacity, selectedStructure, risks]);
 
   return (
     <>
@@ -679,6 +721,7 @@ export function AnatomicalBody3D({ risks, profile, onOrganSelect }: AnatomicalBo
                  activeSystem={activeSystem} 
                  skinOpacity={skinOpacity} 
                  selectedStructure={selectedStructure} 
+                 risks={risks}
                  visibleMarkers={visibleMarkers}
                  hoveredOrgan={hoveredOrgan}
                  setHoveredOrgan={setHoveredOrgan}

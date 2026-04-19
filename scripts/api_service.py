@@ -7,6 +7,7 @@ import os
 from typing import Dict, Optional
 from uuid import uuid4
 from scripts.extract_embeddings import VisionEncoder
+from scripts.copilot_timeline_service import CopilotTimelineService, TimelineExplainRequest
 
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
@@ -37,6 +38,7 @@ models = {}
 vision_encoder = None
 vision_detector = None # Level 2 Ensemble Signal (The "Eyes")
 supabase: Optional[Client] = None
+timeline_service = CopilotTimelineService()
 
 @app.on_event("startup")
 def startup_event():
@@ -93,9 +95,11 @@ class PredictRequest(BaseModel):
     genomic_markers: Dict[str, float]
 
 class PredictTimelineRequest(BaseModel):
+    profile: PatientProfile
     baseline_risk: float = Field(..., ge=0.0, le=1.0)
     treatment: str
     months: int = Field(..., ge=1, le=120)
+    organ: Optional[str] = None
 
 TREATMENT_DECAY_FACTORS = {
     "CHEMOTHERAPY": 0.060,
@@ -443,27 +447,24 @@ def predict_risk(request: PredictRequest):
     }
 
 @app.post("/predict/timeline")
-def predict_timeline(request: PredictTimelineRequest):
-    treatment_key = _normalize_treatment_name(request.treatment)
-    if treatment_key not in TREATMENT_DECAY_FACTORS:
-        supported = ", ".join(sorted(TREATMENT_DECAY_FACTORS.keys()))
-        raise HTTPException(
-            status_code=422,
-            detail=f"Unsupported treatment '{request.treatment}'. Supported treatments: {supported}"
-        )
-
-    decay = TREATMENT_DECAY_FACTORS[treatment_key]
-    floor_risk = 0.08 if treatment_key == "OBSERVATION" else 0.02
-    timeline = []
-    for month in range(request.months + 1):
-        projected = floor_risk + (request.baseline_risk - floor_risk) * np.exp(-decay * month)
-        bounded_risk = float(np.clip(projected, 0.0, 1.0))
-        timeline.append({"month": month, "risk": round(bounded_risk, 4)})
-
+async def predict_timeline(request: PredictTimelineRequest):
+    # Mapping request to TimelineExplainRequest for the LLM service
+    explain_req = TimelineExplainRequest(
+        primary_site=request.profile.primary_site,
+        mutations=[m for m, v in request.profile.mutations.items() if v > 0],
+        baseline_risk=request.baseline_risk,
+        treatment=request.treatment,
+        months=request.months,
+        organ=request.organ or "Metastatic Target"
+    )
+    
+    result = await timeline_service.predict_treatment_timeline(explain_req)
+    
     return {
-        "status": "success",
-        "treatment": treatment_key,
-        "timeline": timeline
+        "status": result.status,
+        "treatment": result.treatment,
+        "timeline": [p.dict() for p in result.timeline],
+        "summary": result.summary
     }
 
 if __name__ == "__main__":
