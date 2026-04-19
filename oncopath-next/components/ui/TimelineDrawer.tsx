@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { TrendingUp, X, ChevronRight } from 'lucide-react';
 import { TimelinePanel } from '@/components/TimelinePanel';
-import { TimelineAssistantPanel } from '@/components/TimelineAssistantPanel';
 import type { PredictionSnapshot } from '@/lib/api';
 import type { TimelinePoint, TreatmentPresetId } from '@/lib/timeline';
 
@@ -13,25 +12,11 @@ interface TimelineDrawerProps {
   selectedMonth: number;
   timeline: TimelinePoint[];
   timelineSource: 'local' | 'backend';
-  isTimelinePending: boolean;
-  timelineErrorMessage: string | null;
   baselineRisk: number | null;
   prediction: PredictionSnapshot | null;
-  isTimelinePlaying: boolean;
-  patientSummary: {
-    age: number;
-    primarySite: string;
-    keyMutations: string[];
-  };
-  selectedOrganLabel: string;
-  selectedTreatmentLabel: string;
-  actionLog: string[];
   onOrganChange: (o: string) => void;
   onTreatmentChange: (t: TreatmentPresetId) => void;
   onMonthChange: (m: number) => void;
-  onPlaybackPlay: () => void;
-  onPlaybackPause: () => void;
-  onPlaybackReplay: () => void;
 }
 
 export function TimelineDrawer(props: TimelineDrawerProps) {
@@ -105,30 +90,12 @@ export function TimelineDrawer(props: TimelineDrawerProps) {
             selectedMonth={props.selectedMonth}
             timeline={props.timeline}
             timelineSource={props.timelineSource}
-            isTimelinePending={props.isTimelinePending}
-            timelineErrorMessage={props.timelineErrorMessage}
             baselineRisk={props.baselineRisk}
             prediction={props.prediction}
-            isTimelinePlaying={props.isTimelinePlaying}
             onOrganChange={props.onOrganChange}
             onTreatmentChange={props.onTreatmentChange}
             onMonthChange={props.onMonthChange}
-            onPlaybackPlay={props.onPlaybackPlay}
-            onPlaybackPause={props.onPlaybackPause}
-            onPlaybackReplay={props.onPlaybackReplay}
           />
-          <div className="px-5 pb-5">
-            <TimelineAssistantPanel
-              patientSummary={props.patientSummary}
-              selectedOrgan={props.selectedOrgan}
-              selectedOrganLabel={props.selectedOrganLabel}
-              selectedTreatment={props.selectedTreatment}
-              selectedTreatmentLabel={props.selectedTreatmentLabel}
-              selectedMonth={props.selectedMonth}
-              timeline={props.timeline}
-              actionLog={props.actionLog}
-            />
-          </div>
         </div>
       </div>
     </>

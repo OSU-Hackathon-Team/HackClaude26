@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "test:playwright:timeline": "playwright test tests/e2e/phase5.timeline-regression.spec.ts",
-    "test:playwright": "playwright test"
+    "lint": "eslint"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.2.3",
@@ -26,7 +24,6 @@
     "three": "^0.183.2"
   },
   "devDependencies": {
-    "@playwright/test": "1.59.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

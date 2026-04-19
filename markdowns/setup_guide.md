@@ -1,68 +1,49 @@
-# Developer Setup Guide: Current Runtime
+# Developer Setup Guide: OncoPath Sandbox
 
-_Last code-verified update: 2026-04-18_
+This guide provides the technical foundation for executing the 12-week OncoPath roadmap.
 
-This setup reflects the **current implemented stack** (FastAPI backend + Next.js frontend), not the older planning-only layout.
+## 1. Data Acquisition (CRITICAL)
+Your work involves two distinct data layers:
 
-## 1. Prerequisites
-- Python 3.10+ recommended
-- Node.js 18+ and npm
+### Clinical Layer (Phase 1 Ready)
+- **File:** `data.tsv` (already in root)
+- **Content:** Patient age, sex, primary site, and metastatic target labels.
 
-## 2. Backend setup (repository root)
-```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
+### Genomic Layer (Required for Phase 2)
+- **Action:** Download the Full Study Archive.
+- **Source Link:** [msk_met_2021.tar.gz (cBioPortal)](https://datahub.assets.cbioportal.org/msk_met_2021.tar.gz)
+- **File to Extract:** `data_mutations_extended.txt`.
+
+## 2. Environment Configuration
+```powershell
+# Create & Activate Virtual Env
+python -m venv venv
+.\venv\Scripts\Activate
+
+# Install Production Dependencies
+pip install pandas numpy scikit-learn xgboost shap fastapi uvicorn pydantic
 ```
 
-### Optional backend env vars
-- `ONCOPATH_MODEL_DIR` (defaults to `./models`)
-- `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (enables persistence)
-- `ONCOPATH_REAL_DATA_PATH` (defined in code, currently not required for API startup)
-
-### Run backend
-```bash
-python -m scripts.api_service
-```
-Backend default URL: `http://127.0.0.1:8000`
-
-## 3. Frontend setup (`oncopath-next/`)
-```bash
-cd oncopath-next
-npm install
-npm run dev
-```
-Frontend default URL: `http://localhost:3000`
-
-### Frontend runtime env vars
-Set in `oncopath-next/.env.local` when needed:
-```bash
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
-NEXT_PUBLIC_API_TIMEOUT_MS=20000
+## 3. File Architecture
+```text
+CancerPrediction/
+├── baseline_analytics.py # Establishing the Phase 1 benchmark
+├── data_dictionary.md   # Feature/Header mapping
+├── master_doc.md        # Vision and scientific grounding
+├── roadmap.md           # 12-week sprint plan
+├── setup_guide.md       # This document
+└── data.tsv             # Primary data source
 ```
 
-For local/E2E auth bypass:
-```bash
-NEXT_PUBLIC_E2E_DISABLE_CLERK=1
+## 4. Verification Milestone
+Before starting Phase 1, ensure you can run:
+```python
+import pandas as pd
+df = pd.read_csv('data.tsv', sep='\t')
+print(df['Primary Tumor Site'].value_counts().head())
 ```
+*If this prints the top cancer types (Lung, Colorectal, etc.), your clinical layer is healthy.*
 
-## 4. Quick health checks
-```bash
-curl http://127.0.0.1:8000/
-```
-Expected: JSON with `"status": "online"` and loaded model keys.
-
-## 5. E2E validation entrypoints
-From `oncopath-next/`:
-```bash
-# Mocked backend regression suite
-npm run test:playwright:timeline
-
-# Real FastAPI + frontend integration suite
-npm run test:playwright:real-backend
-```
-
-## 6. Important implementation notes
-- Active frontend is the Next.js viewer (`/viewer`) with 3D anatomy + timeline drawers.
-- `scripts/app_frontend.py` is a legacy Streamlit prototype and not the primary UI path.
-- Runtime expects serialized model artifacts in `models/` (already present in this repo).
+---
+> [!TIP]
+> Always treat the `Sample ID` as the unique key when merging the genomic layer in Phase 2.

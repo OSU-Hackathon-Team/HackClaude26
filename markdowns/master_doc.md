@@ -1,45 +1,28 @@
-# Master Document: OncoPath Vision & Current State
+# Master Document: OncoPath Vision & Strategy
 
-_Last code-verified update: 2026-04-18_
+## 1. Project Vision
+**OncoPath** is a Predictive Metastatic Visualization Sandbox designed to bridge the gap between reactive cancer monitoring and proactive risk simulation. By leveraging the 25,000+ records of the **MSK-MET (2021)** cohort, this tool simulates "What-If" scenarios to predict the probability and confidence of cancer spreading to specific target organs.
 
-## 1. Vision
-**OncoPath** is a metastatic risk simulation platform that combines clinical profile data, genomic markers, and optional pathology image signal to support "what-if" exploration.
+## 2. Scientific Grounding: "Seed and Soil"
+The model is anchored in Paget’s **"Seed and Soil"** hypothesis. We analyze the interplay between:
+*   **The Seed (Genomics):** Mutation status (TP53, KRAS), chromosomal instability (FGA), and histology.
+*   **The Soil (Clinical):** Patient age, biological sex, and the physiological environment of target organs.
 
 > [!NOTE]
-> **Research support only, not diagnosis or treatment advice.**
+> **Clinical Support, Not Diagnosis:** OncoPath provides probabilistic risk metrics intended for **Decision Support**. It empowers clinicians to prioritize screening intervals and visualize potential metastatic pathways before symptoms arise.
 
-## 2. What is implemented now
-### Backend (FastAPI)
-- `POST /simulate` for multimodal simulation (clinical + genomics + optional image path/base64 input)
-- `POST /predict` for profile-based risk prediction with confidence metrics
-- `POST /predict/timeline` for treatment timeline projection
-- `POST /assistant/timeline-explain` for plain-language timeline guidance
-- Optional Supabase persistence when env vars are configured
+## 3. Technical Strategy (12-Week Roadmap)
+*   **Phase 1 (Baseline):** Training XGBoost models on clinical metadata to establish a "Tropism Map."
+*   **Data Layer:** MSK-MET (2021) cohort. We use **`data_clean.tsv`** (a merge of patient and sample records) for clinical features, and anticipate merging with mutation-level data in Phase 2.
+*   **Phase 2 (Genomics):** Merging bulk mutation data (`data_mutations_extended.txt`) to identify molecular drivers of spread.
+*   **Phase 3 (Sandbox):** Deploying a **FastAPI** backend and **React** frontend for real-time parameter tuning ("What if this patient had an EGFR mutation?").
+*   **Phase 4 (Validation):** External validation against **TCGA** data and community outreach at **The James Cancer Center**.
 
-### Frontend (Next.js / React)
-- Landing page + Clerk auth shell
-- `/viewer` dashboard with:
-  - Full-screen 3D anatomy view
-  - Organ selection and risk popover
-  - Genomic parameter drawer + image upload + "Run Simulation"
-  - Timeline drawer (organ/treatment/month controls, playback, comparison)
-  - Copilot-style assistant panel and action log
-  - Macro/Micro scene mode switch (micro scene reacts to timeline risk)
+## 4. Tech Stack
+*   **Analysis:** Python (Pandas, Scikit-Learn).
+*   **Engine:** XGBoost (Probabilistic Classifier).
+*   **Explainability:** SHAP (Shapley Additive exPlanations).
+*   **Delivery:** FastAPI, Next.js, and 3D Anatomical Visualization.
 
-### Model/runtime artifacts present
-- Clinical encoder + scaler + genomic feature index in `models/`
-- 21 site-specific metastatic models (`model_dmets_dx_*.joblib`)
-- Vision detector (`vision_detector.joblib`)
-
-### Regression coverage present
-- Frontend mocked-backend timeline regression tests
-- Real-backend Playwright E2E spec for `/simulate`, `/predict/timeline`, and assistant endpoint wiring
-
-## 3. Temporary/provisional areas still in code
-1. `/predict` explainability uses deterministic demo SHAP-like values (`_build_demo_shap_values`), not model-native SHAP output.
-2. Timeline assistant depends on `github-copilot-sdk`; when unavailable, backend intentionally returns deterministic fallback explanation text.
-3. Some training/data prep scripts still use machine-local Windows paths (not portable as-is).
-4. Legacy Streamlit frontend (`scripts/app_frontend.py`) is not the active production UI and its payload shape is not aligned with current `/simulate` contract.
-
-## 4. Current phase assessment
-The project is beyond early roadmap planning and has a working end-to-end simulation stack (model artifacts + API + interactive frontend + E2E suites). The remaining work is mostly **validation hardening, portability cleanup, and production readiness** rather than core feature creation.
+---
+*Research-oriented. Ethics-driven. Data-centric.*

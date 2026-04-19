@@ -48,24 +48,6 @@ interface PredictTimelineRequestPayload {
   months: number;
 }
 
-export interface TimelineExplainRequest {
-  patient_summary: {
-    age: number;
-    primary_site: string;
-    key_mutations: string[];
-  };
-  selected_organ: string;
-  treatment: string;
-  timeline_points: TimelinePoint[];
-  active_month: number;
-}
-
-export interface TimelineExplainResponse {
-  plain_explanation: string;
-  next_step_suggestion: string;
-  safety_note: string;
-}
-
 export interface PredictionRequestOptions {
   image?: string;
   preferPredict?: boolean;
@@ -189,29 +171,6 @@ function normalizeTimelineResponse(value: unknown): TimelinePoint[] | null {
   }
 
   return timeline.sort((a, b) => a.month - b.month);
-}
-
-function normalizeTimelineExplainResponse(value: unknown): TimelineExplainResponse | null {
-  const obj = objectFromUnknown(value);
-  if (!obj) {
-    return null;
-  }
-
-  const plain =
-    typeof obj.plain_explanation === "string" ? obj.plain_explanation.trim() : "";
-  const nextStep =
-    typeof obj.next_step_suggestion === "string" ? obj.next_step_suggestion.trim() : "";
-  const safetyNote = typeof obj.safety_note === "string" ? obj.safety_note.trim() : "";
-
-  if (!plain || !nextStep || !safetyNote) {
-    return null;
-  }
-
-  return {
-    plain_explanation: plain,
-    next_step_suggestion: nextStep,
-    safety_note: safetyNote,
-  };
 }
 
 function normalizePredictResponse(value: unknown): PredictionSnapshot | null {
@@ -366,32 +325,4 @@ export async function requestPredictTimeline(
   }
 
   return normalizedTimeline;
-}
-
-export async function requestTimelineExplain(
-  payload: TimelineExplainRequest,
-  signal?: AbortSignal
-): Promise<TimelineExplainResponse> {
-  const response = await fetch(`${API_URL}/assistant/timeline-explain`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `API Error (/assistant/timeline-explain): ${response.status} ${response.statusText || "Unknown error"}`
-    );
-  }
-
-  const data: unknown = await response.json();
-  const normalized = normalizeTimelineExplainResponse(data);
-  if (!normalized) {
-    throw new Error("Schema mismatch from /assistant/timeline-explain");
-  }
-
-  return normalized;
 }

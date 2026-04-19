@@ -41,25 +41,18 @@ This document acts as the "Single Source of Truth" for all agents working on Onc
 ---
 
 ## 3. Timeline ↔ Frontend Contract
-**Endpoint**: `POST /predict/timeline`
+**Endpoint**: `POST /simulate/temporal`
 **Request Payload**:
 ```json
 {
-  "baseline_risk": 0.45,
+  "initial_risk": 0.45,
   "treatment": "CHEMOTHERAPY",
   "months": 24
 }
 ```
-**Field Constraints**:
-- `baseline_risk`: float in `[0.0, 1.0]`
-- `treatment`: string, one of `CHEMOTHERAPY`, `IMMUNOTHERAPY`, `TARGETED_THERAPY`, `RADIATION`, `OBSERVATION`
-- `months`: integer in `[1, 120]`
-
 **Response Payload**:
 ```json
 {
-  "status": "success",
-  "treatment": "CHEMOTHERAPY",
   "timeline": [
     {"month": 0, "risk": 0.45},
     {"month": 6, "risk": 0.25},
@@ -71,53 +64,7 @@ This document acts as the "Single Source of Truth" for all agents working on Onc
 
 ---
 
-## 4. Timeline Assistant ↔ Frontend Contract
-**Endpoint**: `POST /assistant/timeline-explain`
-**Request Payload**:
-```json
-{
-  "patient_summary": {
-    "age": 60,
-    "primary_site": "LUNG",
-    "key_mutations": ["TP53", "KRAS"]
-  },
-  "selected_organ": "LIVER",
-  "treatment": "CHEMOTHERAPY",
-  "timeline_points": [
-    {"month": 0, "risk": 0.45},
-    {"month": 6, "risk": 0.32},
-    {"month": 12, "risk": 0.24}
-  ],
-  "active_month": 6
-}
-```
-**Field Constraints**:
-- `patient_summary.age`: integer in `[0, 130]`
-- `patient_summary.primary_site`: non-empty string
-- `patient_summary.key_mutations`: array of non-empty strings (max 50)
-- `selected_organ`: non-empty string
-- `treatment`: non-empty string
-- `timeline_points`: non-empty array of unique month points sorted ascending
-- `timeline_points[].month`: integer in `[0, 120]`
-- `timeline_points[].risk`: float in `[0.0, 1.0]`
-- `active_month`: integer in `[0, 120]` and must exist in `timeline_points[].month`
-
-**Response Payload**:
-```json
-{
-  "plain_explanation": "Risk is trending down over the selected months with treatment. The current month still shows meaningful risk, so monitoring remains important.",
-  "next_step_suggestion": "Move the month slider forward to compare how risk changes after month 6.",
-  "safety_note": "This is not medical advice."
-}
-```
-**Response Constraints**:
-- `plain_explanation`: 1-2 sentences
-- `next_step_suggestion`: non-empty UI action guidance
-- `safety_note`: must be exactly `"This is not medical advice."`
-
----
-
-## 5. State Management Contract (Zustand)
+## 4. State Management Contract (Zustand)
 **Store**: `useStore`
 **Keys**:
 - `patientData`: Object (Profile + Image)
