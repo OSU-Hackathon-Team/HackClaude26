@@ -53,6 +53,7 @@ export function TimelinePanel({
   selectedMonth,
   timeline,
   timelineSource,
+  simulationSummary,
   isProjectionLoading = false,
   confidenceMetrics,
   baselineRisk,
@@ -675,6 +676,7 @@ export function TimelinePanel({
           </div>
         </div>
       </div>
-    </motion.section>
-  );
+    </div>
+  </motion.section>
+);
 }
