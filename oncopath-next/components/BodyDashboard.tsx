@@ -22,6 +22,10 @@ const AnatomicalBody3D = lazy(() =>
   import('@/components/AnatomicalBody3D').then((m) => ({ default: m.AnatomicalBody3D }))
 );
 
+const OncoBot = lazy(() =>
+  import('@/components/OncoBot').then((m) => ({ default: m.OncoBot }))
+);
+
 // ─── Default patient (Breast Cancer) ──────────────────────────── //
 const DEFAULT_PROFILE: PatientProfile = {
   name: 'Jane Doe',
@@ -321,6 +325,13 @@ export function BodyDashboard() {
               onMonthChange={setSelectedMonth}
               onClose={() => setIsTimelineOpen(false)}
             />
+            
+            {/* OncoBot Integration */}
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+               <Suspense fallback={null}>
+                  <OncoBot />
+               </Suspense>
+            </div>
           </div>
         </div>
       )}
